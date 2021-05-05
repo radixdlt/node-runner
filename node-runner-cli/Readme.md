@@ -1,7 +1,7 @@
 This is node runner cli which can be used for Ubuntu 20.04 to bring the nodes and query endpoints. It uses python3 which comes installed on Ubuntu 20.04 and all modules that are inbuild in python3.
 One can find the hardware/OS specification for the node can be found [here](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
 
-##nodecli script
+## nodecli script
 The nodecli.py script helps to run node in two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below
 
 
@@ -88,13 +88,13 @@ python3 nodecli.py admin-password -m SYSTEMD
 #### To bring up the node in systemD mode
 Below command is using 1.0-beta.32 release. 
 
-For radix core distribution, _option -b or --nodebinaryUrl_, pick up the latest radixdlt-dist zip file from latest release from this [location](https://github.com/radixdlt/radixdlt/releases/). 
+For radix core distribution url, _option -b or --nodebinaryUrl_, pick up the url of latest radixdlt-dist zip file from latest release from this [location](https://github.com/radixdlt/radixdlt/releases/). 
 
-For nginx config distribution, _option -c or --nginxconfigUrl_, pick up the latest archive node or full node zip files from this [location](https://github.com/radixdlt/radixdlt-nginx/releases/)
+For nginx config distribution url, _option -c or --nginxconfigUrl_, pick up the url of latest archive node or full node zip files from this [location](https://github.com/radixdlt/radixdlt-nginx/releases/)
 
 Option _-t or --trustednode_ requires a node from radix network. You can get an ip from  list  in this [location](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
 
-Option _-n or -nodetype_  is one of two nodes - archive or fullnode
+Option _-n or -nodetype_  is one of two nodes - archive or fullnode and should match to nginx config distribution url
 
 Option _-i or --hostip_ is the static IP of your node
 
