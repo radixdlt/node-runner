@@ -1,8 +1,8 @@
-This is node runner cli which can be used for Ubuntu 20.04 to bring the nodes and query endpoints. It uses python3 which comes installed on Ubuntu 20.04 and all modules that are inbuild in python3.
-One can find the hardware/OS specification for the node can be found [here](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
+This is node runner cli which can be used for Ubuntu 20.04 to bring up the node and query endpoints. It uses python3 which comes installed on Ubuntu 20.04 and all modules that are inbuild in python3.
+One can find the hardware/OS specification for the node [here](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
 
 ## nodecli script
-The nodecli.py script helps to run node in two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below
+The nodecli.py script helps to run node in two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below. User running this script should have sudo without password access.
 
 
 ```shell script
@@ -51,6 +51,7 @@ which python
 ```shell script
 python3 nodecli.py configure-docker
 ```
+If you have run this command for first time, command will split out instruction to logout and log back in
 
 #### Setup nginx password if node is run on Docker
 ```shell script
@@ -58,7 +59,7 @@ python3 nodecli.py admin-password -m DOCKER
 ```
 
 #### To bring up the node in Docker mode
-Below command is using 1.0-beta.32 release. Pick up the latest yml from latest release from this [location](https://github.com/radixdlt/radixdlt/releases/)
+Below command is using 1.0-beta.32 release. Pick up the latest yml from latest release [location](https://github.com/radixdlt/radixdlt/releases/)
 
 -t or --trustednode option requires a node from radix network. You can get an ip from  list  in this [location](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
  
@@ -79,8 +80,10 @@ python3 nodecli.py stop-docker
 ```shell script
 python3 nodecli.py configure-systemd
 ```
+If you have run this command for first time, command will split out instructions to carry out before running next command
 
-#### Setup nginx password if node is run on Docker
+
+#### Setup nginx password if node is run on SystemD
 ```shell script
 python3 nodecli.py admin-password -m SYSTEMD
 ```
@@ -124,5 +127,3 @@ python3 nodecli.py registervalidator
 ```shell script
 python3 nodecli.py showvalidator
 ```
-
-
