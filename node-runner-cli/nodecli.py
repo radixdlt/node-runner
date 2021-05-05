@@ -211,7 +211,8 @@ class SystemD(Base):
             universe.location=/etc/radixdlt/node/universe.json
             node.key.path=/etc/radixdlt/node/secrets/validator.ks
             network.tcp.listen_port=30001
-            network.seeds={trustednode}
+            network.tcp.broadcast_port=30000
+            network.seeds={trustednode}:30000
             host.ip={hostip}
             db.location=/data
             node_api.port=3334
