@@ -10,6 +10,8 @@ services:
       - "./prometheus.yml:/etc/prometheus/prometheus.yml"
       - "prometheus_tsdb:/prometheus"
       - "nodes_lst:/nodes"
+    ports:
+      - "9090:9090"
     logging:
       options:
         max-size: "1m"
@@ -23,7 +25,7 @@ services:
     ports:
       - "8099:8099"
     environment:
-      METRICS_EXPORTER_REST_ROOT_API_URL: http://core:3333
+      METRICS_EXPORTER_REST_ROOT_API_URL: https://localhost
       METRICS_EXPORTER_BASIC_AUTH: "${BASIC_AUTH_USER_CREDENTIALS}"
 
 
@@ -31,8 +33,12 @@ services:
       image: grafana/grafana:7.5.4
       ports:
           - "3000:3000"
-
+      volumes:
+        - "grafana-storage:/var/lib/grafana"
+        - "./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml"
 volumes:
   nodes_lst:
   prometheus_tsdb:
+    external: true
+  grafana-storage:
     external: true
