@@ -627,11 +627,11 @@ class Monitoring():
             node_endpoint = f"https://{ip}"
         else:
             node_endpoint = os.environ.get(node_endpoint_env)
-        run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'],
+        run_shell_command(f'docker-compose -f {composefile} up -d',
                           env={
                               "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
                               "NODE_END_POINT": node_endpoint
-                          })
+                          }, shell=True)
 
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
