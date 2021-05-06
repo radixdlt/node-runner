@@ -395,6 +395,10 @@ class Helpers:
             command.append('-v')
         run_shell_command(command)
 
+    @staticmethod
+    def get_public_ip():
+        return requests.get('https://api.ipify.org').text
+
 
 @subcommand([
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
@@ -617,10 +621,16 @@ class Monitoring():
     @staticmethod
     def start_monitoring(composefile):
         user = Helpers.get_nginx_user()
-
+        node_endpoint_env = "NODE_END_POINT"
+        if os.environ.get('%s' % node_endpoint_env) is None:
+            ip = Helpers.get_public_ip()
+            node_endpoint = f"https://{ip}"
+        else:
+            node_endpoint = os.environ.get(node_endpoint_env)
         run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'],
                           env={
-                              "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}'
+                              "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
+                              "NODE_END_POINT": node_endpoint
                           })
 
     @staticmethod

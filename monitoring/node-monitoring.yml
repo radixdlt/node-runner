@@ -25,7 +25,7 @@ services:
     ports:
       - "8099:8099"
     environment:
-      METRICS_EXPORTER_ROOT_API_URL: https://localhost
+      METRICS_EXPORTER_ROOT_API_URL: "${NODE_END_POINT}"
       METRICS_EXPORTER_BASIC_AUTH: "${BASIC_AUTH_USER_CREDENTIALS}"
 
 
