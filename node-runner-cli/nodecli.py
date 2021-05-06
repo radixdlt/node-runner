@@ -569,6 +569,7 @@ def setup_monitoring(args):
     Monitoring.setup_external_volumes()
     Monitoring.start_monitoring(f"monitoring/node-monitoring.yml")
 
+
 class Monitoring():
 
     @staticmethod
@@ -586,7 +587,7 @@ class Monitoring():
         req = requests.Request('GET', f'{default_datasource_cfg_url}')
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
-        Path("monitoring/grafana/datasources").mkdir(parents=True, exist_ok=True)
+        Path("monitoring/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
         with open("monitoring/grafana/provisioning/datasources/datasource.yml", 'wb') as f:
             f.write(content)
 
@@ -595,7 +596,7 @@ class Monitoring():
         req = requests.Request('GET', f'{default_dashboard_cfg_url}')
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
-        Path("monitoring/grafana/dashboards").mkdir(parents=True, exist_ok=True)
+        Path("monitoring/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
         with open("monitoring/grafana/provisioning/dashboards/dashboard.yml", 'wb') as f:
             f.write(content)
 
@@ -615,7 +616,12 @@ class Monitoring():
 
     @staticmethod
     def start_monitoring(composefile):
-        run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'])
+        user = Helpers.get_nginx_user()
+
+        run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'],
+                          env={
+                              "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}'
+                          })
 
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
