@@ -133,10 +133,9 @@ class Docker(Base):
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes):
-        command = ['docker-compose', '-f', composefile, 'down']
-        if removevolumes:
-            command.append('-v')
-        run_shell_command(command)
+        Helpers.docker_compose_down(composefile, removevolumes)
+
+
 
 
 class SystemD(Base):
@@ -362,7 +361,7 @@ class Helpers:
         ))
 
     @staticmethod
-    def send_request(prepared, print_request=False):
+    def send_request(prepared, print_request=False, print_response=True):
         if print_request:
             Helpers.pretty_print_request(prepared)
         s = requests.Session()
@@ -371,6 +370,7 @@ class Helpers:
             print(json.dumps(resp.json()))
         else:
             print(resp.content)
+        return resp.content
 
     @staticmethod
     def get_nginx_user():
@@ -389,7 +389,12 @@ class Helpers:
                 "name": "admin",
                 "password": os.environ.get("%s" % nginx_admin_password)
             })
-
+    @staticmethod
+    def docker_compose_down(composefile, remove_volumes):
+        command = ['docker-compose', '-f', composefile, 'down']
+        if remove_volumes:
+            command.append('-v')
+        run_shell_command(command)
 
 @subcommand([
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
@@ -503,12 +508,19 @@ def peers(args):
 def registervalidator(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
-    data = """
-    {"actions":
+    validator_name = input("Name of your validator:")
+    validator_url = input("Url of your validator:")
+    data = f"""
+    {{"actions":
         [
-        {"action":"RegisterValidator","params":{}}
+        {{"action":"RegisterValidator",
+        "params":{{
+            "name": "{validator_name}",
+            "url": "{validator_url}"
+            }}
+        }}
         ]
-    }
+    }}
     """
     req = requests.Request('POST',
                            f'https://{node_host}/node/execute',
@@ -545,6 +557,63 @@ def systeminfo(args):
 
     prepared.headers['Content-Type'] = 'application/json'
     Helpers.send_request(prepared)
+
+
+@subcommand()
+def setup_monitoring(args):
+    monitor_url_dir = 'https://github.com/radixdlt/node-runner/tree/task/promethues-exporter-setup/monitoring'
+    Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
+    Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
+    Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/dashboard.yml")
+    Monitoring.setup_monitoring_containers(f"monitoring/node-monitoring.yml")
+    Monitoring.start_monitoring(f"{monitor_url_dir}/monitoring/node-monitoring.yml")
+
+class Monitoring():
+
+    @staticmethod
+    def setup_prometheus_yml(default_prometheus_yaml_url):
+        req = requests.Request('GET', f'{default_prometheus_yaml_url}')
+        prepared = req.prepare()
+
+        content = Helpers.send_request(prepared, print_response=False)
+        Path("monitoring/prometheus").mkdir(parents=True, exist_ok=True)
+        with open("monitoring/prometheus/prometheus.yml", 'w') as f:
+            f.write(content)
+
+    @staticmethod
+    def setup_datasource(default_datasource_cfg_url):
+        req = requests.Request('GET', f'{default_datasource_cfg_url}')
+        prepared = req.prepare()
+        content = Helpers.send_request(prepared, print_response=False)
+        Path("monitoring/grafana/datasources").mkdir(parents=True, exist_ok=True)
+        with open("monitoring/grafana/datasources/datasource.yml", 'w') as f:
+            f.write(content)
+
+    @staticmethod
+    def setup_dashboard(default_dashboard_cfg_url):
+        req = requests.Request('GET', f'{default_dashboard_cfg_url}')
+        prepared = req.prepare()
+        content = Helpers.send_request(prepared, print_response=False)
+        Path("monitoring/grafana/dashboards").mkdir(parents=True, exist_ok=True)
+        with open("monitoring/grafana/dashboards/dashboard.yml", 'w') as f:
+            f.write(content)
+
+    @staticmethod
+    def setup_monitoring_containers(default_monitoring_cfg_url):
+        req = requests.Request('GET', f'{default_monitoring_cfg_url}')
+        prepared = req.prepare()
+        content = Helpers.send_request(prepared, print_response=False)
+        Path("monitoring").mkdir(parents=True, exist_ok=True)
+        with open("monitoring/node-monitoring.yml", 'w') as f:
+            f.write(content)
+
+    @staticmethod
+    def start_monitoring(composefile):
+        run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'])
+
+    @staticmethod
+    def stop_monitoring(composefile,remove_volumes):
+        Helpers.docker_compose_down(composefile, remove_volumes)
 
 
 if __name__ == "__main__":
