@@ -35,7 +35,7 @@ services:
           - "3000:3000"
       volumes:
         - "grafana-storage:/var/lib/grafana"
-        - "./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml"
+        - "./grafana/provisioning/:/etc/grafana/provisioning/"
 volumes:
   nodes_lst:
   prometheus_tsdb:
