@@ -587,7 +587,7 @@ class Monitoring():
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/grafana/datasources").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/grafana/datasources/datasource.yml", 'wb') as f:
+        with open("monitoring/grafana/provisioning/datasources/datasource.yml", 'wb') as f:
             f.write(content)
 
     @staticmethod
@@ -596,7 +596,7 @@ class Monitoring():
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/grafana/dashboards").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/grafana/dashboards/dashboard.yml", 'wb') as f:
+        with open("monitoring/grafana/provisioning/dashboards/dashboard.yml", 'wb') as f:
             f.write(content)
 
     @staticmethod

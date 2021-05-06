@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3.7'
 
 services:
   prometheus:
@@ -7,7 +7,7 @@ services:
     environment:
       PROMETHEUS_TSDB_RETENTION: 30d
     volumes:
-      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./prometheus/:/etc/prometheus/"
       - "prometheus_tsdb:/prometheus"
       - "nodes_lst:/nodes"
     ports:
