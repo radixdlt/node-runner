@@ -136,8 +136,6 @@ class Docker(Base):
         Helpers.docker_compose_down(composefile, removevolumes)
 
 
-
-
 class SystemD(Base):
 
     @staticmethod
@@ -389,12 +387,14 @@ class Helpers:
                 "name": "admin",
                 "password": os.environ.get("%s" % nginx_admin_password)
             })
+
     @staticmethod
     def docker_compose_down(composefile, remove_volumes):
         command = ['docker-compose', '-f', composefile, 'down']
         if remove_volumes:
             command.append('-v')
         run_shell_command(command)
+
 
 @subcommand([
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
@@ -561,12 +561,13 @@ def systeminfo(args):
 
 @subcommand()
 def setup_monitoring(args):
-    monitor_url_dir = 'https://github.com/radixdlt/node-runner/tree/task/promethues-exporter-setup/monitoring'
+    monitor_url_dir = 'https://raw.githubusercontent.com/radixdlt/node-runner/task/promethues-exporter-setup/monitoring'
     Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
     Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
     Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/dashboard.yml")
-    Monitoring.setup_monitoring_containers(f"monitoring/node-monitoring.yml")
-    Monitoring.start_monitoring(f"{monitor_url_dir}/monitoring/node-monitoring.yml")
+    Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
+    Monitoring.setup_external_volumes()
+    Monitoring.start_monitoring(f"monitoring/node-monitoring.yml")
 
 class Monitoring():
 
@@ -577,7 +578,7 @@ class Monitoring():
 
         content = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/prometheus").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/prometheus/prometheus.yml", 'w') as f:
+        with open("monitoring/prometheus/prometheus.yml", 'wb') as f:
             f.write(content)
 
     @staticmethod
@@ -586,7 +587,7 @@ class Monitoring():
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/grafana/datasources").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/grafana/datasources/datasource.yml", 'w') as f:
+        with open("monitoring/grafana/datasources/datasource.yml", 'wb') as f:
             f.write(content)
 
     @staticmethod
@@ -595,8 +596,13 @@ class Monitoring():
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/grafana/dashboards").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/grafana/dashboards/dashboard.yml", 'w') as f:
+        with open("monitoring/grafana/dashboards/dashboard.yml", 'wb') as f:
             f.write(content)
+
+    @staticmethod
+    def setup_external_volumes():
+        run_shell_command(["docker", "volume", "create", "prometheus_tsdb"])
+        run_shell_command(["docker", "volume", "create", "grafana-storage"])
 
     @staticmethod
     def setup_monitoring_containers(default_monitoring_cfg_url):
@@ -604,7 +610,7 @@ class Monitoring():
         prepared = req.prepare()
         content = Helpers.send_request(prepared, print_response=False)
         Path("monitoring").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/node-monitoring.yml", 'w') as f:
+        with open("monitoring/node-monitoring.yml", 'wb') as f:
             f.write(content)
 
     @staticmethod
@@ -612,7 +618,7 @@ class Monitoring():
         run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'])
 
     @staticmethod
-    def stop_monitoring(composefile,remove_volumes):
+    def stop_monitoring(composefile, remove_volumes):
         Helpers.docker_compose_down(composefile, remove_volumes)
 
 

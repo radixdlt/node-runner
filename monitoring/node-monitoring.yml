@@ -7,7 +7,7 @@ services:
     environment:
       PROMETHEUS_TSDB_RETENTION: 30d
     volumes:
-      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
       - "prometheus_tsdb:/prometheus"
       - "nodes_lst:/nodes"
     ports:
