@@ -568,10 +568,16 @@ def setup_monitoring(args):
     monitor_url_dir = 'https://raw.githubusercontent.com/radixdlt/node-runner/task/promethues-exporter-setup/monitoring'
     Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
     Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
-    Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/dashboard.yml")
+    Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/",
+                               ["dashboard.yml", "sample-node-dashboard.json"])
     Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
     Monitoring.setup_external_volumes()
     Monitoring.start_monitoring(f"monitoring/node-monitoring.yml")
+
+
+@subcommand([argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
+def stop_monitoring(args):
+    Monitoring.stop_monitoring(f"monitoring/node-monitoring.yml",args.removevolumes)
 
 
 class Monitoring():
@@ -596,13 +602,14 @@ class Monitoring():
             f.write(content)
 
     @staticmethod
-    def setup_dashboard(default_dashboard_cfg_url):
-        req = requests.Request('GET', f'{default_dashboard_cfg_url}')
-        prepared = req.prepare()
-        content = Helpers.send_request(prepared, print_response=False)
-        Path("monitoring/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/grafana/provisioning/dashboards/dashboard.yml", 'wb') as f:
-            f.write(content)
+    def setup_dashboard(default_dashboard_cfg_url, files):
+        for file in files:
+            req = requests.Request('GET', f'{default_dashboard_cfg_url}/{file}')
+            prepared = req.prepare()
+            content = Helpers.send_request(prepared, print_response=False)
+            Path("monitoring/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
+            with open(f"monitoring/grafana/provisioning/dashboards/{file}", 'wb') as f:
+                f.write(content)
 
     @staticmethod
     def setup_external_volumes():
