@@ -1880,7 +1880,7 @@
         "hide": 2,
         "label": null,
         "name": "instance",
-        "query": "exporter1:8099",
+        "query": "metrics-exporter:8099",
         "skipUrlSync": false,
         "type": "constant"
       }
@@ -1892,7 +1892,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Sample Radix Node Dashboard",
-  "uid": "0sTMoGjMz",
+  "title": "Radix Node Dashboard",
+  "uid": "radix_node_dashboard",
   "version": 50
 }
