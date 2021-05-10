@@ -918,7 +918,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "balance_xrd{instance=\"$instance\"} / 1000000000000000000",
+              "expr": "balance_xrd{instance=\"$instance\"}",
               "instant": true,
               "interval": "",
               "legendFormat": "",
