@@ -30,6 +30,10 @@ def subcommand(args=[], parent=subparsers):
     return decorator
 
 
+def cli_version():
+    return "test-version"
+
+
 def printCommand(cmd):
     print('-----------------------------')
     if type(cmd) is list:
@@ -249,12 +253,12 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def download_binaries(binarylocationUrl, node_dir, version):
+    def download_binaries(binarylocationUrl, node_dir, node_version):
         run_shell_command(
             ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binarylocationUrl])
         run_shell_command('unzip radixdlt-dist.zip', shell=True)
-        run_shell_command(f'mkdir -p {node_dir}/{version}', shell=True)
-        run_shell_command(f'mv radixdlt-{version}/* {node_dir}/{version}', shell=True)
+        run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
+        run_shell_command(f'mv radixdlt-{node_version}/* {node_dir}/{node_version}', shell=True)
 
     @staticmethod
     def start_node_service():
@@ -400,6 +404,11 @@ class Helpers:
         return requests.get('https://api.ipify.org').text
 
 
+@subcommand([])
+def version(args):
+    print(f"Cli - Version : {cli_version()}")
+
+
 @subcommand([
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
@@ -428,10 +437,10 @@ def start_systemd(args):
     SystemD.fetch_universe_json(args.trustednode, node_dir)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir)
-    version = args.nodebinaryUrl.rsplit('/', 2)[-2]
-    SystemD.setup_service_file(version)
+    node_version = args.nodebinaryUrl.rsplit('/', 2)[-2]
+    SystemD.setup_service_file(node_version)
 
-    SystemD.download_binaries(args.nodebinaryUrl, node_dir=node_dir, version=version)
+    SystemD.download_binaries(args.nodebinaryUrl, node_dir=node_dir, node_version=node_version)
     SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl, node_type=args.nodetype,
                                nginx_etc_dir=nginx_dir)
     SystemD.create_ssl_certs(nginx_secrets_dir)
@@ -565,7 +574,7 @@ def systeminfo(args):
 
 @subcommand()
 def setup_monitoring(args):
-    monitor_url_dir = 'https://raw.githubusercontent.com/radixdlt/node-runner/tree/test-version/monitoring'
+    monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/monitoring'
     Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
     Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
     Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/",
@@ -577,7 +586,7 @@ def setup_monitoring(args):
 
 @subcommand([argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
 def stop_monitoring(args):
-    Monitoring.stop_monitoring(f"monitoring/node-monitoring.yml",args.removevolumes)
+    Monitoring.stop_monitoring(f"monitoring/node-monitoring.yml", args.removevolumes)
 
 
 class Monitoring():
