@@ -143,7 +143,7 @@ NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> python3 nodecli.py setup_monito
 This command, fetches the file from the release, that the `nodecli.py` is pointing to.  If for any reasons, one wants to update the configs,  one can download initial version using above command 
 To update the config, one has to bring down the monitoring using below `stop-monitoring` command
 
-If the monitoring is setup on different instance/machine, one can pass the IP as below
+If the monitoring is setup on different instance/machine, one can pass the IP of the node as below
 
 ```shell script
 NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> NODE_END_POINT=https://<your node IP> python3 nodecli.py setup_monitoring
