@@ -565,7 +565,7 @@ def systeminfo(args):
 
 @subcommand()
 def setup_monitoring(args):
-    monitor_url_dir = 'https://raw.githubusercontent.com/radixdlt/node-runner/task/promethues-exporter-setup/monitoring'
+    monitor_url_dir = 'https://raw.githubusercontent.com/radixdlt/node-runner/tree/test-version/monitoring'
     Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
     Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
     Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/",

@@ -1,8 +1,14 @@
+
+
 This is node runner cli which can be used for Ubuntu 20.04 to bring up the node and query endpoints. It uses python3 which comes installed on Ubuntu 20.04 and all modules that are inbuild in python3.
 One can find the hardware/OS specification for the node [here](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
 
 ## nodecli script
 The nodecli.py script helps to run node in two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below. User running this script should have sudo without password access.
+
+
+### Installation
+wget  -O  nodecli.py https://github.com/radixdlt/node-runner/releases/download/<latest version>/nodecli.py
 
 
 ```shell script
@@ -127,3 +133,25 @@ python3 nodecli.py registervalidator
 ```shell script
 python3 nodecli.py showvalidator
 ```
+
+##Monitoring
+####Installation
+The monitoring setup uses system/info endpoint and requires nginx admin password. Run below command by replacing you nginx admin password 
+```shell script
+NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> python3 nodecli.py setup_monitoring
+```
+This command, fetches the file from the release, that the `nodecli.py` is pointing to.  If for any reasons, one wants to update the configs,  one can initial version using above command 
+and bring down the monitoring using below `stop-monitoring` command
+
+#### Stopping monitoring
+```shell script
+python3 nodecli.py stop_monitoring
+```
+
+#### Restarting the monitoring
+One can restart the monitoring using updated config files by running below command. 
+```shell script
+BASIC_AUTH_USER_CREDENTIALS=admin:<your_nginx_admin_password>  NODE_END_POINT=https://<your node IP> docker-compose -f monitoring/node-monitoring.yml up -d
+```
+`<your node IP>` - your node's ip. localhost will not work even though you may be running on same machine as this variable is referenced in docker container of exporter
+
