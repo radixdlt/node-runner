@@ -140,8 +140,8 @@ The monitoring setup uses system/info endpoint and requires nginx admin password
 ```shell script
 NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> python3 nodecli.py setup_monitoring
 ```
-This command, fetches the file from the release, that the `nodecli.py` is pointing to.  If for any reasons, one wants to update the configs,  one can initial version using above command 
-and bring down the monitoring using below `stop-monitoring` command
+This command, fetches the file from the release, that the `nodecli.py` is pointing to.  If for any reasons, one wants to update the configs,  one can download initial version using above command 
+To update the config, one has to bring down the monitoring using below `stop-monitoring` command
 
 #### Stopping monitoring
 ```shell script
@@ -153,5 +153,12 @@ One can restart the monitoring using updated config files by running below comma
 ```shell script
 BASIC_AUTH_USER_CREDENTIALS=admin:<your_nginx_admin_password>  NODE_END_POINT=https://<your node IP> docker-compose -f monitoring/node-monitoring.yml up -d
 ```
-`<your node IP>` - your node's ip. localhost will not work even though you may be running on same machine as this variable is referenced in docker container of exporter
+`<your node IP>` - your node's ip. localhost will not work even though you may be running on same machine as this variable is referenced inside docker container of metrics exporter
+
+
+#### Viewing dashboard
+Grafana can be accessed on port 3000. The monitoring can be setup on different machine or on same machine where the node runs.
+If the monitoring is setup on same instance as node , to access the dashboard outside the node, one has to open up the port 3000 for grafana. 
+If it is on different instance, then firewall on that instance needs to allow traffic on port 3000
+Then nn any browser type http://<node-ip>:3000 to access the grafana. For the first time , the password admin/admin allows you to login. Then change the grafana admin password to something of your choice
 
