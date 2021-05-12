@@ -110,7 +110,7 @@ Option _-i or --hostip_ is the static IP of your node
 ```shell script
 python3 nodecli.py start-systemd \
  -b https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radixdlt-dist-1.0-beta.32.zip \
- -c https://github.com/radixdlt/node-runner/releases/download/v1.4.0/radixdlt-nginx-archive-conf.zip \
+ -c https://github.com/radixdlt/radixdlt-nginx/releases/download/1.0-beta.32/radixdlt-nginx-archive-conf.zip \
  -t 52.48.95.182 \
  -n archive \
  -i 18.132.198.185
