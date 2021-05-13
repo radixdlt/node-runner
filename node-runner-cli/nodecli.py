@@ -355,6 +355,11 @@ class SystemD(Base):
         run_shell_command('sudo systemctl restart nginx', shell=True)
 
     @staticmethod
+    def restart_nginx_service():
+        run_shell_command('sudo systemctl daemon-reload', shell=True)
+        run_shell_command('sudo systemctl restart nginx', shell=True)
+
+    @staticmethod
     def checkUser():
         result = run_shell_command(f'whoami | grep radixdlt', shell=True)
         if result.returncode != 0:
@@ -367,6 +372,11 @@ class SystemD(Base):
     def create_initial_service_file():
         run_shell_command("sudo touch /etc/systemd/system/radixdlt-node.service", shell=True)
         run_shell_command("sudo chown radixdlt:radixdlt /etc/systemd/system/radixdlt-node.service", shell=True)
+
+    @staticmethod
+    def restart_node_service():
+        run_shell_command('sudo systemctl daemon-reload', shell=True)
+        run_shell_command('sudo systemctl restart radixdlt-node.service', shell=True)
 
 
 class Helpers:
@@ -443,7 +453,7 @@ def version(args):
 @subcommand([
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
-    argument("-u", "--update", help="Update the node if there are changes in docker composefile", action="store"),
+    argument("-u", "--update", help="Update the node to new version of composefile", action="store"),
 ])
 def setup_docker(args):
     Docker.fetchComposeFile(args.composefileurl)
@@ -475,6 +485,8 @@ def setup_docker(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-n", "--nodetype", required=True, help="Type of node archive or fullnode", action="store"),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
+    argument("-u", "--update", help="Update the node to new version of node", action="store"),
+
 ])
 def start_systemd(args):
     node_dir = '/etc/radixdlt/node'
@@ -499,14 +511,21 @@ def start_systemd(args):
 
     SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
 
-    nginx_reconfigured = SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl,
+    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl,
                                                     node_type=args.nodetype,
                                                     nginx_etc_dir=nginx_dir, backup_time=backup_time)
     SystemD.create_ssl_certs(nginx_secrets_dir)
-    SystemD.start_node_service()
+    if not args.update:
+        SystemD.start_node_service()
+    else:
+        SystemD.restart_node_service()
 
-    if nginx_reconfigured:
+    if nginx_configured and not args.update:
         SystemD.start_nginx_service()
+    elif nginx_configured and args.update:
+        SystemD.start_nginx_service()
+    else:
+        print("Nginx not configured or not updated")
 
 
 @subcommand([
