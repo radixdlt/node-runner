@@ -70,14 +70,24 @@ Below command is using 1.0-beta.32 release. Pick up the latest yml from latest r
 -t or --trustednode option requires a node from radix network. You can get an ip from  list  in this [location](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
  
 ```shell script
-python3 nodecli.py start-docker  \
+python3 nodecli.py setup-docker  \
  -f https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radix-fullnode-compose.yml \
  -t 52.48.95.182
 ```
 
+If may want to choose Y to start the node or you below command to start the node
+
+#### To start the node using docker-compose 
+```shell script
+python3 nodecli.py start-docker \
+ -t 52.48.95.182 \
+ -f radix-fullnode-compose.yml
+```
+
 #### To stop the node in Docker mode
 ```shell script
-python3 nodecli.py stop-docker
+python3 nodecli.py stop-docker \
+ -f radix-fullnode-compose.yml
 ```
 
 ## SystemD mode

@@ -8,6 +8,7 @@ import pprint, json
 from requests.auth import HTTPBasicAuth
 import urllib3
 import getpass
+from datetime import datetime
 
 urllib3.disable_warnings()
 
@@ -133,7 +134,13 @@ class Docker(Base):
 
     @staticmethod
     def fetchComposeFile(composefileurl):
-        run_shell_command(['wget', '-O', composefileurl.rsplit('/', 1)[-1], composefileurl])
+        compose_file_name = composefileurl.rsplit('/', 1)[-1]
+        if os.path.isfile(compose_file_name):
+            backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
+            print(f"Docker compose file {compose_file_name} exists. Backing it up as {backup_file_name}")
+            run_shell_command(f"cp {compose_file_name} {backup_file_name}", shell=True)
+        print(f"Downloading new compose file from {composefileurl}")
+        run_shell_command(['wget', '-O', compose_file_name, composefileurl])
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes):
@@ -403,6 +410,11 @@ class Helpers:
     def get_public_ip():
         return requests.get('https://api.ipify.org').text
 
+    @staticmethod
+    def get_current_date_time():
+        now = datetime.now()
+        return now.strftime("%Y_%m_%d_%H_%M")
+
 
 @subcommand([])
 def version(args):
@@ -413,11 +425,23 @@ def version(args):
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
 ])
-def start_docker(args):
+def setup_docker(args):
     Docker.fetchComposeFile(args.composefileurl)
     keystore_password = Base.generatekey(keyfile_path=str(Path(__file__).parent.absolute()))
     Base.fetch_universe_json(args.trustednode)
-    Docker.run_docker_compose_up(keystore_password, args.composefileurl.rsplit('/', 1)[-1], args.trustednode)
+
+    compose_file_name = args.composefileurl.rsplit('/', 1)[-1]
+    print(f"About to start the node using docker-compose file {compose_file_name}, which is as below")
+    run_shell_command(f"cat {compose_file_name}", shell=True)
+    should_start = input(f"Okay to start the node Y/n")
+    if should_start is "Y":
+        Docker.run_docker_compose_up(keystore_password, compose_file_name, args.trustednode)
+    else:
+        print(f"""
+            Bring up node by updating the file {compose_file_name}
+            You can do it through cli using below command
+                python3 nodecli.py start_docker
+            """)
 
 
 @subcommand([
@@ -446,6 +470,15 @@ def start_systemd(args):
     SystemD.create_ssl_certs(nginx_secrets_dir)
     SystemD.start_node_service()
     SystemD.start_nginx_service()
+
+
+@subcommand([
+    argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
+    argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
+])
+def start_docker(args):
+    keystore_password = Base.generatekey(keyfile_path=str(Path(__file__).parent.absolute()))
+    Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
 @subcommand([
