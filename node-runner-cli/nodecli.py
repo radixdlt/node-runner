@@ -202,10 +202,18 @@ class SystemD(Base):
         Base.fetch_universe_json(trustenode, extraction_path)
 
     @staticmethod
+    def backup_file(filepath, filename, backup_time):
+        if os.path.isfile(f"{filepath}/{filename}"):
+            backup_yes = input("Current {filename} file exists. Do you want to back up Y/n:")
+            if backup_yes is "Y":
+                Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
+                run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
+
+    @staticmethod
     def set_environment_variables(keystore_password, node_secrets_dir):
         command = f"""
         cat > {node_secrets_dir}/environment << EOF
-        JAVA_OPTS="-server -Xms2g -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -Dcom.sun.management.jmxremote.port=9010 -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=core -agentlib:jdwp=transport=dt_socket,address=50505,suspend=n,server=y"
+        JAVA_OPTS="-server -Xms3g -Xmx3g -XX:+HeapDumpOnOutOfMemoryError -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -Dcom.sun.management.jmxremote.port=9010 -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dcom.sun.management.jmxremote.rmi.port=9010 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=core -agentlib:jdwp=transport=dt_socket,address=50505,suspend=n,server=y"
         RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         """
         run_shell_command(command, shell=True)
@@ -232,7 +240,7 @@ class SystemD(Base):
 
     @staticmethod
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
-                           node_secrets_path="/etc/radixdlt/node/secrets", ):
+                           node_secrets_path="/etc/radixdlt/node/secrets"):
 
         command = f"""
         sudo cat > /etc/systemd/system/radixdlt-node.service << EOF
@@ -279,12 +287,23 @@ class SystemD(Base):
         run_shell_command('sudo rm -rf /etc/nginx/{sites-available,sites-enabled}', shell=True)
 
     @staticmethod
-    def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir):
-        run_shell_command(
-            ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
-        run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
-        run_shell_command(f'sudo mv {nginx_etc_dir}/nginx-{node_type}.conf  /etc/nginx/nginx.conf', shell=True)
-        run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)
+    def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time):
+        backup_yes = input("Do you want to backup existing nginx config Y/n:")
+        if backup_yes is "Y":
+            Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
+            from distutils.dir_util import copy_tree
+            copy_tree("{nginx_etc_dir}", f"{backup_time}/nginx-config")
+
+        continue_nginx = input("Do you want to continue with nginx setup Y/n:")
+        if continue_nginx is "Y":
+            run_shell_command(
+                ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
+            run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
+            run_shell_command(f'sudo mv {nginx_etc_dir}/nginx-{node_type}.conf  /etc/nginx/nginx.conf', shell=True)
+            run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)
+            return True
+        else:
+            return False
 
     @staticmethod
     def create_ssl_certs(secrets_dir):
@@ -424,6 +443,7 @@ def version(args):
 @subcommand([
     argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
+    argument("-u", "--update", help="Update the node if there are changes in docker composefile", action="store"),
 ])
 def setup_docker(args):
     Docker.fetchComposeFile(args.composefileurl)
@@ -431,16 +451,21 @@ def setup_docker(args):
     Base.fetch_universe_json(args.trustednode)
 
     compose_file_name = args.composefileurl.rsplit('/', 1)[-1]
-    print(f"About to start the node using docker-compose file {compose_file_name}, which is as below")
+    action = "update" if args.update else "start"
+    print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
     should_start = input(f"Okay to start the node Y/n")
     if should_start is "Y":
+        if action is "update":
+            print(f"For update, bringing down the node using compose file {compose_file_name}")
+            Docker.run_docker_compose_down(compose_file_name)
         Docker.run_docker_compose_up(keystore_password, compose_file_name, args.trustednode)
     else:
         print(f"""
             Bring up node by updating the file {compose_file_name}
             You can do it through cli using below command
-                python3 nodecli.py start_docker
+                python3 nodecli.py stop_docker -f {compose_file_name} -t {args.trustednode}
+                python3 nodecli.py start_docker -f {compose_file_name} -t {args.trustednode}
             """)
 
 
@@ -456,20 +481,32 @@ def start_systemd(args):
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
+    backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
     keystore_password = SystemD.generatekey(node_secrets_dir)
     SystemD.fetch_universe_json(args.trustednode, node_dir)
+
+    SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
+
+    SystemD.backup_file(node_dir, f"default.config", backup_time)
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir)
+
     node_version = args.nodebinaryUrl.rsplit('/', 2)[-2]
-    SystemD.setup_service_file(node_version)
+    SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir, )
 
     SystemD.download_binaries(args.nodebinaryUrl, node_dir=node_dir, node_version=node_version)
-    SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl, node_type=args.nodetype,
-                               nginx_etc_dir=nginx_dir)
+
+    SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
+
+    nginx_reconfigured = SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl,
+                                                    node_type=args.nodetype,
+                                                    nginx_etc_dir=nginx_dir, backup_time=backup_time)
     SystemD.create_ssl_certs(nginx_secrets_dir)
     SystemD.start_node_service()
-    SystemD.start_nginx_service()
+
+    if nginx_reconfigured:
+        SystemD.start_nginx_service()
 
 
 @subcommand([

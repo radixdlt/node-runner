@@ -90,6 +90,16 @@ python3 nodecli.py stop-docker \
  -f radix-fullnode-compose.yml
 ```
 
+
+#### To update the node in docker mode
+
+```shell script
+python3 nodecli.py setup-docker  \
+ -f https://github.com/radixdlt/radixdlt/releases/download/<new release>/radix-fullnode-compose.yml \
+ -t 52.48.95.182
+ -u
+```
+
 ## SystemD mode
 #### To install all necessary packages and configure user for SystemD mode
 
