@@ -8,42 +8,12 @@ The nodecli.py script helps to run node in two modes - Docker compose and System
 
 
 ### Installation
-wget  -O  nodecli.py https://github.com/radixdlt/node-runner/releases/download/<latest version>/nodecli.py
 
-
-```shell script
-# To list the subcommands
-python3 nodecli.py --help
-
-usage: nodecli.py [-h]
-                  {start-docker,start-systemd,stop-docker,configure-docker,configure-systemd,admin-password,nodeaddress,peers,registervalidator,showvalidator,systeminfo}
-                  ...
-
-positional arguments:
-  {start-docker,start-systemd,stop-docker,configure-docker,configure-systemd,admin-password,nodeaddress,peers,registervalidator,showvalidator,systeminfo}
-
-optional arguments:
-  -h, --help            show this help message and exit
 ```
-```shell script
-# Check the options for a subcommand such as start-docker
-python3 nodecli.py start-docker -h
-
-usage: nodecli.py start-docker [-h] -f COMPOSEFILEURL -t TRUSTEDNODE
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -f COMPOSEFILEURL, --composefileurl COMPOSEFILEURL
-                        URl to download the docker compose file
-  -t TRUSTEDNODE, --trustednode TRUSTEDNODE
-                        Trusted node on radix network
+wget  -O  nodecli.py https://github.com/radixdlt/node-runner/releases/download/<latest version>/nodecli.py
 ```
 
 Download the latest release of script by running command. Latest release can be found [here](https://github.com/radixdlt/node-runner/releases)
-
-```shell script
-wget  -O  nodecli.py <url_to_latest_location>
-```
 
 ## Docker compose mode
 
@@ -92,6 +62,7 @@ python3 nodecli.py stop-docker \
 
 
 #### To update the node in docker mode
+Update uses same subcommand as setup-docker . Except that it takes extra option "-u"
 
 ```shell script
 python3 nodecli.py setup-docker  \
@@ -123,18 +94,32 @@ For nginx config distribution url, _option -c or --nginxconfigUrl_, pick up the 
 
 Option _-t or --trustednode_ requires a node from radix network. You can get an ip from  list  in this [location](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
 
-Option _-n or -nodetype_  is one of two nodes - archive or fullnode and should match to nginx config distribution url
+Option _-n or --nodetype_  is one of two nodes - archive or fullnode and should match to nginx config distribution url
 
 Option _-i or --hostip_ is the static IP of your node
 
 ```shell script
 python3 nodecli.py start-systemd \
- -b https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radixdlt-dist-1.0-beta.32.zip \
- -c https://github.com/radixdlt/radixdlt-nginx/releases/download/1.0-beta.32/radixdlt-nginx-archive-conf.zip \
- -t 52.48.95.182 \
- -n archive \
- -i 18.132.198.185
+ --nodebinaryUrl https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radixdlt-dist-1.0-beta.32.zip \
+ --nginxconfigUrl https://github.com/radixdlt/radixdlt-nginx/releases/download/1.0-beta.32/radixdlt-nginx-archive-conf.zip \
+ --trustednode <IP of trustednode> \
+ --nodetype fullnode \
+ --hostip <hostip>
 ```
+
+#### To update the node in systemD mode
+Update uses same subcommand as start-systemd . Except that it takes extra option "-u" or "--update"
+
+```shell script
+python3 nodecli.py start-systemd \
+ --nodebinaryUrl https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radixdlt-dist-1.0-beta.32.zip \
+ --nginxconfigUrl https://github.com/radixdlt/radixdlt-nginx/releases/download/1.0-beta.32/radixdlt-nginx-archive-conf.zip \
+ --trustednode <IP of trustednode> \
+ --nodetype fullnode \
+ --hostip <hostip> \
+ --update
+```
+
 
 
 ## Interact with node API
@@ -189,3 +174,36 @@ If the monitoring is setup on same instance as node , to access the dashboard ou
 If it is on different instance, then firewall on that instance needs to allow traffic on port 3000
 Then nn any browser type http://<node-ip>:3000 to access the grafana. For the first time , the password admin/admin allows you to login. Then change the grafana admin password to something of your choice
 
+
+### More usage instructions
+
+To list all subcommands
+```shell script
+# To list the subcommands
+python3 nodecli.py --help
+
+usage: nodecli.py [-h]
+                  {start-docker,start-systemd,stop-docker,configure-docker,configure-systemd,admin-password,nodeaddress,peers,registervalidator,showvalidator,systeminfo}
+                  ...
+
+positional arguments:
+  {start-docker,start-systemd,stop-docker,configure-docker,configure-systemd,admin-password,nodeaddress,peers,registervalidator,showvalidator,systeminfo}
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+
+To list options/arguements for the subcommand
+```shell script
+# Check the options for a subcommand such as start-docker
+python3 nodecli.py start-docker -h
+
+usage: nodecli.py start-docker [-h] -f COMPOSEFILEURL -t TRUSTEDNODE
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f COMPOSEFILEURL, --composefileurl COMPOSEFILEURL
+                        URl to download the docker compose file
+  -t TRUSTEDNODE, --trustednode TRUSTEDNODE
+                        Trusted node on radix network
+```
