@@ -204,8 +204,8 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time):
         if os.path.isfile(f"{filepath}/{filename}"):
-            backup_yes = input("Current {filename} file exists. Do you want to back up Y/n:")
-            if backup_yes is "Y":
+            backup_yes = input(f"Current {filename} file exists. Do you want to back up Y/n:")
+            if backup_yes == "Y":
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
@@ -273,6 +273,11 @@ class SystemD(Base):
             ['wget', '--no-check-certificate', '-O', 'radixdlt-dist.zip', binarylocationUrl])
         run_shell_command('unzip radixdlt-dist.zip', shell=True)
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
+        if os.listdir(f'{node_dir}/{node_version}'):
+            print(f"Directory {node_dir}/{node_version} is not empty")
+            okay = input("Should the directory be removed Y/n :")
+            if okay == "Y":
+                run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
         run_shell_command(f'mv radixdlt-{node_version}/* {node_dir}/{node_version}', shell=True)
 
     @staticmethod
@@ -280,6 +285,7 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /etc/radixdlt', shell=True)
         run_shell_command('sudo systemctl start radixdlt-node.service', shell=True)
         run_shell_command('sudo systemctl enable radixdlt-node.service', shell=True)
+        run_shell_command('sudo systemctl restart radixdlt-node.service', shell=True)
 
     @staticmethod
     def install_nginx():
@@ -289,13 +295,12 @@ class SystemD(Base):
     @staticmethod
     def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time):
         backup_yes = input("Do you want to backup existing nginx config Y/n:")
-        if backup_yes is "Y":
+        if backup_yes == "Y":
             Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
-            from distutils.dir_util import copy_tree
-            copy_tree("{nginx_etc_dir}", f"{backup_time}/nginx-config")
+            run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
         continue_nginx = input("Do you want to continue with nginx setup Y/n:")
-        if continue_nginx is "Y":
+        if continue_nginx == "Y":
             run_shell_command(
                 ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
             run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
@@ -465,8 +470,8 @@ def setup_docker(args):
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
     should_start = input(f"Okay to start the node Y/n")
-    if should_start is "Y":
-        if action is "update":
+    if should_start == "Y":
+        if action == "update":
             print(f"For update, bringing down the node using compose file {compose_file_name}")
             Docker.run_docker_compose_down(compose_file_name)
         Docker.run_docker_compose_up(keystore_password, compose_file_name, args.trustednode)
@@ -512,8 +517,8 @@ def start_systemd(args):
     SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
 
     nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl,
-                                                    node_type=args.nodetype,
-                                                    nginx_etc_dir=nginx_dir, backup_time=backup_time)
+                                                  node_type=args.nodetype,
+                                                  nginx_etc_dir=nginx_dir, backup_time=backup_time)
     SystemD.create_ssl_certs(nginx_secrets_dir)
     if not args.update:
         SystemD.start_node_service()

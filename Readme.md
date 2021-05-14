@@ -42,7 +42,7 @@ Below command is using 1.0-beta.32 release. Pick up the latest yml from latest r
 ```shell script
 python3 nodecli.py setup-docker  \
  -f https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radix-fullnode-compose.yml \
- -t 52.48.95.182
+ -t <IP of trusted node>
 ```
 
 If may want to choose Y to start the node or you below command to start the node
@@ -50,7 +50,7 @@ If may want to choose Y to start the node or you below command to start the node
 #### To start the node using docker-compose 
 ```shell script
 python3 nodecli.py start-docker \
- -t 52.48.95.182 \
+ -t <IP of trusted node> \
  -f radix-fullnode-compose.yml
 ```
 
@@ -67,7 +67,7 @@ Update uses same subcommand as setup-docker . Except that it takes extra option 
 ```shell script
 python3 nodecli.py setup-docker  \
  -f https://github.com/radixdlt/radixdlt/releases/download/<new release>/radix-fullnode-compose.yml \
- -t 52.48.95.182
+ -t <IP of trusted node>
  -u
 ```
 
@@ -143,7 +143,7 @@ python3 nodecli.py showvalidator
 ####Installation
 The monitoring setup uses system/info endpoint and requires nginx admin password. Run below command by replacing you nginx admin password 
 ```shell script
-NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> python3 nodecli.py setup_monitoring
+NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> python3 nodecli.py setup-monitoring
 ```
 This command, fetches the file from the release, that the `nodecli.py` is pointing to.  If for any reasons, one wants to update the configs,  one can download initial version using above command 
 To update the config, one has to bring down the monitoring using below `stop-monitoring` command
@@ -157,7 +157,7 @@ NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> NODE_END_POINT=https://<your no
 
 #### Stopping monitoring
 ```shell script
-python3 nodecli.py stop_monitoring
+python3 nodecli.py stop-monitoring
 ```
 
 #### Restarting the monitoring
