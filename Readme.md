@@ -4,8 +4,12 @@ This is node runner cli which can be used for Ubuntu 20.04 to bring up the node 
 One can find the hardware/OS specification for the node [here](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
 
 ## nodecli script
-The nodecli.py script helps to run node in two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below. User running this script should have sudo without password access.
+The nodecli.py script helps to run node in either of two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below. User running this script should have sudo without password access.
 
+```shell script
+# To list the subcommands
+python3 nodecli.py --help
+```
 
 ### Installation
 
@@ -13,7 +17,7 @@ The nodecli.py script helps to run node in two modes - Docker compose and System
 wget  -O  nodecli.py https://github.com/radixdlt/node-runner/releases/download/<latest version>/nodecli.py
 ```
 
-Download the latest release of script by running command. Latest release can be found [here](https://github.com/radixdlt/node-runner/releases)
+Download the latest release of script by running above wget command. Latest release can be found [here](https://github.com/radixdlt/node-runner/releases)
 
 ## Docker compose mode
 
