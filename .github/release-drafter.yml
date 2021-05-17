@@ -1,0 +1,40 @@
+#This configuration needs to be in the default repository branch
+template: |
+  ## Changes
+
+  $CHANGES
+categories:
+  - title: 'node-runner-cli'
+    labels:
+      - 'node-runner-cli'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: '🍏 CI & Build'
+    labels:
+      - 'ci'
+      - 'build'
+  - title: 'Maintenance'
+    labels:
+      - 'chore'
+      - 'task'
+      - 'refactor'
+  - title: 'Documentation'
+    labels:
+      - 'docs'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch

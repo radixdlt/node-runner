@@ -1,0 +1,5 @@
+ansible:
+  - node-runner-cli/*
+
+ci:
+  - .github/*
