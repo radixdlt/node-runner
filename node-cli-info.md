@@ -276,6 +276,7 @@ Monitoring setup needs metrics exporter to export the metrics from node, prometh
     
     These config can be setup by default so that it avoids adding more environment variables on the docker or systemd config.
     
+    Also for host level metrics, we need to get node-exporter container that can export node metrics.
     
     
          
