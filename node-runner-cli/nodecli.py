@@ -32,7 +32,7 @@ def subcommand(args=[], parent=subparsers):
 
 
 def cli_version():
-    return "test-version"
+    return "test-version.34"
 
 
 def printCommand(cmd):
