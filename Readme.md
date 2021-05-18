@@ -45,8 +45,8 @@ Below command is using 1.0-beta.32 release. Pick up the latest yml from latest r
  
 ```shell script
 python3 nodecli.py setup-docker  \
- -f https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radix-fullnode-compose.yml \
  -t <IP of trusted node>
+ -n <Type of node fullnode or archivenode>
 ```
 
 If may want to choose Y to start the node or you below command to start the node
@@ -70,7 +70,7 @@ Update uses same subcommand as setup-docker . Except that it takes extra option 
 
 ```shell script
 python3 nodecli.py setup-docker  \
- -f https://github.com/radixdlt/radixdlt/releases/download/<new release>/radix-fullnode-compose.yml \
+ -n <Type of node fullnode or archivenode>
  -t <IP of trusted node>
  -u
 ```
@@ -104,10 +104,8 @@ Option _-i or --hostip_ is the static IP of your node
 
 ```shell script
 python3 nodecli.py start-systemd \
- --nodebinaryUrl https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radixdlt-dist-1.0-beta.32.zip \
- --nginxconfigUrl https://github.com/radixdlt/radixdlt-nginx/releases/download/1.0-beta.32/radixdlt-nginx-archive-conf.zip \
  --trustednode <IP of trustednode> \
- --nodetype fullnode \
+ --nodetype <fullnode or archivenode> \
  --hostip <hostip>
 ```
 

@@ -18,7 +18,7 @@ services:
         max-file: "30"
 
   metrics-exporter:
-    image: eu.gcr.io/dev-container-repo/radixdlt-exporter2:latest
+    image: radixdlt/metrics-exporter:1.0-beta.34
     restart: unless-stopped
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -27,9 +27,7 @@ services:
     environment:
       METRICS_EXPORTER_BASIC_AUTH: "${BASIC_AUTH_USER_CREDENTIALS}"
       METRICS_EXPORTER_ROOT_API_URL: "${NODE_END_POINT}"
-      METRICS_EXPORTER_RMI_HOST_URL: core:9010
       METRICS_EXPORTER_LEDGER_FOLDER: /data
-      METRICS_EXPORTER_CONTAIER_NAME: radixdlt_core_1
       METRICS_EXPORTER_COLLECT_JSON_RPC_METRICS: "false"
 
   grafana:

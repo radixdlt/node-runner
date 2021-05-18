@@ -143,7 +143,7 @@ class Docker(Base):
         run_shell_command(['wget', '-O', compose_file_name, composefileurl])
 
     @staticmethod
-    def run_docker_compose_down(composefile, removevolumes):
+    def run_docker_compose_down(composefile, removevolumes=False):
         Helpers.docker_compose_down(composefile, removevolumes)
 
 
@@ -294,6 +294,14 @@ class SystemD(Base):
 
     @staticmethod
     def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time):
+        if node_type == "archivenode":
+            conf_file = 'nginx-archive.conf'
+        elif node_type == "fullnode":
+            conf_file = 'nginx-fullnode.conf'
+        else:
+            print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
+            quit()
+
         backup_yes = input("Do you want to backup existing nginx config Y/n:")
         if backup_yes == "Y":
             Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
@@ -304,7 +312,7 @@ class SystemD(Base):
             run_shell_command(
                 ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
             run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
-            run_shell_command(f'sudo mv {nginx_etc_dir}/nginx-{node_type}.conf  /etc/nginx/nginx.conf', shell=True)
+            run_shell_command(f'sudo mv {nginx_etc_dir}/{conf_file}  /etc/nginx/nginx.conf', shell=True)
             run_shell_command(f'sudo mkdir -p /var/cache/nginx/radixdlt-hot', shell=True)
             return True
         else:
@@ -456,16 +464,30 @@ def version(args):
 
 
 @subcommand([
-    argument("-f", "--composefileurl", required=True, help="URl to download the docker compose file ", action="store"),
+
+    argument("-r", "--release", required=True, default="1.0-beta.34",
+             help="Version of node software to install. Defaulted to latest release",
+             action="store"),
+    argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
+             action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-u", "--update", help="Update the node to new version of composefile", action="store"),
 ])
 def setup_docker(args):
-    Docker.fetchComposeFile(args.composefileurl)
+    composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{args.version}/radix-{args.nodetype}-compose.yml"
+    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {args.version}
+            From location {composefileurl}. Do you want to continue Y/n:
+        """)
+
+    if continue_setup != "Y":
+        print(" Quitting ....")
+        quit()
+
+    Docker.fetchComposeFile(composefileurl)
     keystore_password = Base.generatekey(keyfile_path=str(Path(__file__).parent.absolute()))
     Base.fetch_universe_json(args.trustednode)
 
-    compose_file_name = args.composefileurl.rsplit('/', 1)[-1]
+    compose_file_name = composefileurl.rsplit('/', 1)[-1]
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
@@ -485,10 +507,12 @@ def setup_docker(args):
 
 
 @subcommand([
-    argument("-b", "--nodebinaryUrl", required=True, help="URL to download radix node binaries", action="store"),
-    argument("-c", "--nginxconfigUrl", required=True, help="URL to nginx config", action="store"),
+    argument("-r", "--release", required=True, default="1.0-beta.34",
+             help="Version of node software to install. Defaulted to latest release",
+             action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
-    argument("-n", "--nodetype", required=True, help="Type of node archive or fullnode", action="store"),
+    argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
+             action="store"),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
     argument("-u", "--update", help="Update the node to new version of node", action="store"),
 
@@ -498,6 +522,17 @@ def start_systemd(args):
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
+    nodebinaryUrl = f"https://github.com/radixdlt/radixdlt/releases/download/{args.version}/radixdlt-dist-{args.version}.zip"
+    nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{args.version}/radixdlt-nginx-{args.nodetype}-conf.zip"
+
+    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {args.version}
+            From location {nodebinaryUrl} and {nginxconfigUrl}. Do you want to continue Y/n:
+        """)
+
+    if continue_setup != "Y":
+        print(" Quitting ....")
+        quit()
+
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
     keystore_password = SystemD.generatekey(node_secrets_dir)
