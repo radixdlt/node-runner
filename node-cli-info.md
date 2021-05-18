@@ -131,7 +131,7 @@ python3 nodecli.py start-systemd \
 ##### Description 
        
 
-#######   Node  
+######  Node  
  
 Creates a key file by looking up file named 'validator.ks' in directory /etc/radixdlt/node/secrets. 
   - If the file exists, it will ask for the password instead.
@@ -151,7 +151,7 @@ Fetches the universe.json from trusted node and saves it to file in directory /e
 
 On Update, it restarts the node service
   
-#######   Nginx  
+######   Nginx  
     Prompts for nginx back up. If yes, it creates backup direcgtory (again this directory checked before creating) and then backs up /etc/nginx directory.
     Then Prompts asking to continue setup nginx . If Yes, then Pulls down the binaries of nginx for the version hardcoded in the CLI. Unzip them in the location where cli command is run and moved over to "/etc/nginx" directory
     Creates nginx certificates, if exists prompts for recreation Y/N
