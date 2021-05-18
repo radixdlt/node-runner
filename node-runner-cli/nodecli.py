@@ -178,7 +178,7 @@ class SystemD(Base):
              Then login using account radixdlt and the password you setup just now. To login using password, you need to enable it in /etc/ssh/sshd_config.
              Instead, we suggest, for you to setup password less ssh login by copying the public key to
              /home/radixdlt/.ssh/authorized_keys
-            3. Also copy the nodecli.py to the home directory of radixdlt (/home/radixdlt)
+            3. Also download/copy the nodecli.py to the home directory of radixdlt (/home/radixdlt)
         """)
 
     @staticmethod
@@ -544,10 +544,10 @@ def start_systemd(args):
     SystemD.backup_file(node_dir, f"default.config", backup_time)
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir)
 
-    node_version = args.nodebinaryUrl.rsplit('/', 2)[-2]
+    node_version = nodebinaryUrl.rsplit('/', 2)[-2]
     SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir, )
 
-    SystemD.download_binaries(args.nodebinaryUrl, node_dir=node_dir, node_version=node_version)
+    SystemD.download_binaries(nodebinaryUrl, node_dir=node_dir, node_version=node_version)
 
     SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
 
