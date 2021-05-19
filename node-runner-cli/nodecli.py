@@ -81,7 +81,7 @@ class Base:
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path="."):
         run_shell_command(
-            ['wget', '--no-check-certificate', '-O', f'{extraction_path}/universe.json',
+            ['sudo', 'wget', '--no-check-certificate', '-O', f'{extraction_path}/universe.json',
              'https://' + trustenode + '/universe.json'])
 
     @staticmethod
@@ -465,17 +465,17 @@ def version(args):
 
 @subcommand([
 
-    argument("-r", "--release", required=True, default="1.0-beta.34",
+    argument("-r", "--release", default="1.0-beta.34",
              help="Version of node software to install. Defaulted to latest release",
              action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
-    argument("-u", "--update", help="Update the node to new version of composefile", action="store"),
+    argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
 ])
 def setup_docker(args):
-    composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{args.version}/radix-{args.nodetype}-compose.yml"
-    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {args.version}
+    composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{args.release}/radix-{args.nodetype}-compose.yml"
+    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {args.release}
             From location {composefileurl}. Do you want to continue Y/n:
         """)
 
@@ -491,7 +491,7 @@ def setup_docker(args):
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
-    should_start = input(f"Okay to start the node Y/n")
+    should_start = input(f"\nOkay to start the node Y/n:")
     if should_start == "Y":
         if action == "update":
             print(f"For update, bringing down the node using compose file {compose_file_name}")
@@ -501,13 +501,13 @@ def setup_docker(args):
         print(f"""
             Bring up node by updating the file {compose_file_name}
             You can do it through cli using below command
-                python3 nodecli.py stop_docker -f {compose_file_name} -t {args.trustednode}
-                python3 nodecli.py start_docker -f {compose_file_name} -t {args.trustednode}
+                python3 nodecli.py stop-docker  -f {compose_file_name}
+                python3 nodecli.py start-docker -f {compose_file_name} -t {args.trustednode}
             """)
 
 
 @subcommand([
-    argument("-r", "--release", required=True, default="1.0-beta.34",
+    argument("-r", "--release",  default="1.0-beta.34",
              help="Version of node software to install. Defaulted to latest release",
              action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
@@ -522,10 +522,10 @@ def start_systemd(args):
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
-    nodebinaryUrl = f"https://github.com/radixdlt/radixdlt/releases/download/{args.version}/radixdlt-dist-{args.version}.zip"
-    nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{args.version}/radixdlt-nginx-{args.nodetype}-conf.zip"
+    nodebinaryUrl = f"https://github.com/radixdlt/radixdlt/releases/download/{args.release}/radixdlt-dist-{args.release}.zip"
+    nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{args.release}/radixdlt-nginx-{args.nodetype}-conf.zip"
 
-    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {args.version}
+    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {args.release}
             From location {nodebinaryUrl} and {nginxconfigUrl}. Do you want to continue Y/n:
         """)
 
@@ -551,7 +551,7 @@ def start_systemd(args):
 
     SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
 
-    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=args.nginxconfigUrl,
+    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=nginxconfigUrl,
                                                   node_type=args.nodetype,
                                                   nginx_etc_dir=nginx_dir, backup_time=backup_time)
     SystemD.create_ssl_certs(nginx_secrets_dir)
