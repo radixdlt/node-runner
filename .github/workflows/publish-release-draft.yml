@@ -15,6 +15,7 @@ jobs:
           access_token: ${{ github.token }}
   publish:
     runs-on: ubuntu-latest
+    environment: publish-release
     name: Publish release draft
     steps:
       - run: echo ${{ github.event.client_payload.release_tag }}
