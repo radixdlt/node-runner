@@ -465,8 +465,8 @@ def version(args):
 
 @subcommand([
 
-    argument("-r", "--release", default="1.0-beta.34",
-             help="Version of node software to install. Defaulted to latest release",
+    argument("-r", "--release", required=True,
+             help="Version of node software to install such as 1.0-beta.34",
              action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store"),
@@ -507,14 +507,14 @@ def setup_docker(args):
 
 
 @subcommand([
-    argument("-r", "--release",  default="1.0-beta.34",
-             help="Version of node software to install. Defaulted to latest release",
+    argument("-r", "--release", required=True,
+             help="Version of node software to install",
              action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store"),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
-    argument("-u", "--update", help="Update the node to new version of node", action="store"),
+    argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
 def start_systemd(args):
