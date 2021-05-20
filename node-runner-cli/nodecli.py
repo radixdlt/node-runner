@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser
 import os
 import subprocess
@@ -55,7 +56,7 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         print("""
             Command failed. Exiting...
         """)
-        quit()
+        sys.exit()
     return result
 
 
@@ -189,7 +190,7 @@ class SystemD(Base):
     @staticmethod
     def make_data_directory():
         run_shell_command('sudo mkdir -p /data', shell=True)
-        run_shell_command('sudo chown radixdlt:radixdlt /data', shell=True)
+        run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name="validator.ks"):
@@ -300,7 +301,7 @@ class SystemD(Base):
             conf_file = 'nginx-fullnode.conf'
         else:
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
-            quit()
+            sys.exit()
 
         backup_yes = input("Do you want to backup existing nginx config Y/n:")
         if backup_yes == "Y":
@@ -377,7 +378,7 @@ class SystemD(Base):
         result = run_shell_command(f'whoami | grep radixdlt', shell=True)
         if result.returncode != 0:
             print(" You are not logged as radixdlt user. Logout and login as radixdlt user")
-            quit()
+            sys.exit()
         else:
             print("User on the terminal is radixdlt")
 
@@ -434,7 +435,7 @@ class Helpers:
 
             echo 'export NGINX_ADMIN_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
-            quit()
+            sys.exit()
         else:
             return dict({
                 "name": "admin",
@@ -481,7 +482,7 @@ def setup_docker(args):
 
     if continue_setup != "Y":
         print(" Quitting ....")
-        quit()
+        sys.exit()
 
     Docker.fetchComposeFile(composefileurl)
     keystore_password = Base.generatekey(keyfile_path=str(Path(__file__).parent.absolute()))
@@ -531,7 +532,7 @@ def start_systemd(args):
 
     if continue_setup != "Y":
         print(" Quitting ....")
-        quit()
+        sys.exit()
 
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
@@ -545,10 +546,12 @@ def start_systemd(args):
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir)
 
     node_version = nodebinaryUrl.rsplit('/', 2)[-2]
+    #TODO backup the service file
     SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir, )
 
     SystemD.download_binaries(nodebinaryUrl, node_dir=node_dir, node_version=node_version)
 
+    #TODO fix below
     SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
 
     nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=nginxconfigUrl,
