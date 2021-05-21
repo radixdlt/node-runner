@@ -613,7 +613,7 @@ def configure_systemd(args):
 
 @subcommand(
     [argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD", action="store")])
-def admin_password(args):
+def set_admin_password(args):
     if args.setupmode == "DOCKER":
         Docker.setup_nginx_Password()
     if args.setupmode == "SYSTEMD":
@@ -628,7 +628,7 @@ def admin_password(args):
 
 
 @subcommand()
-def nodeaddress(args):
+def get_node_address(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
     req = requests.Request('GET',
@@ -639,7 +639,7 @@ def nodeaddress(args):
 
 
 @subcommand()
-def peers(args):
+def get_peers(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
     req = requests.Request('GET',
@@ -650,11 +650,11 @@ def peers(args):
 
 
 @subcommand()
-def registervalidator(args):
+def register_validator(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
     validator_name = input("Name of your validator:")
-    validator_url = input("Url of your validator:")
+    validator_url = input("Info URL of your validator:")
     data = f"""
     {{"actions":
         [
@@ -679,7 +679,7 @@ def registervalidator(args):
 
 
 @subcommand()
-def showvalidator(args):
+def validator_info(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
     req = requests.Request('POST',
@@ -692,7 +692,7 @@ def showvalidator(args):
 
 
 @subcommand()
-def systeminfo(args):
+def system_info(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
     req = requests.Request('GET',
