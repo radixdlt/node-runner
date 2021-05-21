@@ -36,6 +36,15 @@ def cli_version():
     return "test-version.34"
 
 
+def latest_release(repo_name="radixdlt/radixdlt"):
+    user = Helpers.get_nginx_user()
+    req = requests.Request('GET',
+                           f'https://api.github.com/repos/{repo_name}/releases/latest')
+    prepared = req.prepare()
+    resp = Helpers.send_request(prepared)
+    return resp.content.tag_name
+
+
 def printCommand(cmd):
     print('-----------------------------')
     if type(cmd) is list:
@@ -94,7 +103,8 @@ class Base:
         else:
             ask_keystore_exists = input("Do you have keystore file named 'validator.ks' already from previous node Y/n")
             if ask_keystore_exists == "Y":
-                print(f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")
+                print(
+                    f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")
                 sys.exit()
             else:
                 print(f"""
@@ -427,7 +437,7 @@ class Helpers:
             print(json.dumps(resp.json()))
         else:
             print(resp.content)
-        return resp.content
+        return resp
 
     @staticmethod
     def get_nginx_user():
@@ -472,7 +482,7 @@ def version(args):
 @subcommand([
 
     argument("-r", "--release", required=True,
-             help="Version of node software to install such as 1.0-beta.34",
+             help="Version of node software to install such as 1.0-beta.34", default=latest_release(),
              action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store"),
@@ -513,7 +523,7 @@ def setup_docker(args):
 
 
 @subcommand([
-    argument("-r", "--release", required=True,
+    argument("-r", "--release", default=latest_release(),
              help="Version of node software to install",
              action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
@@ -552,7 +562,7 @@ def start_systemd(args):
 
     node_version = nodebinaryUrl.rsplit('/', 2)[-2]
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time)
-    SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir )
+    SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir)
 
     SystemD.download_binaries(nodebinaryUrl, node_dir=node_dir, node_version=node_version)
 
@@ -590,6 +600,7 @@ def stop_systemd(args):
     else:
         print(f"Invalid service name {args.services}")
         sys.exit()
+
 
 @subcommand([
     argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
@@ -748,29 +759,29 @@ class Monitoring():
         req = requests.Request('GET', f'{default_prometheus_yaml_url}')
         prepared = req.prepare()
 
-        content = Helpers.send_request(prepared, print_response=False)
+        resp = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/prometheus").mkdir(parents=True, exist_ok=True)
         with open("monitoring/prometheus/prometheus.yml", 'wb') as f:
-            f.write(content)
+            f.write(resp.content)
 
     @staticmethod
     def setup_datasource(default_datasource_cfg_url):
         req = requests.Request('GET', f'{default_datasource_cfg_url}')
         prepared = req.prepare()
-        content = Helpers.send_request(prepared, print_response=False)
+        resp = Helpers.send_request(prepared, print_response=False)
         Path("monitoring/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
         with open("monitoring/grafana/provisioning/datasources/datasource.yml", 'wb') as f:
-            f.write(content)
+            f.write(resp.content)
 
     @staticmethod
     def setup_dashboard(default_dashboard_cfg_url, files):
         for file in files:
             req = requests.Request('GET', f'{default_dashboard_cfg_url}/{file}')
             prepared = req.prepare()
-            content = Helpers.send_request(prepared, print_response=False)
+            resp = Helpers.send_request(prepared, print_response=False)
             Path("monitoring/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
             with open(f"monitoring/grafana/provisioning/dashboards/{file}", 'wb') as f:
-                f.write(content)
+                f.write(resp.content)
 
     @staticmethod
     def setup_external_volumes():
@@ -781,10 +792,10 @@ class Monitoring():
     def setup_monitoring_containers(default_monitoring_cfg_url):
         req = requests.Request('GET', f'{default_monitoring_cfg_url}')
         prepared = req.prepare()
-        content = Helpers.send_request(prepared, print_response=False)
+        resp = Helpers.send_request(prepared, print_response=False)
         Path("monitoring").mkdir(parents=True, exist_ok=True)
         with open("monitoring/node-monitoring.yml", 'wb') as f:
-            f.write(content)
+            f.write(resp.content)
 
     @staticmethod
     def start_monitoring(composefile):
