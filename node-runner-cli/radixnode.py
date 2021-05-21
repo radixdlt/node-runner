@@ -89,19 +89,24 @@ class Base:
     def generatekey(keyfile_path, keyfile_name="validator.ks"):
         print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/validator.ks'):
-            print("Node key file already exist")
+            print(f"Node key file already exist at location {keyfile_path}")
             keystore_password = getpass.getpass("Enter the password of the existing keystore file 'validator.ks':")
         else:
-            print(f"""
-            Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/validator.ks
-            """)
-            keystore_password = getpass.getpass("Enter the password of the new file 'validator.ks':")
-            run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
-                               'radixdlt/keygen:1.0-beta.31',
-                               '--keystore=/keygen/key/validator.ks',
-                               '--password=' + keystore_password], quite=True
-                              )
-            run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/validator.ks'])
+            ask_keystore_exists = input("Do you have keystore file named 'validator.ks' already from previous node Y/n")
+            if ask_keystore_exists == "Y":
+                print(f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")
+                sys.exit()
+            else:
+                print(f"""
+                Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/validator.ks
+                """)
+                keystore_password = getpass.getpass("Enter the password of the new file 'validator.ks':")
+                run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
+                                   'radixdlt/keygen:1.0-beta.31',
+                                   '--keystore=/keygen/key/validator.ks',
+                                   '--password=' + keystore_password], quite=True
+                                  )
+                run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/validator.ks'])
 
         return keystore_password
 
