@@ -546,13 +546,12 @@ def start_systemd(args):
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir)
 
     node_version = nodebinaryUrl.rsplit('/', 2)[-2]
-    #TODO backup the service file
-    SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir, )
+    SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time)
+    SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir )
 
     SystemD.download_binaries(nodebinaryUrl, node_dir=node_dir, node_version=node_version)
 
-    #TODO fix below
-    SystemD.backup_file(nginx_dir, f"radixdlt-node.service", backup_time)
+    SystemD.backup_file("/lib/systemd/system", f"nginx.service", backup_time)
 
     nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=nginxconfigUrl,
                                                   node_type=args.nodetype,
@@ -570,6 +569,22 @@ def start_systemd(args):
     else:
         print("Nginx not configured or not updated")
 
+
+@subcommand([
+    argument("-s", "--services", default="all",
+             help="Name of the service either to be stopped. Valid values nginx or radixdlt-node", action="store")
+])
+def stop_systemd(args):
+    if args.services == "all":
+        SystemD.restart_nginx_service()
+        SystemD.restart_node_service()
+    elif args.services == "nginx":
+        SystemD.restart_nginx_service()
+    elif args.services == "radixdlt-node":
+        SystemD.restart_node_service()
+    else:
+        print(f"Invalid service name {args.services}")
+        sys.exit()
 
 @subcommand([
     argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
