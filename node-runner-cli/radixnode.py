@@ -10,7 +10,11 @@ from requests.auth import HTTPBasicAuth
 import urllib3
 import getpass
 from datetime import datetime
-
+import setuptools
+setuptools.setup(
+    version_config=True,
+    setup_requires=['setuptools-git-versioning'],
+)
 urllib3.disable_warnings()
 
 cli = ArgumentParser()
@@ -474,15 +478,15 @@ class Helpers:
         return now.strftime("%Y_%m_%d_%H_%M")
 
 
-@subcommand([])
-def version(args):
-    print(f"Cli - Version : {cli_version()}")
+# @subcommand([])
+# def version(args):
+#     print(f"Cli - Version : {cli_version()}")
 
 
 @subcommand([
 
     argument("-r", "--release", required=True,
-             help="Version of node software to install such as 1.0-beta.34", default=latest_release(),
+             help="Version of node software to install such as 1.0-beta.34",
              action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store"),
@@ -523,7 +527,7 @@ def setup_docker(args):
 
 
 @subcommand([
-    argument("-r", "--release", default=latest_release(),
+    argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
