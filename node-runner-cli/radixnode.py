@@ -10,11 +10,8 @@ from requests.auth import HTTPBasicAuth
 import urllib3
 import getpass
 from datetime import datetime
-import setuptools
-setuptools.setup(
-    version_config=True,
-    setup_requires=['setuptools-git-versioning'],
-)
+from version import __version__
+
 urllib3.disable_warnings()
 
 cli = ArgumentParser()
@@ -37,7 +34,7 @@ def subcommand(args=[], parent=subparsers):
 
 
 def cli_version():
-    return "test-version.34"
+    return __version__
 
 
 def latest_release(repo_name="radixdlt/radixdlt"):
@@ -478,9 +475,9 @@ class Helpers:
         return now.strftime("%Y_%m_%d_%H_%M")
 
 
-# @subcommand([])
-# def version(args):
-#     print(f"Cli - Version : {cli_version()}")
+@subcommand([])
+def version(args):
+    print(f"Cli - Version : {cli_version()}")
 
 
 @subcommand([

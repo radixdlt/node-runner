@@ -24,13 +24,17 @@ RUN set -ex \
 
 RUN CONFIGURE_OPTS=--enable-shared pyenv install 3.7.6
 
-WORKDIR /app
-COPY . /app
+
 
 RUN pyenv virtualenv 3.7.6 nodecli
 RUN pyenv local nodecli
 RUN pip install pyinstaller
+
+WORKDIR /app
+COPY . /app
+RUN pip install -r requirements.txt
 RUN pyinstaller --onefile --windowed radixnode.py
+RUN /app/dist/radixnode version
 
 FROM scratch AS export-stage
 COPY --from=BUILD /app/dist /
