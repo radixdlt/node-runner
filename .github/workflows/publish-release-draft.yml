@@ -1,0 +1,47 @@
+name: publish-release-draft
+
+on:
+  repository_dispatch:
+    types: [start_release]
+
+jobs:
+  cancel_running_workflows:
+    name: Cancel running workflows
+    runs-on: ubuntu-20.04
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+  publish:
+    runs-on: ubuntu-latest
+    environment: publish-release
+    name: Publish release draft
+    steps:
+      - run: echo ${{ github.event.client_payload.release_tag }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get latest release ID
+        id: last_release
+        uses: InsonusK/get-latest-release@v1.0.1
+        with:
+          myToken: ${{ github.token }}
+          exclude_types: "release"
+          view_top: 1
+      - name: Print latest release information
+        run: |
+          echo "id: ${{ steps.last_release.outputs.id }}"
+          echo "name: ${{ steps.last_release.outputs.name }}"
+          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
+          echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
+          echo "draft: ${{ steps.last_release.outputs.draft }}"
+          echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+      - name: Update draft to ${{ github.event.client_payload.release_tag }}
+        run: |
+          curl \
+            -u radixbot:${{ secrets.RADIXBOT_GITHUB_REPO_PACKAGES_TOKEN }} \
+            -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/radixdlt/node-runner/releases/${{ steps.last_release.outputs.id }} \
+            -d '{"tag_name":"${{ github.event.client_payload.release_tag }}", "name": "${{ github.event.client_payload.release_tag }}", "draft": "false"}'
