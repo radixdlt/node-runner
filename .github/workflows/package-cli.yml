@@ -17,11 +17,13 @@ jobs:
       - name: Install build essentials
         run: sudo apt-get -y install build-essential
       - name: Build the binary for ubuntu
-        run: make output-ubuntu-focal
+        run: |
+          cd node-runner-cli
+          make output-ubuntu-focal
       - name: "Upload generated site"
         uses: actions/upload-artifact@v2.2.3
         with:
           name: ubuntu 20.04
-          path: "${{ github.workspace }}/out/ubuntu/focal/radixnode"
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
 
 
