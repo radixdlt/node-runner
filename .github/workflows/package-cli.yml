@@ -14,8 +14,8 @@ jobs:
           access_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install docker and build essentials
-        run: sudo apt-get -y install docker.io build-essential
+      - name: Install build essentials
+        run: sudo apt-get -y install build-essential
       - name: Build the binary for ubuntu
         run: make output-ubuntu-focal
       - name: "Upload generated site"
