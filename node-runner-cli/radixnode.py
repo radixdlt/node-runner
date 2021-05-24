@@ -311,8 +311,9 @@ def system_info(args):
     Helpers.send_request(prepared)
 
 
-@subcommand([argument("-m", "--setupmode", help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
-                      action="store")])
+@subcommand(
+    [argument("-m", "--setupmode", required=True, help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
+              action="store")])
 def setup_monitoring(args):
     if args.setupmode == "QUICK_SETUP_MODE":
         monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/monitoring'
@@ -332,7 +333,7 @@ def setup_monitoring(args):
 
 
 @subcommand([
-    argument("-m", "--setupmode", help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
+    argument("-m", "--setupmode", required=True, help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
              action="store"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
 def stop_monitoring(args):
