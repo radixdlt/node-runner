@@ -19,8 +19,8 @@ jobs:
       - name: Build the binary for ubuntu
         run: |
           set -ex \
-              && curl https://pyenv.run | bash \
-              && pyenv update
+              && curl https://pyenv.run | bash
+          exec $SHELL
           pyenv install 3.7.6
           cd node-runner-cli
           make output-ubuntu-focal
