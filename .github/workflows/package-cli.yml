@@ -1,0 +1,27 @@
+name: Package cli
+
+on:
+  push:
+
+jobs:
+  package_ubuntu_cli:
+    name: "Package cli for Ubuntu"
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+          uses: actions/checkout@v2
+      - name: Install docker and build essentials
+        run: sudo apt-get -y install docker.io build-essential
+      - name: Build the binary for ubuntu
+        run: make output-ubuntu-focal
+      - name: "Upload generated site"
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: ubuntu 20.04
+          path: "${{ github.workspace }}/out/ubuntu/focal/radixnode"
+
+

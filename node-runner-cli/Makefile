@@ -1,5 +1,5 @@
 .PHONY: output
-output:
+output-ubuntu-focal:
 	$(shell chmod +x add-version.sh)
 	$(shell ./add-version.sh)
 	pipenv lock -r > requirements.txt
