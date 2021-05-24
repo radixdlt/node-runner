@@ -37,7 +37,16 @@ jobs:
           echo "created_at: ${{ steps.last_release.outputs.created_atd }}"
           echo "draft: ${{ steps.last_release.outputs.draft }}"
           echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
+          RELEASE_ID=${{ steps.last_release.outputs.id }}
+          if [[ -z $RELEASE_ID ]];then
+            echo "There is no release draft. Creating a new one"
+            echo "RELEASE_DRAFT_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "There is a release draft"
+            echo "RELEASE_DRAFT_EXISTS=true" >> $GITHUB_ENV
+          fi
       - name: Update draft to ${{ github.event.client_payload.release_tag }}
+        if: "${{ env.RELEASE_DRAFT_EXISTS == 'true' }}"
         run: |
           curl \
             -u radixbot:${{ secrets.RADIXBOT_GITHUB_REPO_PACKAGES_TOKEN }} \
@@ -45,3 +54,10 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/radixdlt/node-runner/releases/${{ steps.last_release.outputs.id }} \
             -d '{"tag_name":"${{ github.event.client_payload.release_tag }}", "name": "${{ github.event.client_payload.release_tag }}", "draft": "false"}'
+      - uses: ncipollo/release-action@v1
+        if: "${{ env.RELEASE_DRAFT_EXISTS == 'false' }}"
+        with:
+          token: ${{ secrets.RADIXBOT_GITHUB_REPO_PACKAGES_TOKEN }}
+          tag: ${{ github.event.client_payload.release_tag }}
+          omitBody: true
+          name: ${{ github.event.client_payload.release_tag }}
