@@ -135,8 +135,11 @@ class SystemD(Base):
              
              Instead, we suggest, for you to setup password less ssh login by copying the public key to
              /home/radixdlt/.ssh/authorized_keys
+             
+            3. Also once can change to another user by running sudo su command
+                $ sudo su radixdlt
+                $ cd /home/radixdlt
             
-            3. Also download/copy the radixnode file to the home directory of radixdlt (/home/radixdlt)
             ----------------------------------------------------------------------------------------
         """)
 
