@@ -108,6 +108,7 @@ class SystemD(Base):
 
     @staticmethod
     def setup_user():
+        print("Checking if user radixdlt already exists")
         user_exists = run_shell_command("cat /etc/passwd | grep radixdlt", shell=True, fail_on_error=False)
         if user_exists.returncode != 0:
             run_shell_command('sudo useradd -m -s /bin/bash radixdlt ', shell=True)
@@ -120,6 +121,7 @@ class SystemD(Base):
     @staticmethod
     def sudoers_instructions():
         print("""
+            ----------------------------------------------------------------------------------------
             1. Execute following setups so that radixdlt user can use sudo commands without password
 
                 $ sudo su 
@@ -128,10 +130,14 @@ class SystemD(Base):
         """)
         print("""
             2. After the above step logout.
-             Then login using account radixdlt and the password you setup just now. To login using password, you need to enable it in /etc/ssh/sshd_config.
+             Then login using account radixdlt and the password you setup just now. To login using password, 
+             you need to enable it in /etc/ssh/sshd_config.
+             
              Instead, we suggest, for you to setup password less ssh login by copying the public key to
              /home/radixdlt/.ssh/authorized_keys
+            
             3. Also download/copy the radixnode file to the home directory of radixdlt (/home/radixdlt)
+            ----------------------------------------------------------------------------------------
         """)
 
     @staticmethod
@@ -339,6 +345,7 @@ class SystemD(Base):
 
     @staticmethod
     def checkUser():
+        print("\nChecking the user is radixdlt")
         result = run_shell_command(f'whoami | grep radixdlt', shell=True)
         if result.returncode != 0:
             print(" You are not logged as radixdlt user. Logout and login as radixdlt user")

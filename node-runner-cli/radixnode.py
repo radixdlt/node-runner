@@ -12,7 +12,7 @@ from requests.auth import HTTPBasicAuth
 from utils.utils import run_shell_command
 from utils.utils import Helpers
 from version import __version__
-from setup import Base,Docker,SystemD
+from setup import Base, Docker, SystemD
 
 urllib3.disable_warnings()
 
@@ -39,8 +39,6 @@ def cli_version():
     return __version__
 
 
-
-
 @subcommand([])
 def version(args):
     print(f"Cli - Version : {cli_version()}")
@@ -62,9 +60,8 @@ def setup_docker(args):
     else:
         release = args.release
     composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radix-{args.nodetype}-compose.yml"
-    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {release}
-            From location {composefileurl}. Do you want to continue Y/n:
-        """)
+    continue_setup = input(
+        f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n Do you want to continue Y/n:")
 
     if continue_setup != "Y":
         print(" Quitting ....")
@@ -86,10 +83,12 @@ def setup_docker(args):
         Docker.run_docker_compose_up(keystore_password, compose_file_name, args.trustednode)
     else:
         print(f"""
+            ---------------------------------------------------------------
             Bring up node by updating the file {compose_file_name}
             You can do it through cli using below command
                 ./radixnode stop-docker  -f {compose_file_name}
-                ./radixnode nodecli.py start-docker -f {compose_file_name} -t {args.trustednode}
+                ./radixnode start-docker -f {compose_file_name} -t {args.trustednode}
+            ----------------------------------------------------------------
             """)
 
 
@@ -105,7 +104,6 @@ def setup_docker(args):
 
 ])
 def start_systemd(args):
-
     if not args.release:
         release = latest_release()
     else:
@@ -116,11 +114,12 @@ def start_systemd(args):
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
     nodebinaryUrl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip"
+
+    # TODO add method to fetch latest nginx release
     nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{args.nodetype}-conf.zip"
 
-    continue_setup = input(f"""Going to setup node type {args.nodetype} for version {release}
-            From location {nodebinaryUrl} and {nginxconfigUrl}. Do you want to continue Y/n:
-        """)
+    continue_setup = input(
+        f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
 
     if continue_setup != "Y":
         print(" Quitting ....")
