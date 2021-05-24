@@ -63,7 +63,7 @@ class Docker(Base):
     @staticmethod
     def setup_nginx_Password():
         print('-----------------------------')
-        print('Setting up nginx')
+        print('Setting up nginx password')
         nginx_password = getpass.getpass("Enter your nginx password: ")
         run_shell_command(['docker', 'run', '--rm', '-v',
                            os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
@@ -242,8 +242,10 @@ class SystemD(Base):
 
     @staticmethod
     def install_nginx():
-        run_shell_command('sudo apt install -y nginx apache2-utils', shell=True)
-        run_shell_command('sudo rm -rf /etc/nginx/{sites-available,sites-enabled}', shell=True)
+        nginx_installed = run_shell_command("sudo service --status-all | grep nginx",shell=True)
+        if nginx_installed.returncode != 0:
+            run_shell_command('sudo apt install -y nginx apache2-utils', shell=True)
+            run_shell_command('sudo rm -rf /etc/nginx/{sites-available,sites-enabled}', shell=True)
 
     @staticmethod
     def make_nginx_secrets_directory():
@@ -251,6 +253,7 @@ class SystemD(Base):
 
     @staticmethod
     def setup_nginx_config(nginx_config_location_Url, node_type, nginx_etc_dir, backup_time):
+        SystemD.install_nginx()
         if node_type == "archivenode":
             conf_file = 'nginx-archive.conf'
         elif node_type == "fullnode":
@@ -308,7 +311,7 @@ class SystemD(Base):
     def setup_nginx_password(secrets_dir):
         run_shell_command(f'sudo mkdir -p {secrets_dir}', shell=True)
         print('-----------------------------')
-        print('Setting up nginx')
+        print('Setting up nginx password')
         run_shell_command(f'sudo touch {secrets_dir}/htpasswd.admin', fail_on_error=True, shell=True)
         run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.admin admin', shell=True)
         print(
@@ -331,6 +334,10 @@ class SystemD(Base):
         run_shell_command('sudo systemctl restart nginx', shell=True)
 
     @staticmethod
+    def stop_nginx_service():
+        run_shell_command('sudo systemctl stop nginx', shell=True)
+
+    @staticmethod
     def checkUser():
         result = run_shell_command(f'whoami | grep radixdlt', shell=True)
         if result.returncode != 0:
@@ -348,4 +355,8 @@ class SystemD(Base):
     def restart_node_service():
         run_shell_command('sudo systemctl daemon-reload', shell=True)
         run_shell_command('sudo systemctl restart radixdlt-node.service', shell=True)
+
+    @staticmethod
+    def stop_node_service():
+        run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
 

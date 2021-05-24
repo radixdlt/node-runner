@@ -168,12 +168,12 @@ def start_systemd(args):
 ])
 def stop_systemd(args):
     if args.services == "all":
-        SystemD.restart_nginx_service()
-        SystemD.restart_node_service()
+        SystemD.stop_nginx_service()
+        SystemD.stop_node_service()
     elif args.services == "nginx":
-        SystemD.restart_nginx_service()
+        SystemD.stop_nginx_service()
     elif args.services == "radixdlt-node":
-        SystemD.restart_node_service()
+        SystemD.stop_node_service()
     else:
         print(f"Invalid service name {args.services}")
         sys.exit()
