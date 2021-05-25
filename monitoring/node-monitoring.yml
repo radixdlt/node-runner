@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  prometheus:
+    image: radixdlt/radixdlt-prometheus:latest
+    restart: unless-stopped
+    environment:
+      PROMETHEUS_TSDB_RETENTION: 30d
+    volumes:
+      - "./prometheus/:/etc/prometheus/"
+      - "prometheus_tsdb:/prometheus"
+      - "nodes_lst:/nodes"
+    ports:
+      - "9090:9090"
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "30"
+
+  metrics-exporter:
+    image: radixdlt/metrics-exporter:1.0-beta.34
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "8099:8099"
+    environment:
+      METRICS_EXPORTER_BASIC_AUTH: "${BASIC_AUTH_USER_CREDENTIALS}"
+      METRICS_EXPORTER_ROOT_API_URL: "${NODE_END_POINT}"
+      METRICS_EXPORTER_LEDGER_FOLDER: /data
+      METRICS_EXPORTER_COLLECT_JSON_RPC_METRICS: "false"
+
+  grafana:
+      image: grafana/grafana:7.5.4
+      ports:
+          - "3000:3000"
+      volumes:
+        - "grafana-storage:/var/lib/grafana"
+        - "./grafana/provisioning/:/etc/grafana/provisioning/"
+volumes:
+  nodes_lst:
+  prometheus_tsdb:
+    external: true
+  grafana-storage:
+    external: true

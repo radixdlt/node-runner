@@ -1,0 +1,48 @@
+name: Package cli
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package_ubuntu_cli:
+    name: "Package cli for Ubuntu"
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: cancel running workflows
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install build essentials
+        run: sudo apt-get -y install build-essential
+      - name: setup python
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.7.6
+      - name: Build the binary for ubuntu
+        run: |
+          cd node-runner-cli
+          make output-ubuntu-focal
+      - name: "Upload generated cli file"
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: ubuntu 20.04
+          path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Upload radixcli ubunutu binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ./node-runner-cli/out/ubuntu/focal/radixnode
+          asset_name: radixnode-ubuntu-20.04
+          asset_content_type: application/octet-stream
+
