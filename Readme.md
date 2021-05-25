@@ -1,181 +1,60 @@
 
+# Node cli
 
-This is node runner cli which can be used for Ubuntu 20.04 to bring up the node and query endpoints. It uses python3 which comes installed on Ubuntu 20.04 and all modules that are inbuild in python3.
-One can find the hardware/OS specification for the node [here](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
+## Introduction:
 
-## nodecli script
-The nodecli.py script helps to run node in either of two modes - Docker compose and Systemd. It has inbuilt help which you can check by running below. User running this script should have sudo without password access.
+Executable name - radixnode
 
-```shell script
-# To list the subcommands
-python3 nodecli.py --help
-```
+All the below commands can be executed on Ubuntu 20.04 ( supported OS) as below
 
-### Installation
+**./radixnode <sub command>**
 
-```
-wget  -O  nodecli.py https://github.com/radixdlt/node-runner/releases/download/<latest version>/nodecli.py
-```
+The main purpose of this cli is to enable node runners
 
-Download the latest release of script by running above wget command. Latest release can be found [here](https://github.com/radixdlt/node-runner/releases)
+1. To interact with node using common API calls
+2. To setup node quickly on a fresh ubuntu machine using docker compose or systemd
+3. To setup monitoring for the node. Currently supports on API monitoring.
 
-## Docker compose mode
+## Interaction with node
 
-#### To check if python is installed
-```shell script
-# Python3 comes default on ubuntu20.04
-which python
-```
-
-#### To install all necessary packages and configure user for Docker Mode
-```shell script
-python3 nodecli.py configure-docker
-```
-If you have run this command for first time, command will split out instruction to logout and log back in
-
-#### Setup nginx password if node is run on Docker
-```shell script
-python3 nodecli.py admin-password -m DOCKER
-```
-
-#### To bring up the node in Docker mode
-Below command is using 1.0-beta.32 release. Pick up the latest yml from latest release [location](https://github.com/radixdlt/radixdlt/releases/)
-
--t or --trustednode option requires a node from radix network. You can get an ip from  list  in this [location](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
- 
-```shell script
-python3 nodecli.py setup-docker  \
- -t <IP of trusted node>
- -n <Type of node fullnode or archivenode>
-```
-
-If may want to choose Y to start the node or you below command to start the node
-
-#### To start the node using docker-compose 
-```shell script
-python3 nodecli.py start-docker \
- -t <IP of trusted node> \
- -f radix-fullnode-compose.yml
-```
-
-#### To stop the node in Docker mode
-```shell script
-python3 nodecli.py stop-docker \
- -f radix-fullnode-compose.yml
-```
+| **Sub Commands** | **Options** | **Prompts** | **Comments** |
+| --- | --- | --- | --- |
+| get-node-address | - | - | Returns the response on GET /node |
+| get-peers | - | - | Returns the response on GET /system/peers |
+| register-validator | - |<ul><li>1. Name of your validator:</li><li>2. Info URL of your validator:</li></ul>| Returns the response on POST /node/execute |
+| validator-info | - | - | Returns the response on POST /node/validator |
+| system-info | - | - | Returns the response on POST /system/info |
 
 
-#### To update the node in docker mode
-Update uses same subcommand as setup-docker . Except that it takes extra option "-u"
+## Setup/Update docker
 
-```shell script
-python3 nodecli.py setup-docker  \
- -n <Type of node fullnode or archivenode>
- -t <IP of trusted node>
- -u
-```
+| **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
+| --- | --- | --- | --- |
+| configure-docker | - | - | Prints out instruction to logout and login at the end if required |
+| setup-docker |<br/> -r or --release <releasetag>, required <br/> -n or --nodetype <(fullnode or archivenode>, required,<br/> -t or --trustednode <ip of node on network>, required. <br/> -u or --update, optional| <br/>- Displays url of composefile being used and prompts to continue <br/>- Prompts to back up the file, if the compose file exists <br/>- Prompts about generation of key if doesn&#39;t exist or just the password if key already exists <br/>- Displays the compose file asking user to start the node with Y/n| Setups the docker compose file for the node typeCreate key if not present and then asks for passwordPrints out instruction to stop and start the docker containers, if user chooses not to start the containers at the end |
+| start-docker |<br/> -t or --trustednode <ip of node on network>, required.<br/> -f or --composefile <name of the composefile>required|<br/>- Prompts about generation of key otherwise just password if key already exists| Setups the environment variables and brings up the container |
+| stop-docker |<br/> -f or --composefile <name of the composefile>,required <br/>-v or --removevolumes, optional|| Stops the docker containers and removes volumes if one wants to clear the volumes. Externally mounted volumes won&#39;t be cleared even with -v option |
 
-## SystemD mode
-#### To install all necessary packages and configure user for SystemD mode
+## Setup/Update systemd
 
-```shell script
-python3 nodecli.py configure-systemd
-```
-If you have run this command for first time, command will split out instructions to carry out before running next command
+| **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
+| --- | --- | --- | --- |
+| configure-systemd ||<br/>- Prompts for radixdlt user password| Prints out instructions to edit sudoers file and add public ssh key for password less login |
+| start-systemd |<br/> -r or --release <releasetag>, required<br/> -n or --nodetype <fullnode or archivenode>, required,<br/> -t or --trustednode <ip of radixnode on network>, required.<br/> -i or --hostip <ip of the host>,required<br/> -u or --update, optional|<br/>- Displays url of node binary and nginx binary being downloaded and prompts to continue<br/>- Prompts to back up files for node service, if the below files exists<br/>-- environment<br/> -- config<br/> -- radixdlt-node.service<br/> - Prompts if user wants to setup nginx. If yes , then prompts for backup on existing nginx files<br/> - Prompts for existing nginx secrets before recreating them||
+| stop-systemd |<br/> -s or --services <nginx or radixdlt-node>, defaults=all|| Stop the service based on the option. If option not provided , it stops both |
 
+## Nginx Passwords
 
-#### Setup nginx password if node is run on SystemD
-```shell script
-python3 nodecli.py admin-password -m SYSTEMD
-```
+| **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
+| --- | --- | --- | --- |
+| set-admin-password |<br/> -m or --setupmode <DOCKER or SYSTEMD>, required|<br/>- Prompts for nginx admin password to be changed or to be setup||
 
-#### To bring up the node in systemD mode
-Below command is using 1.0-beta.32 release. 
+## Monitoring
 
-For radix core distribution url, _option -b or --nodebinaryUrl_, pick up the url of latest radixdlt-dist zip file from latest release from this [location](https://github.com/radixdlt/radixdlt/releases/). 
-
-For nginx config distribution url, _option -c or --nginxconfigUrl_, pick up the url of latest archive node or full node zip files from this [location](https://github.com/radixdlt/radixdlt-nginx/releases/)
-
-Option _-t or --trustednode_ requires a node from radix network. You can get an ip from  list  in this [location](https://docs.radixdlt.com/documentation-component/betanet/radix-nodes/running-a-full-node.html#_setting_up_your_environment)
-
-Option _-n or --nodetype_  is one of two nodes - archive or fullnode and should match to nginx config distribution url
-
-Option _-i or --hostip_ is the static IP of your node
-
-```shell script
-python3 nodecli.py start-systemd \
- --trustednode <IP of trustednode> \
- --nodetype <fullnode or archivenode> \
- --hostip <hostip>
-```
-
-#### To update the node in systemD mode
-Update uses same subcommand as start-systemd . Except that it takes extra option "-u" or "--update"
-
-```shell script
-python3 nodecli.py start-systemd \
- --nodebinaryUrl https://github.com/radixdlt/radixdlt/releases/download/1.0-beta.32/radixdlt-dist-1.0-beta.32.zip \
- --nginxconfigUrl https://github.com/radixdlt/radixdlt-nginx/releases/download/1.0-beta.32/radixdlt-nginx-archive-conf.zip \
- --trustednode <IP of trustednode> \
- --nodetype fullnode \
- --hostip <hostip> \
- --update
-```
-
-
-
-## Interact with node API
-
-#### To fetch the node address 
-```shell script
-python3 nodecli.py nodeaddress
-```
-
-#### To register your node as validator
-```shell script
-python3 nodecli.py registervalidator
-```
-
-#### To show your validator info
-```shell script
-python3 nodecli.py showvalidator
-```
-
-##Monitoring
-####Installation
-The monitoring setup uses system/info endpoint and requires nginx admin password. Run below command by replacing you nginx admin password 
-```shell script
-NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> python3 nodecli.py setup-monitoring
-```
-This command, fetches the file from the release, that the `nodecli.py` is pointing to.  If for any reasons, one wants to update the configs,  one can download initial version using above command 
-To update the config, one has to bring down the monitoring using below `stop-monitoring` command
-
-If the monitoring is setup on different instance/machine, one can pass the IP of the node as below
-
-```shell script
-NGINX_ADMIN_PASSWORD=<your_nginx_admin_password> NODE_END_POINT=https://<your node IP> python3 nodecli.py setup_monitoring
-```
-
-
-#### Stopping monitoring
-```shell script
-python3 nodecli.py stop-monitoring
-```
-
-#### Restarting the monitoring
-One can restart the monitoring using updated config files by running below command. 
-```shell script
-BASIC_AUTH_USER_CREDENTIALS=admin:<your_nginx_admin_password>  NODE_END_POINT=https://<your node IP> docker-compose -f monitoring/node-monitoring.yml up -d
-```
-`<your node IP>` - your node's ip. localhost will not work even though you may be running on same machine as this variable is referenced inside docker container of metrics exporter
-
-
-#### Viewing dashboard
-Grafana can be accessed on port 3000. The monitoring can be setup on different machine or on same machine where the node runs.
-If the monitoring is setup on same instance as node , to access the dashboard outside the node, one has to open up the port 3000 for grafana. 
-If it is on different instance, then firewall on that instance needs to allow traffic on port 3000
-Then nn any browser type http://<node-ip>:3000 to access the grafana. For the first time , the password admin/admin allows you to login. Then change the grafana admin password to something of your choice
-
+| **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
+| --- | --- | --- | --- |
+| setup-monitoring ||| Uses hardcoded cli version to download the aritfacts. Creates external volumes for prometheus and grafana and starts up the monitoring containers |
+| stop-monitoring |<br/> -v or --removevolumes|| Stops the docker containers and removes volumes if one wants to clear the volumes. Externally created/mounted volumes won&#39;t be cleared even with -v option |
 
 ### More usage instructions
 
