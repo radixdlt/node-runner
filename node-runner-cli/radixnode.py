@@ -312,7 +312,8 @@ def system_info(args):
 
 
 @subcommand(
-    [argument("-m", "--setupmode", required=True, help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
+    [argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
+              help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
               action="store")])
 def setup_monitoring(args):
     if args.setupmode == "QUICK_SETUP_MODE":
@@ -333,7 +334,8 @@ def setup_monitoring(args):
 
 
 @subcommand([
-    argument("-m", "--setupmode", required=True, help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
+    argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
+             help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
              action="store"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
 def stop_monitoring(args):
