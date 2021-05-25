@@ -31,8 +31,8 @@ The main purpose of this cli is to enable node runners
 | **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
 | --- | --- | --- | --- |
 | configure-docker | - | - | Prints out instruction to logout and login at the end if required |
-| setup-docker |<br/> -r or --release <releasetag>, required <br/> -n or --nodetype <(fullnode or archivenode>, required,<br/> -t or --trustednode <ip of node on network>, required. <br/> -u or --update, optional| <br/>- Displays url of composefile being used and prompts to continue <br/>- Prompts to back up the file, if the compose file exists <br/>- Prompts about generation of key if doesn&#39;t exist or just the password if key already exists <br/>- Displays the compose file asking user to start the node with Y/n| Setups the docker compose file for the node typeCreate key if not present and then asks for passwordPrints out instruction to stop and start the docker containers, if user chooses not to start the containers at the end |
-| start-docker |<br/> -t or --trustednode <ip of node on network>, required.<br/> -f or --composefile <name of the composefile>required|<br/>- Prompts about generation of key otherwise just password if key already exists| Setups the environment variables and brings up the container |
+| setup-docker |<br/> -r or --release <releasetag>, required <br/> -n or --nodetype <(fullnode or archivenode>, required,<br/> -t or --trustednode <IP of node on network>, required. <br/> -u or --update, optional| <br/>- Displays URL of composefile being used and prompts to continue <br/>- Prompts to back up the file, if the compose file exists <br/>- Prompts about generation of key if doesn&#39;t exist or just the password if key already exists <br/>- Displays the compose file asking user to start the node with Y/n| <br/> -Setups the docker compose file for the node type <br/> -Create key if not present and then asks for password <br/>- Prints out instruction to stop and start the docker containers, if user chooses not to start the containers at the end |
+| start-docker |<br/> -t or --trustednode <IP of node on network>, required.<br/> -f or --composefile <name of the composefile>required|<br/>- Prompts about generation of key otherwise just password if key already exists| Setups the environment variables and brings up the container |
 | stop-docker |<br/> -f or --composefile <name of the composefile>,required <br/>-v or --removevolumes, optional|| Stops the docker containers and removes volumes if one wants to clear the volumes. Externally mounted volumes won&#39;t be cleared even with -v option |
 
 ## Setup/Update systemd
@@ -40,7 +40,7 @@ The main purpose of this cli is to enable node runners
 | **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
 | --- | --- | --- | --- |
 | configure-systemd ||<br/>- Prompts for radixdlt user password| Prints out instructions to edit sudoers file and add public ssh key for password less login |
-| start-systemd |<br/> -r or --release <releasetag>, required<br/> -n or --nodetype <fullnode or archivenode>, required,<br/> -t or --trustednode <ip of radixnode on network>, required.<br/> -i or --hostip <ip of the host>,required<br/> -u or --update, optional|<br/>- Displays url of node binary and nginx binary being downloaded and prompts to continue<br/>- Prompts to back up files for node service, if the below files exists<br/>-- environment<br/> -- config<br/> -- radixdlt-node.service<br/> - Prompts if user wants to setup nginx. If yes , then prompts for backup on existing nginx files<br/> - Prompts for existing nginx secrets before recreating them||
+| start-systemd |<br/> -r or --release <releasetag>, required<br/> -n or --nodetype <fullnode or archivenode>, required,<br/> -t or --trustednode <IP of radixnode on network>, required.<br/> -i or --hostip <ip of the host>,required<br/> -u or --update, optional|<br/>- Displays URL of node binary and nginx binary being downloaded and prompts to continue<br/>- Prompts to back up files for node service, if the below files exists<br/>-- environment<br/> -- config<br/> -- radixdlt-node.service<br/> - Prompts if user wants to setup nginx. If yes , then prompts for backup on existing nginx files<br/> - Prompts for existing nginx secrets before recreating them||
 | stop-systemd |<br/> -s or --services <nginx or radixdlt-node>, defaults=all|| Stop the service based on the option. If option not provided , it stops both |
 
 ## Nginx Passwords
@@ -61,14 +61,13 @@ The main purpose of this cli is to enable node runners
 To list all subcommands
 ```shell script
 # To list the subcommands
-python3 nodecli.py --help
-
-usage: nodecli.py [-h]
-                  {start-docker,start-systemd,stop-docker,configure-docker,configure-systemd,admin-password,nodeaddress,peers,registervalidator,showvalidator,systeminfo}
-                  ...
+radixnode -h
+usage: radixnode [-h]
+                 {version,setup-docker,start-systemd,stop-systemd,start-docker,stop-docker,configure-docker,configure-systemd,set-admin-password,get-node-address,get-peers,register-validator,validator-info,system-info,setup-monitoring,stop-monitoring}
+                 ...
 
 positional arguments:
-  {start-docker,start-systemd,stop-docker,configure-docker,configure-systemd,admin-password,nodeaddress,peers,registervalidator,showvalidator,systeminfo}
+  {version,setup-docker,start-systemd,stop-systemd,start-docker,stop-docker,configure-docker,configure-systemd,set-admin-password,get-node-address,get-peers,register-validator,validator-info,system-info,setup-monitoring,stop-monitoring}
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -77,14 +76,19 @@ optional arguments:
 To list options/arguements for the subcommand
 ```shell script
 # Check the options for a subcommand such as start-docker
-python3 nodecli.py start-docker -h
+radixnode setup-docker -h
 
-usage: nodecli.py start-docker [-h] -f COMPOSEFILEURL -t TRUSTEDNODE
+usage: radixnode setup-docker [-h] [-r RELEASE] -n NODETYPE -t TRUSTEDNODE
+                              [-u]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f COMPOSEFILEURL, --composefileurl COMPOSEFILEURL
-                        URl to download the docker compose file
+  -r RELEASE, --release RELEASE
+                        Version of node software to install such as
+                        1.0-beta.34
+  -n NODETYPE, --nodetype NODETYPE
+                        Type of node fullnode or archivenode
   -t TRUSTEDNODE, --trustednode TRUSTEDNODE
                         Trusted node on radix network
+  -u, --update          Update the node to new version of composefile
 ```
