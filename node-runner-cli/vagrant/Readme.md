@@ -1,5 +1,9 @@
 Purpose of using Vagrant is to bring up the machine quickly on the local machine for quick testing.
 
+Prerequisites
+####
+You will need to [install VirtualBox](https://www.virtualbox.org/wiki/Downloads) before you can use the Vagrant VM setup.
+
 Usage
 #### 
 Run below command to bring the up the VM described in vagarantfile
