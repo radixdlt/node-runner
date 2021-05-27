@@ -2,7 +2,9 @@ import getpass
 import os
 import sys
 from pathlib import Path
-from utils.utils import run_shell_command,Helpers
+
+from utils.utils import run_shell_command, Helpers
+
 
 class Base:
     @staticmethod
@@ -251,7 +253,7 @@ class SystemD(Base):
 
     @staticmethod
     def install_nginx():
-        nginx_installed = run_shell_command("sudo service --status-all | grep nginx",shell=True)
+        nginx_installed = run_shell_command("sudo service --status-all | grep nginx", shell=True, fail_on_error=False)
         if nginx_installed.returncode != 0:
             run_shell_command('sudo apt install -y nginx apache2-utils', shell=True)
             run_shell_command('sudo rm -rf /etc/nginx/{sites-available,sites-enabled}', shell=True)
@@ -349,7 +351,7 @@ class SystemD(Base):
     @staticmethod
     def checkUser():
         print("\nChecking the user is radixdlt")
-        result = run_shell_command(f'whoami | grep radixdlt', shell=True)
+        result = run_shell_command(f'whoami | grep radixdlt', shell=True, fail_on_error=False)
         if result.returncode != 0:
             print(" You are not logged as radixdlt user. Logout and login as radixdlt user")
             sys.exit()
@@ -369,4 +371,3 @@ class SystemD(Base):
     @staticmethod
     def stop_node_service():
         run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
-
