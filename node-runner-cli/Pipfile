@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 requests = "==2.25.1"
+ansible-runner = "==1.4.7"
+ansible = "==2.10.0"
 
 [requires]
 python_version = "3.7.6"

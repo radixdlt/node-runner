@@ -223,10 +223,12 @@ def configure_systemd(args):
 def set_admin_password(args):
     if args.setupmode == "DOCKER":
         Docker.setup_nginx_Password()
-    if args.setupmode == "SYSTEMD":
+    elif args.setupmode == "SYSTEMD":
         SystemD.checkUser()
         SystemD.install_nginx()
         SystemD.setup_nginx_password("/etc/nginx/secrets")
+    else:
+        print("Invalid setupmode specified. It should be either DOCKER or SYSTEMD.")
 
 
 """
@@ -347,6 +349,9 @@ def stop_monitoring(args):
     else:
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
+@subcommand([])
+def check_ansible(args):
+    Base.setup_node_optimisation_config()
 
 class Monitoring():
 
