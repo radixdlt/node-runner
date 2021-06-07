@@ -3,8 +3,9 @@ import os
 import sys
 from pathlib import Path
 
+import requests
+
 from utils.utils import run_shell_command, Helpers
-import ansible_runner, ansible
 
 
 class Base:
@@ -17,6 +18,7 @@ class Base:
         run_shell_command(['sudo', 'apt', 'install', 'rng-tools'])
         run_shell_command(['sudo', 'rngd', '-r', '/dev/random'])
         run_shell_command('sudo apt install python3-pip', shell=True)
+        run_shell_command('pip install ansible==2.10.0', shell=True)
 
     @staticmethod
     def add_user_docker_group():
@@ -62,23 +64,18 @@ class Base:
         return keystore_password
 
     @staticmethod
-    def setup_node_optimisation_config():
-        import sys, os
-        if getattr(sys, 'frozen', False):
-            # If the application is run as a bundle, the PyInstaller bootloader
-            # extends the sys module by a flag frozen=True and sets the app
-            # path into variable _MEIPASS'.
-            application_path = sys._MEIPASS
-        else:
-            application_path = os.path.dirname(os.path.abspath(__file__))
-        print(ansible.release.__version__)
-        Path("ansible").mkdir(parents=True, exist_ok=True)
+    def download_ansible_file(ansible_dir,file):
+        req = requests.Request('GET', f'{ansible_dir}/{file}')
+        prepared = req.prepare()
 
-        r = ansible_runner.run(inventory='localhost', private_data_dir='ansible',
-                               playbook=f'{application_path}/provision.yml')
-        print("{}: {}".format(r.status, r.rc))
-        # successful: 0
-        # for each_host_event in r.events:
-        #     print(each_host_event['event'])
-        print("Final status:")
-        print(r.stats)
+        resp = Helpers.send_request(prepared, print_response=False)
+        Path(file).mkdir(parents=True, exist_ok=True)
+        with open(file, 'wb') as f:
+            f.write(resp.content)
+
+    @staticmethod
+    def setup_node_optimisation_config(version):
+        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli/ansible'
+        print(f"Downloading artifacts from {ansible_dir}\n")
+        Base.download_ansible_file(ansible_dir, 'project/provision.yml')
+        run_shell_command("ansible-playbook ansible/playbook.yml", shell=True)

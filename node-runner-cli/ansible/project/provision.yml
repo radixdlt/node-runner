@@ -8,6 +8,24 @@
     swap_size: 8G
 
   tasks:
+    - block:
+        - name: configure system settings, file descriptors and number of threads
+          pam_limits:
+            domain: radix
+            limit_type: "{{item.limit_type}}"
+            limit_item: "{{item.limit_item}}"
+            value: "{{item.value}}"
+          with_items:
+            - { limit_type: '-', limit_item: 'nofile', value: 65536 }
+            - { limit_type: '-', limit_item: 'nproc', value: 65536 }
+            - { limit_type: 'soft', limit_item: 'memlock', value: unlimited }
+            - { limit_type: 'hard', limit_item: 'memlock', value: unlimited }
+        - name: reload settings from all system configuration files
+          shell: sysctl --system
+      tags: [ulimits]
+      remote_user: radix
+      become: true
+
     - name: template out huge page setting service
       template: src=setup-transparent-huge-pages.service.j2 dest=/etc/systemd/system/setup-transparent-huge-pages.service
       notify:
