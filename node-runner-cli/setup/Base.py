@@ -69,13 +69,15 @@ class Base:
         prepared = req.prepare()
 
         resp = Helpers.send_request(prepared, print_response=False)
-        Path(file).mkdir(parents=True, exist_ok=True)
+        directory = file.rsplit('/', 2)[-2]
+        print(f'directory {directory}')
+        Path(directory).mkdir(parents=True, exist_ok=True)
         with open(file, 'wb') as f:
             f.write(resp.content)
 
     @staticmethod
     def setup_node_optimisation_config(version):
-        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli/ansible'
+        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli/'
         print(f"Downloading artifacts from {ansible_dir}\n")
-        Base.download_ansible_file(ansible_dir, 'project/provision.yml')
+        Base.download_ansible_file(ansible_dir, 'ansible/project/provision.yml')
         run_shell_command("ansible-playbook ansible/playbook.yml", shell=True)

@@ -351,7 +351,7 @@ def stop_monitoring(args):
 
 @subcommand([])
 def check_ansible(args):
-    Base.setup_node_optimisation_config()
+    Base.setup_node_optimisation_config(cli_version())
 
 class Monitoring():
 
