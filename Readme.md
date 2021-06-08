@@ -59,7 +59,7 @@ The main purpose of this cli is to enable node runners
 # Other commands
 | **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
 | --- | --- | --- | --- |
-| optimise-node |<br/> -s or --setupswap, defaults to true <br/> -l or --setuplimits, defaults to true || Uses hardcoded cli version to download the aritfacts. Creates external volumes for prometheus and grafana and starts up the monitoring containers |
+| optimise-node |-|<br/>- Prompts asking to setup limits <br/>- Prompts asking to setup swap and size of swap in GB|- |
 
 
 ### More usage instructions
