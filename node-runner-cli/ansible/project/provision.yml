@@ -35,7 +35,6 @@
 
     - block:
       - name: check swapfile exists
-        become: true
         shell: |
           swapon --show | grep "/swapfile"
         register: swapfile
@@ -44,7 +43,6 @@
 
 
       - name: setup swap file
-        become: true
         shell: |
           fallocate -l {{swap_size}} /swapfile
           chmod 600 /swapfile
@@ -56,6 +54,7 @@
           echo "vm.swappiness={{swappiness_factor}}" >> /etc/sysctl.conf
           sysctl vm.vfs_cache_pressure={{cache_pressure_factor}}
           echo "vm.vfs_cache_pressure={{cache_pressure_factor}}" >> /etc/sysctl.conf
-        when: >
-        swapfile.stdout == ""
+        when: swapfile.stdout == ""
+
+      become: true
       when: setup_swap | bool
