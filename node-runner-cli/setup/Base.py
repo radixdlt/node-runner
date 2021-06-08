@@ -64,7 +64,7 @@ class Base:
         return keystore_password
 
     @staticmethod
-    def download_ansible_file(ansible_dir,file):
+    def download_ansible_file(ansible_dir, file):
         req = requests.Request('GET', f'{ansible_dir}/{file}')
         prepared = req.prepare()
 
@@ -76,9 +76,26 @@ class Base:
             f.write(resp.content)
 
     @staticmethod
-    def setup_node_optimisation_config(version,setup_swap,setup_limits):
-        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli'
+    def setup_node_optimisation_config(version, setup_swap, setup_limits):
 
+        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli'
         print(f"Downloading artifacts from {ansible_dir}\n")
         Base.download_ansible_file(ansible_dir, 'ansible/project/provision.yml')
-        run_shell_command(f"ansible-playbook ansible/project/provision.yml -e setup_limits={setup_limits} -e setup_swap={setup_swap}", shell=True)
+        ask_setup_limits = input \
+            ("Do you want to setup ulimits Y/n?:")
+        setup_limits = "true" if ask_setup_limits == "Y" else "false"
+        run_shell_command(
+            f"ansible-playbook ansible/project/provision.yml -e setup_limits={setup_limits}",
+            shell=True)
+        ask_setup_swap = input \
+            ("Do you want to setup swap space Y/n?:")
+        if ask_setup_limits == "Y":
+            setup_swap = "true"
+            ask_swap_size = input \
+                ("Enter swap size in GB. Example - 1G or 3G or 8G ?:")
+            run_shell_command(
+                f"ansible-playbook ansible/project/provision.yml -e setup_swap={setup_swap} -e swap_size={ask_swap_size}",
+                shell=True)
+        else:
+            setup_swap = "false"
+

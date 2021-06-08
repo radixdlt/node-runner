@@ -359,15 +359,9 @@ def stop_monitoring(args):
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
 
-@subcommand([argument("-s", "--setupswap", default="true",
-                      help="Setup swap space",
-                      action="store"),
-             argument("-l", "--setuplimits", default="true",
-                      help="Setup ulimits",
-                      action="store")
-             ])
+@subcommand()
 def optimise_node(args):
-    Base.setup_node_optimisation_config(cli_version(), args.setupswap, args.setuplimits)
+    Base.setup_node_optimisation_config(cli_version())
 
 
 class Monitoring():

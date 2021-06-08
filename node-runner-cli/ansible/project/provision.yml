@@ -6,6 +6,8 @@
     swappiness_factor: 10
     cache_pressure_factor: 50
     swap_size: 8G
+    setup_swap: false
+    setup_limits: false
 
   tasks:
     - block:

@@ -41,7 +41,7 @@ class SystemD(Base):
              Instead, we suggest, for you to setup passwordless ssh login by copying the public key to
              /home/radixdlt/.ssh/authorized_keys
 
-            3. Also once can change to another user by running sudo su command
+            3. Also one can change to another user by running sudo su command
                 $ sudo su radixdlt
                 $ cd /home/radixdlt
 
@@ -100,7 +100,7 @@ class SystemD(Base):
             host.ip={hostip}
             db.location=/data
             node_api.port=3334
-            client_api.enable=false
+            client_api.enable={enable_client_api}
             client_api.port=8081
             log.level=debug
         """
