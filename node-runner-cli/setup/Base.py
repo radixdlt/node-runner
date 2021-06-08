@@ -17,8 +17,6 @@ class Base:
         run_shell_command(['sudo', 'apt', 'install', 'docker-compose'])
         run_shell_command(['sudo', 'apt', 'install', 'rng-tools'])
         run_shell_command(['sudo', 'rngd', '-r', '/dev/random'])
-        run_shell_command('sudo apt install python3-pip', shell=True)
-        run_shell_command('pip install ansible==2.10.0', shell=True)
 
     @staticmethod
     def add_user_docker_group():
@@ -70,13 +68,23 @@ class Base:
 
         resp = Helpers.send_request(prepared, print_response=False)
         directory = file.rsplit('/', 1)[0]
-        print(f'directory {directory}')
         Path(directory).mkdir(parents=True, exist_ok=True)
         with open(file, 'wb') as f:
             f.write(resp.content)
 
     @staticmethod
-    def setup_node_optimisation_config(version, setup_swap, setup_limits):
+    def setup_node_optimisation_config(version):
+        check_ansible = run_shell_command(f"pip list | grep ansible", shell=True, fail_on_error=False)
+        import subprocess
+        user = subprocess.check_output('whoami', shell=True).strip()
+        if check_ansible.returncode != 0:
+            print(f"Ansible not found for the user {user.decode('utf-8')}. Installing ansible now")
+            check_pip = run_shell_command("pip -V ", shell=True, fail_on_error=False)
+            if check_pip.returncode != 0:
+                print(f"Pip is not installed. Installing pip now")
+                run_shell_command('sudo apt install python3-pip', shell=True)
+            run_shell_command(f"pip install --user ansible==2.10.0", shell=True)
+            run_shell_command(f"exec su - {user.decode('utf-8')}")
 
         ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli'
         print(f"Downloading artifacts from {ansible_dir}\n")
@@ -89,7 +97,7 @@ class Base:
             shell=True)
         ask_setup_swap = input \
             ("Do you want to setup swap space Y/n?:")
-        if ask_setup_limits == "Y":
+        if ask_setup_swap == "Y":
             setup_swap = "true"
             ask_swap_size = input \
                 ("Enter swap size in GB. Example - 1G or 3G or 8G ?:")
@@ -98,4 +106,3 @@ class Base:
                 shell=True)
         else:
             setup_swap = "false"
-
