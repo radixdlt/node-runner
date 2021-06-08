@@ -76,8 +76,9 @@ class Base:
             f.write(resp.content)
 
     @staticmethod
-    def setup_node_optimisation_config(version):
-        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli/'
+    def setup_node_optimisation_config(version,setup_swap,setup_limits):
+        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli'
+
         print(f"Downloading artifacts from {ansible_dir}\n")
         Base.download_ansible_file(ansible_dir, 'ansible/project/provision.yml')
-        run_shell_command("ansible-playbook ansible/project/provision.yml", shell=True)
+        run_shell_command(f"ansible-playbook ansible/project/provision.yml -e setup_limits={setup_limits} -e setup_swap={setup_swap}", shell=True)

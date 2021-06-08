@@ -9,9 +9,16 @@
 
   tasks:
     - block:
+        - name: Run whoami without become.
+          command: whoami
+          changed_when: false
+          become: false
+          register: whoami
+
+
         - name: configure system settings, file descriptors and number of threads
           pam_limits:
-            domain: radix
+            domain: "{{whoami.stdout}}"
             limit_type: "{{item.limit_type}}"
             limit_item: "{{item.limit_item}}"
             value: "{{item.value}}"
@@ -23,43 +30,32 @@
         - name: reload settings from all system configuration files
           shell: sysctl --system
       tags: [ulimits]
-      remote_user: radix
       become: true
+      when: setup_limits | bool
 
-    - name: template out huge page setting service
-      template: src=setup-transparent-huge-pages.service.j2 dest=/etc/systemd/system/setup-transparent-huge-pages.service
-      notify:
-        - Restart huge page setting service
+    - block:
+      - name: check swapfile exists
+        become: true
+        shell: |
+          swapon --show | grep "/swapfile"
+        register: swapfile
+        changed_when: false
+        ignore_errors: true
 
-    - name: enable and start service
-      become: true
-      systemd:
-        enabled: true
-        name: setup-transparent-huge-pages
-        state: started
-        daemon_reload: true
-      changed_when: False
-      when: molecule_yml is not defined
 
-    - name: check swapfile exists
-      become: true
-      shell: |
-        swapon --show | grep "/swapfile"
-      register: swapfile
-      changed_when: false
-      ignore_errors: true
-
-#    - name: setup swap file
-#      become: true
-#      shell: |
-#        fallocate -l {{swap_size}} /swapfile
-#        chmod 600 /swapfile
-#        mkswap /swapfile
-#        swapon /swapfile
-#        cp /etc/fstab /etc/fstab_{{ansible_date_time.iso8601_basic_short}}.bak
-#        echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-#        sysctl vm.swappiness={{swappiness_factor}}
-#        echo "vm.swappiness={{swappiness_factor}}" >> /etc/sysctl.conf
-#        sysctl vm.vfs_cache_pressure={{cache_pressure_factor}}
-#        echo "vm.vfs_cache_pressure={{cache_pressure_factor}}" >> /etc/sysctl.conf
-#      when: swapfile.stdout == ""
+      - name: setup swap file
+        become: true
+        shell: |
+          fallocate -l {{swap_size}} /swapfile
+          chmod 600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          cp /etc/fstab /etc/fstab_{{ansible_date_time.iso8601_basic_short}}.bak
+          echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+          sysctl vm.swappiness={{swappiness_factor}}
+          echo "vm.swappiness={{swappiness_factor}}" >> /etc/sysctl.conf
+          sysctl vm.vfs_cache_pressure={{cache_pressure_factor}}
+          echo "vm.vfs_cache_pressure={{cache_pressure_factor}}" >> /etc/sysctl.conf
+        when: >
+        swapfile.stdout == ""
+      when: setup_swap | bool

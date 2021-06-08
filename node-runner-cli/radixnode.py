@@ -349,9 +349,17 @@ def stop_monitoring(args):
     else:
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
-@subcommand([])
-def check_ansible(args):
-    Base.setup_node_optimisation_config(cli_version())
+
+@subcommand([argument("-s", "--setupswap", default="true",
+                      help="Setup swap space",
+                      action="store"),
+             argument("-l", "--setuplimits", default="true",
+                      help="Setup ulimits",
+                      action="store")
+             ])
+def optimise_node(args):
+    Base.setup_node_optimisation_config(cli_version(),args.setupswap,args.setuplimits)
+
 
 class Monitoring():
 
