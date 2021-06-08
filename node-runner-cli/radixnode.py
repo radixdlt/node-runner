@@ -109,6 +109,14 @@ def start_systemd(args):
     else:
         release = args.release
 
+    if args.nodetype == "archivenode":
+        node_type_name = 'archive'
+    elif args.nodetype == "fullnode":
+        node_type_name = 'fullnode'
+    else:
+        print(f"Node type - {args.nodetype} specificed should be either archivenode or fullnode")
+        sys.exit()
+
     node_dir = '/etc/radixdlt/node'
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
@@ -116,7 +124,7 @@ def start_systemd(args):
     nodebinaryUrl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip"
 
     # TODO add method to fetch latest nginx release
-    nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{args.nodetype}-conf.zip"
+    nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{node_type_name}-conf.zip"
 
     continue_setup = input(
         f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
@@ -134,7 +142,8 @@ def start_systemd(args):
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
-    SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir)
+    SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
+                                 node_type=args.nodetype)
 
     node_version = nodebinaryUrl.rsplit('/', 2)[-2]
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time)
@@ -223,10 +232,12 @@ def configure_systemd(args):
 def set_admin_password(args):
     if args.setupmode == "DOCKER":
         Docker.setup_nginx_Password()
-    if args.setupmode == "SYSTEMD":
+    elif args.setupmode == "SYSTEMD":
         SystemD.checkUser()
         SystemD.install_nginx()
         SystemD.setup_nginx_password("/etc/nginx/secrets")
+    else:
+        print("Invalid setupmode specified. It should be either DOCKER or SYSTEMD.")
 
 
 """
@@ -346,6 +357,11 @@ def stop_monitoring(args):
         sys.exit()
     else:
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
+
+
+@subcommand()
+def optimise_node(args):
+    Base.setup_node_optimisation_config(cli_version())
 
 
 class Monitoring():

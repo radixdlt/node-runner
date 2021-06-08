@@ -53,8 +53,14 @@ The main purpose of this cli is to enable node runners
 
 | **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
 | --- | --- | --- | --- |
-| setup-monitoring ||| Uses hardcoded cli version to download the aritfacts. Creates external volumes for prometheus and grafana and starts up the monitoring containers |
-| stop-monitoring |<br/> -v or --removevolumes|| Stops the docker containers and removes volumes if one wants to clear the volumes. Externally created/mounted volumes won&#39;t be cleared even with -v option |
+| setup-monitoring |-|-| Uses hardcoded cli version to download the aritfacts. Creates external volumes for prometheus and grafana and starts up the monitoring containers |
+| stop-monitoring |<br/> -v or --removevolumes|-| Stops the docker containers and removes volumes if one wants to clear the volumes. Externally created/mounted volumes won&#39;t be cleared even with -v option |
+
+# Other commands
+| **Sub Commands** | **Arguments** | **Prompts** | **Comments** |
+| --- | --- | --- | --- |
+| optimise-node |-|<br/>- Prompts asking to setup limits <br/>- Prompts asking to setup swap and size of swap in GB|- |
+
 
 ### More usage instructions
 

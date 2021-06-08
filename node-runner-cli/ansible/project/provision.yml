@@ -1,0 +1,62 @@
+---
+- hosts: localhost
+  any_errors_fatal: true
+  vars:
+    huge_pages_setting: never
+    swappiness_factor: 10
+    cache_pressure_factor: 50
+    swap_size: 8G
+    setup_swap: false
+    setup_limits: false
+
+  tasks:
+    - block:
+        - name: Run whoami without become.
+          command: whoami
+          changed_when: false
+          become: false
+          register: whoami
+
+
+        - name: configure system settings, file descriptors and number of threads
+          pam_limits:
+            domain: "{{whoami.stdout}}"
+            limit_type: "{{item.limit_type}}"
+            limit_item: "{{item.limit_item}}"
+            value: "{{item.value}}"
+          with_items:
+            - { limit_type: '-', limit_item: 'nofile', value: 65536 }
+            - { limit_type: '-', limit_item: 'nproc', value: 65536 }
+            - { limit_type: 'soft', limit_item: 'memlock', value: unlimited }
+            - { limit_type: 'hard', limit_item: 'memlock', value: unlimited }
+        - name: reload settings from all system configuration files
+          shell: sysctl --system
+      tags: [ulimits]
+      become: true
+      when: setup_limits | bool
+
+    - block:
+      - name: check swapfile exists
+        shell: |
+          swapon --show | grep "/swapfile"
+        register: swapfile
+        changed_when: false
+        ignore_errors: true
+
+
+      - name: setup swap file
+        shell: |
+          fallocate -l {{swap_size}} /swapfile
+          chmod 600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          cp /etc/fstab /etc/fstab_{{ansible_date_time.iso8601_basic_short}}.bak
+          echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+          sysctl vm.swappiness={{swappiness_factor}}
+          echo "vm.swappiness={{swappiness_factor}}" >> /etc/sysctl.conf
+          sysctl vm.vfs_cache_pressure={{cache_pressure_factor}}
+          echo "vm.vfs_cache_pressure={{cache_pressure_factor}}" >> /etc/sysctl.conf
+        when: swapfile.stdout == ""
+
+      become: true
+      when: setup_swap | bool

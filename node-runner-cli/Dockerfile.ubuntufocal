@@ -31,9 +31,12 @@ RUN pyenv local nodecli
 RUN pip install pyinstaller
 
 WORKDIR /app
-COPY . /app
+COPY requirements.txt /app/requirements.txt
 RUN pip install -r requirements.txt
-RUN pyinstaller --onefile --windowed radixnode.py
+
+COPY . /app
+RUN pyinstaller --onefile --windowed radixnode.spec
+
 RUN /app/dist/radixnode version
 
 FROM scratch AS export-stage
