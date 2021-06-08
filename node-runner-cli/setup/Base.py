@@ -84,7 +84,10 @@ class Base:
                 print(f"Pip is not installed. Installing pip now")
                 run_shell_command('sudo apt install python3-pip', shell=True)
             run_shell_command(f"pip install --user ansible==2.10.0", shell=True)
-            run_shell_command(f"exec su - {user.decode('utf-8')}")
+            print("""
+                     ----------------------------------------------------------------------------------------
+                    Ansible installed successfully. You need exit shell and login back""")
+            sys.exit()
 
         ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli'
         print(f"Downloading artifacts from {ansible_dir}\n")
