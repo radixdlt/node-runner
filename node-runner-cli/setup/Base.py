@@ -43,7 +43,7 @@ class Base:
             keystore_password = getpass.getpass("Enter the password of the existing keystore file 'validator.ks':")
         else:
             ask_keystore_exists = input \
-                ("Do you have keystore file named 'validator.ks' already from previous node Y/n:")
+                ("Do you have keystore file named 'validator.ks' already from previous node Y/n?:")
             if ask_keystore_exists == "Y":
                 print(
                     f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")

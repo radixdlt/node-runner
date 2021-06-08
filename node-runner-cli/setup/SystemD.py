@@ -38,7 +38,7 @@ class SystemD(Base):
              Then login using account radixdlt and the password you setup just now. To login using password, 
              you need to enable it in /etc/ssh/sshd_config.
 
-             Instead, we suggest, for you to setup password less ssh login by copying the public key to
+             Instead, we suggest, for you to setup passwordless ssh login by copying the public key to
              /home/radixdlt/.ssh/authorized_keys
 
             3. Also once can change to another user by running sudo su command
@@ -71,7 +71,7 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time):
         if os.path.isfile(f"{filepath}/{filename}"):
-            backup_yes = input(f"Current {filename} file exists. Do you want to back up Y/n:")
+            backup_yes = input(f"{filename} file exists. Do you want to back up Y/n:")
             if backup_yes == "Y":
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
@@ -86,7 +86,8 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir):
+    def setup_default_config(trustednode, hostip, node_dir, node_type):
+        enable_client_api = "true" if node_type == "archivenode" else "false"
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
