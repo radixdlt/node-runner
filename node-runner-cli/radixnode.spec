@@ -7,10 +7,7 @@ block_cipher = None
 a = Analysis(['radixnode.py'],
              pathex=['.'],
              binaries=[],
-             datas=[
-             ('ansible/project/provision.yml','ansible/project/provision.yml'),
-             ('ansible/ansible.cfg','.')
-             ],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
