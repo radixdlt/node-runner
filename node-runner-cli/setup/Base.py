@@ -69,7 +69,7 @@ class Base:
         prepared = req.prepare()
 
         resp = Helpers.send_request(prepared, print_response=False)
-        directory = file.rsplit('/', 2)[-2]
+        directory = file.rsplit('/', 1)[0]
         print(f'directory {directory}')
         Path(directory).mkdir(parents=True, exist_ok=True)
         with open(file, 'wb') as f:
@@ -80,4 +80,4 @@ class Base:
         ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli/'
         print(f"Downloading artifacts from {ansible_dir}\n")
         Base.download_ansible_file(ansible_dir, 'ansible/project/provision.yml')
-        run_shell_command("ansible-playbook ansible/playbook.yml", shell=True)
+        run_shell_command("ansible-playbook ansible/project/provision.yml", shell=True)
