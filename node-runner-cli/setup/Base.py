@@ -67,6 +67,10 @@ class Base:
         prepared = req.prepare()
 
         resp = Helpers.send_request(prepared, print_response=False)
+        if not resp.ok:
+            print(f"{resp.status_code} error retrieving ansible playbook.. Existing the command...")
+            sys.exit()
+
         directory = file.rsplit('/', 1)[0]
         Path(directory).mkdir(parents=True, exist_ok=True)
         with open(file, 'wb') as f:
