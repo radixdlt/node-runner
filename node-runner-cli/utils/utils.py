@@ -66,6 +66,7 @@ class Helpers:
     @staticmethod
     def get_nginx_user():
         nginx_admin_password = 'NGINX_ADMIN_PASSWORD'
+        nginx_admin_password = 'NGINX_ADMIN_USERNAME'
         if os.environ.get('%s' % nginx_admin_password) is None:
             print("""
             ------
@@ -77,7 +78,7 @@ class Helpers:
             sys.exit()
         else:
             return dict({
-                "name": "admin",
+                "name": os.getenv('NGINX_ADMIN_USERNAME', 'admin'),
                 "password": os.environ.get("%s" % nginx_admin_password)
             })
 
@@ -110,3 +111,10 @@ class Helpers:
             application_path = os.path.dirname(os.path.abspath(__file__))
 
         return application_path
+
+    @staticmethod
+    def check_Yes(anwer):
+        if anwer.lower() == "y":
+            return True
+        else:
+            return False

@@ -11,7 +11,7 @@ class Docker(Base):
         print('-----------------------------')
         print('Setting up nginx password')
         nginx_password = getpass.getpass("Enter your nginx password: ")
-        run_shell_command(['/usr/local/bin/docker', 'run', '--rm', '-v',
+        run_shell_command(['docker', 'run', '--rm', '-v',
                            os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
                            'radixdlt/htpasswd:v1.0.0',
                            'htpasswd', '-bc', '/secrets/htpasswd.admin', 'admin', nginx_password])
