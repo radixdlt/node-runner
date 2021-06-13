@@ -1,7 +1,11 @@
 import getpass
 import os
+import sys
+
+import requests
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
+import yaml
 
 
 class Docker(Base):
@@ -39,7 +43,35 @@ class Docker(Base):
             print(f"Docker compose file {compose_file_name} exists. Backing it up as {backup_file_name}")
             run_shell_command(f"cp {compose_file_name} {backup_file_name}", shell=True)
         print(f"Downloading new compose file from {composefileurl}")
-        run_shell_command(['wget', '-O', compose_file_name, composefileurl])
+
+        req = requests.Request('GET', f'{composefileurl}')
+        prepared = req.prepare()
+
+        resp = Helpers.send_request(prepared, print_response=False)
+        if not resp.ok:
+            print(f" Errored downloading file {composefileurl}. Exitting ... ")
+            sys.exit()
+
+        composefile_yaml = yaml.safe_load(resp.content)
+        data_dir_path = Base.get_data_dir()
+
+        external_data_yaml = yaml.safe_load(f"""
+        services:
+          core:
+            volumes:
+              - "core_ledger:/home/radixdlt/RADIXDB"
+        volumes:
+          core_ledger:
+            driver: local
+            driver_opts:
+              o: bind
+              type: none
+              device: {data_dir_path}
+        """)
+        composefile_yaml.update(external_data_yaml)
+
+        with open(compose_file_name, 'wb') as f:
+            f.write(composefile_yaml)
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):

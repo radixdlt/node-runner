@@ -113,3 +113,8 @@ class Base:
                 shell=True)
         else:
             setup_swap = "false"
+
+    @staticmethod
+    def get_data_dir():
+        data_dir_path = input("Enter the absoulte path to data DB folder:")
+        return data_dir_path
