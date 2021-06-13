@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 from setup.Base import Base
-from utils.utils import run_shell_command
+from utils.utils import run_shell_command, Helpers
 
 
 class SystemD(Base):
@@ -71,8 +71,8 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time):
         if os.path.isfile(f"{filepath}/{filename}"):
-            backup_yes = input(f"{filename} file exists. Do you want to back up Y/n:")
-            if backup_yes == "Y":
+            backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
+            if Helpers.check_Yes(backup_yes):
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
@@ -143,8 +143,8 @@ class SystemD(Base):
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
             print(f"Directory {node_dir}/{node_version} is not empty")
-            okay = input("Should the directory be removed Y/n :")
-            if okay == "Y":
+            okay = input("Should the directory be removed [Y/n]?:")
+            if Helpers.check_Yes(okay):
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
         run_shell_command(f'mv radixdlt-{node_version}/* {node_dir}/{node_version}', shell=True)
 
@@ -177,13 +177,13 @@ class SystemD(Base):
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
             sys.exit()
 
-        backup_yes = input("Do you want to backup existing nginx config Y/n:")
-        if backup_yes == "Y":
+        backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
+        if Helpers.check_Yes(backup_yes):
             Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
             run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
-        continue_nginx = input("Do you want to continue with nginx setup Y/n:")
-        if continue_nginx == "Y":
+        continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
+        if Helpers.check_Yes(continue_nginx):
             run_shell_command(
                 ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
             run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
@@ -199,7 +199,7 @@ class SystemD(Base):
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
             print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
             answer = input("Do you want to regenerate y/n :")
-            if answer == "y":
+            if Helpers.check_Yes(answer):
                 run_shell_command(f"""
                      sudo openssl req  -nodes -new -x509 -nodes -subj '/CN=localhost' \
                       -keyout "{secrets_dir}/server.key" \
@@ -216,7 +216,7 @@ class SystemD(Base):
         if os.path.isfile(f'{secrets_dir}/dhparam.pem'):
             print(f"File {secrets_dir}/dhparam.pem already exists")
             answer = input("Do you want to regenerate y/n :")
-            if answer == "y":
+            if Helpers.check_Yes(answer):
                 run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
         else:
             print("Generating a dhparam.pem file")

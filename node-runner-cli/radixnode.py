@@ -61,9 +61,9 @@ def setup_docker(args):
         release = args.release
     composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radix-{args.nodetype}-compose.yml"
     continue_setup = input(
-        f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n Do you want to continue Y/n:")
+        f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n Do you want to continue [Y/n]?:")
 
-    if continue_setup != "Y":
+    if not Helpers.check_Yes(continue_setup):
         print(" Quitting ....")
         sys.exit()
 
@@ -75,8 +75,8 @@ def setup_docker(args):
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
-    should_start = input(f"\nOkay to start the node Y/n:")
-    if should_start == "Y":
+    should_start = input(f"\nOkay to start the node [Y/n]?:")
+    if Helpers.check_Yes(should_start):
         if action == "update":
             print(f"For update, bringing down the node using compose file {compose_file_name}")
             Docker.run_docker_compose_down(compose_file_name)
@@ -129,7 +129,7 @@ def start_systemd(args):
     continue_setup = input(
         f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
 
-    if continue_setup != "Y":
+    if not Helpers.check_Yes(continue_setup):
         print(" Quitting ....")
         sys.exit()
 
