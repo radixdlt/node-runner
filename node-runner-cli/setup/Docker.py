@@ -58,8 +58,13 @@ class Docker(Base):
         if Helpers.check_Yes(prompt_external_db):
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
 
-        with open(compose_file_name, 'wb') as f:
-            f.write(composefile_yaml)
+        def represent_none(self, _):
+            return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+        yaml.add_representer(type(None), represent_none)
+
+        with open(compose_file_name, 'w') as f:
+            yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
     def merge_external_db_config(composefile_yaml):
@@ -78,8 +83,8 @@ class Docker(Base):
               type: none
               device: {data_dir_path}
         """)
-        composefile_yaml.update(external_data_yaml)
-        return composefile_yaml
+        final_conf = Helpers.merge(external_data_yaml, composefile_yaml)
+        return final_conf
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):
