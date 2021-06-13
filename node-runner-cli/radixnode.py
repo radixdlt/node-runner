@@ -339,7 +339,6 @@ def setup_monitoring(args):
 
         monitoring_file_location = "monitoring/node-monitoring.yml"
         start_monitoring_answer = input(f"Do you want to start monitoring using file as {monitoring_file_location} [Y/n]?")
-        Monitoring.start_monitoring(f"{monitoring_file_location}")
         if Helpers.check_Yes(start_monitoring_answer):
             Monitoring.start_monitoring(f"{monitoring_file_location}")
 

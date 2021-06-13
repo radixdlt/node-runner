@@ -54,7 +54,7 @@ class Docker(Base):
 
         composefile_yaml = yaml.safe_load(resp.content)
 
-        prompt_external_db = input("Do you configure data directory for the ledger [Y/n]?:")
+        prompt_external_db = input("Do you want to configure data directory for the ledger [Y/n]?:")
         if Helpers.check_Yes(prompt_external_db):
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
 
