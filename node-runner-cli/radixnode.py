@@ -458,19 +458,22 @@ class Monitoring():
 
 def check_latest_cli():
     cli_latest_version = latest_release("radixdlt/node-runner")
-    if cli_version() != cli_latest_version:
-        os_name = "ubuntu-20.04"
-        print(f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {cli_version()}.\n.")
-        print(f"""
-            ---------------------------------------------------------------
-            Update the CLI by running these commands
-                wget -O radixnode https://github.com/radixdlt/node-runner/releases/download/{cli_latest_version}/radixnode-{os_name}
-                chmod +x radixnode
-                sudo mv radixnode /usr/local/bin
-            """)
-        abort = input("Do you abort the command now to update the cli Y/n?:")
-        if Helpers.check_Yes(abort):
-            sys.exit()
+
+    if os.getenv("DISABLE_VERSION_CHECK", "False").lower() not in ("true", "yes"):
+        if cli_version() != cli_latest_version :
+            os_name = "ubuntu-20.04"
+            print(
+                f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {cli_version()}.\n.")
+            print(f"""
+                ---------------------------------------------------------------
+                Update the CLI by running these commands
+                    wget -O radixnode https://github.com/radixdlt/node-runner/releases/download/{cli_latest_version}/radixnode-{os_name}
+                    chmod +x radixnode
+                    sudo mv radixnode /usr/local/bin
+                """)
+            abort = input("Do you want to ABORT the command now to update the cli Y/n?:")
+            if Helpers.check_Yes(abort):
+                sys.exit()
 
 
 if __name__ == "__main__":

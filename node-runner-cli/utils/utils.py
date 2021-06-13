@@ -66,7 +66,7 @@ class Helpers:
     @staticmethod
     def get_nginx_user():
         nginx_admin_password = 'NGINX_ADMIN_PASSWORD'
-        nginx_admin_password = 'NGINX_ADMIN_USERNAME'
+        nginx_admin_username = 'NGINX_ADMIN_USERNAME'
         if os.environ.get('%s' % nginx_admin_password) is None:
             print("""
             ------
@@ -78,7 +78,7 @@ class Helpers:
             sys.exit()
         else:
             return dict({
-                "name": os.getenv('NGINX_ADMIN_USERNAME', 'admin'),
+                "name": os.getenv(nginx_admin_username, 'admin'),
                 "password": os.environ.get("%s" % nginx_admin_password)
             })
 
