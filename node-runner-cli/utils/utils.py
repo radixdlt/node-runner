@@ -113,8 +113,8 @@ class Helpers:
         return application_path
 
     @staticmethod
-    def check_Yes(anwer):
-        if anwer.lower() == "y":
+    def check_Yes(answer):
+        if answer.lower() == "y":
             return True
         else:
             return False
