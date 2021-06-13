@@ -117,4 +117,5 @@ class Base:
     @staticmethod
     def get_data_dir():
         data_dir_path = input("Enter the absolute path to data DB folder:")
+        run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path

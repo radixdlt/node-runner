@@ -70,11 +70,14 @@ class Docker(Base):
     def merge_external_db_config(composefile_yaml):
         data_dir_path = Base.get_data_dir()
 
+        #TODO fix the issue where volumes array gets merged correctly
         external_data_yaml = yaml.safe_load(f"""
         services:
           core:
             volumes:
               - "core_ledger:/home/radixdlt/RADIXDB"
+              - "./universe.json:/home/radixdlt/universe.json"
+              - "./validator.ks:/home/radixdlt/validator.ks"
         volumes:
           core_ledger:
             driver: local

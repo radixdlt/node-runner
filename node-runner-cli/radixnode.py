@@ -86,8 +86,8 @@ def setup_docker(args):
             ---------------------------------------------------------------
             Bring up node by updating the file {compose_file_name}
             You can do it through cli using below command
-                ./radixnode stop-docker  -f {compose_file_name}
-                ./radixnode start-docker -f {compose_file_name} -t {args.trustednode}
+                radixnode stop-docker  -f {compose_file_name}
+                radixnode start-docker -f {compose_file_name} -t {args.trustednode}
             ----------------------------------------------------------------
             """)
 
