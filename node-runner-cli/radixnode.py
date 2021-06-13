@@ -474,10 +474,11 @@ def check_latest_cli():
 
 
 if __name__ == "__main__":
-    check_latest_cli()
 
     args = cli.parse_args()
     if args.subcommand is None:
         cli.print_help()
     else:
+        if args.subcommand != "version":
+            check_latest_cli()
         args.func(args)
