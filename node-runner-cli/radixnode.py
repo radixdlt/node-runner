@@ -336,6 +336,30 @@ def setup_monitoring(args):
                                    ["dashboard.yml", "sample-node-dashboard.json"])
         Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
         Monitoring.setup_external_volumes()
+
+        monitoring_file_location = "monitoring/node-monitoring.yml"
+        start_monitoring_answer = input(f"Do you want to start monitoring using file as {monitoring_file_location}")
+        Monitoring.start_monitoring(f"{monitoring_file_location}")
+        if Helpers.check_Yes(start_monitoring_answer):
+            Monitoring.start_monitoring(f"{monitoring_file_location}")
+
+    elif args.setupmode == "PRODUCTION_MODE":
+        print(" PRODUCTION_MODE not supported yet ")
+        sys.exit()
+    else:
+        print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
+
+
+@subcommand(
+    [
+        argument("-f", "--composefile", default="monitoring/node-monitoring.yml", action="store"),
+        argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
+                 help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
+                 action="store")
+    ]
+)
+def start_monitoring(args):
+    if args.setupmode == "QUICK_SETUP_MODE":
         Monitoring.start_monitoring(f"monitoring/node-monitoring.yml")
     elif args.setupmode == "PRODUCTION_MODE":
         print(" PRODUCTION_MODE not supported yet ")
@@ -414,6 +438,9 @@ class Monitoring():
         user = Helpers.get_nginx_user()
         node_endpoint_env = "NODE_END_POINT"
         if os.environ.get('%s' % node_endpoint_env) is None:
+            print(
+                "NODE_END_POINT environment not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
+                "the node.")
             ip = Helpers.get_public_ip()
             node_endpoint = f"https://{ip}"
         else:
