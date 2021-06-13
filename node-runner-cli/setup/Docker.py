@@ -46,13 +46,23 @@ class Docker(Base):
 
         req = requests.Request('GET', f'{composefileurl}')
         prepared = req.prepare()
-
         resp = Helpers.send_request(prepared, print_response=False)
+
         if not resp.ok:
             print(f" Errored downloading file {composefileurl}. Exitting ... ")
             sys.exit()
 
         composefile_yaml = yaml.safe_load(resp.content)
+
+        prompt_external_db = input("Do you configure data directory for the ledger [Y/n]?:")
+        if Helpers.check_Yes(prompt_external_db):
+            composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
+
+        with open(compose_file_name, 'wb') as f:
+            f.write(composefile_yaml)
+
+    @staticmethod
+    def merge_external_db_config(composefile_yaml):
         data_dir_path = Base.get_data_dir()
 
         external_data_yaml = yaml.safe_load(f"""
@@ -69,9 +79,7 @@ class Docker(Base):
               device: {data_dir_path}
         """)
         composefile_yaml.update(external_data_yaml)
-
-        with open(compose_file_name, 'wb') as f:
-            f.write(composefile_yaml)
+        return composefile_yaml
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):

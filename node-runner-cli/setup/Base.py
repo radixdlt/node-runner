@@ -116,5 +116,5 @@ class Base:
 
     @staticmethod
     def get_data_dir():
-        data_dir_path = input("Enter the absoulte path to data DB folder:")
+        data_dir_path = input("Enter the absolute path to data DB folder:")
         return data_dir_path
