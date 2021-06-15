@@ -21,6 +21,7 @@ class SystemD(Base):
 
     @staticmethod
     def create_service_user_password():
+        #TODO AutoApprove
         run_shell_command('sudo passwd radixdlt', shell=True)
 
     @staticmethod
@@ -71,6 +72,7 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time):
         if os.path.isfile(f"{filepath}/{filename}"):
+            #TODO AutoApprove
             backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
             if Helpers.check_Yes(backup_yes):
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
@@ -182,6 +184,7 @@ class SystemD(Base):
             Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
             run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
+        #TODO AutoApprove
         continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
         if Helpers.check_Yes(continue_nginx):
             run_shell_command(

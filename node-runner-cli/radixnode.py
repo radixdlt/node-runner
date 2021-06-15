@@ -60,8 +60,10 @@ def setup_docker(args):
     else:
         release = args.release
     composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radix-{args.nodetype}-compose.yml"
+    print(f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n")
+    #TODO autoapprove
     continue_setup = input(
-        f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n Do you want to continue [Y/n]?:")
+         "Do you want to continue [Y/n]?:")
 
     if not Helpers.check_Yes(continue_setup):
         print(" Quitting ....")
@@ -75,6 +77,7 @@ def setup_docker(args):
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
+    #TODO AutoApprove
     should_start = input(f"\nOkay to start the node [Y/n]?:")
     if Helpers.check_Yes(should_start):
         if action == "update":
@@ -126,6 +129,7 @@ def start_systemd(args):
     # TODO add method to fetch latest nginx release
     nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{node_type_name}-conf.zip"
 
+    # TODO AutoApprove
     continue_setup = input(
         f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
 
