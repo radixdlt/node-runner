@@ -12,6 +12,8 @@ from requests.auth import HTTPBasicAuth
 from utils.utils import run_shell_command
 from utils.utils import Helpers
 from version import __version__
+from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, NODE_END_POINT, \
+    DISABLE_VERSION_CHECK
 from setup import Base, Docker, SystemD
 
 urllib3.disable_warnings()
@@ -59,11 +61,12 @@ def setup_docker(args):
         release = latest_release()
     else:
         release = args.release
-    composefileurl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radix-{args.nodetype}-compose.yml"
+    composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
+                               f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radix-{args.nodetype}-compose.yml")
     print(f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n")
-    #TODO autoapprove
+    # TODO autoapprove
     continue_setup = input(
-         "Do you want to continue [Y/n]?:")
+        "Do you want to continue [Y/n]?:")
 
     if not Helpers.check_Yes(continue_setup):
         print(" Quitting ....")
@@ -77,7 +80,7 @@ def setup_docker(args):
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
-    #TODO AutoApprove
+    # TODO AutoApprove
     should_start = input(f"\nOkay to start the node [Y/n]?:")
     if Helpers.check_Yes(should_start):
         if action == "update":
@@ -124,11 +127,12 @@ def start_systemd(args):
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
-    nodebinaryUrl = f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip"
+    nodebinaryUrl = os.getenv(NODE_BINARY_OVERIDE,
+                              f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip")
 
     # TODO add method to fetch latest nginx release
-    nginxconfigUrl = f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{node_type_name}-conf.zip"
-
+    nginxconfigUrl = os.getenv(NGINX_BINARY_OVERIDE,
+                               f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{node_type_name}-conf.zip")
     # TODO AutoApprove
     continue_setup = input(
         f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
@@ -342,7 +346,8 @@ def setup_monitoring(args):
         Monitoring.setup_external_volumes()
 
         monitoring_file_location = "monitoring/node-monitoring.yml"
-        start_monitoring_answer = input(f"Do you want to start monitoring using file as {monitoring_file_location} [Y/n]?")
+        start_monitoring_answer = input(
+            f"Do you want to start monitoring using file as {monitoring_file_location} [Y/n]?")
         if Helpers.check_Yes(start_monitoring_answer):
             Monitoring.start_monitoring(f"{monitoring_file_location}")
 
@@ -439,19 +444,18 @@ class Monitoring():
     @staticmethod
     def start_monitoring(composefile):
         user = Helpers.get_nginx_user()
-        node_endpoint_env = "NODE_END_POINT"
-        if os.environ.get('%s' % node_endpoint_env) is None:
+        if os.environ.get('%s' % NODE_END_POINT) is None:
             print(
-                "NODE_END_POINT environment not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
+                f"{NODE_END_POINT} environment not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
                 "the node.")
             ip = Helpers.get_public_ip()
             node_endpoint = f"https://{ip}"
         else:
-            node_endpoint = os.environ.get(node_endpoint_env)
+            node_endpoint = os.environ.get(NODE_END_POINT)
         run_shell_command(f'docker-compose -f {composefile} up -d',
                           env={
                               "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
-                              "NODE_END_POINT": node_endpoint
+                              f"{NODE_END_POINT}": node_endpoint
                           }, shell=True)
 
     @staticmethod
@@ -462,8 +466,8 @@ class Monitoring():
 def check_latest_cli():
     cli_latest_version = latest_release("radixdlt/node-runner")
 
-    if os.getenv("DISABLE_VERSION_CHECK", "False").lower() not in ("true", "yes"):
-        if cli_version() != cli_latest_version :
+    if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
+        if cli_version() != cli_latest_version:
             os_name = "ubuntu-20.04"
             print(
                 f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {cli_version()}.\n.")
