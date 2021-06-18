@@ -36,7 +36,7 @@ jobs:
 
       - name: set branchname with commit
         run: |
-          BRANCH_NAME_WITH_HYPENS=$(echo $GITHUB_HEAD_REF | sed 's/\//-/g')
+          BRANCH_NAME_WITH_HYPENS=$(echo ${GITHUB_REF##*/} | sed 's/\//-/g')
           COMMIT=$(git log -1 --format=%h )
           BRANCH_WITH_COMMIT=$BRANCH_NAME_WITH_HYPENS-$COMMIT
           echo "BRANCH_WITH_COMMIT=$BRANCH_WITH_COMMIT" >> $GITHUB_ENV
