@@ -3,9 +3,7 @@ name: Package cli
 on:
   release:
     types: [published]
-  pull_request:
-    branches:
-      - test-artifacts*
+  push:
     tags:
       - test-artifacts*
 jobs:
@@ -42,7 +40,7 @@ jobs:
           COMMIT=$(git log -1 --format=%h )
           BRANCH_WITH_COMMIT=$BRANCH_NAME_WITH_HYPENS-$COMMIT
           echo "BRANCH_WITH_COMMIT=$BRANCH_WITH_COMMIT" >> $GITHUB_ENV
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'push' }}
       - name: Configure AWS Region
         run: echo "AWS_DEFAULT_REGION=eu-west-1" >> $GITHUB_ENV
       - id: install-aws-cli
@@ -55,7 +53,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'push' }}
 
       - name: Get release
         id: get_release
