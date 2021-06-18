@@ -3,11 +3,16 @@ name: Package cli
 on:
   release:
     types: [published]
-
+  pull_request:
+    branches:
+      - test-artifacts*
+    tags:
+      - test-artifacts*
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: [ubuntu-latest]
+    environment: AWS_ARTIFACT
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -30,11 +35,34 @@ jobs:
         with:
           name: ubuntu 20.04
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
+
+      - name: set branchname with commit
+        run: |
+          BRANCH_NAME_WITH_HYPENS=$(echo $GITHUB_HEAD_REF | sed 's/\//-/g')
+          COMMIT=$(git log -1 --format=%h )
+          BRANCH_WITH_COMMIT=$BRANCH_NAME_WITH_HYPENS-$COMMIT
+          echo "BRANCH_WITH_COMMIT=$BRANCH_WITH_COMMIT" >> $GITHUB_ENV
+        if: ${{ github.event_name == 'pull_request' }}
+      - name: Configure AWS Region
+        run: echo "AWS_DEFAULT_REGION=eu-west-1" >> $GITHUB_ENV
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2
+      - name: Upload cli to asset store
+        run: |
+          aws s3 cp node-runner-cli/out/ubuntu/focal/radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
+        if: ${{ github.event_name == 'pull_request' }}
+
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.2.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        if: ${{ github.event_name == 'release' }}
 
       - name: Upload radixcli ubunutu binary
         uses: actions/upload-release-asset@v1
@@ -45,4 +73,5 @@ jobs:
           asset_path: ./node-runner-cli/out/ubuntu/focal/radixnode
           asset_name: radixnode-ubuntu-20.04
           asset_content_type: application/octet-stream
+        if: ${{ github.event_name == 'release' }}
 
