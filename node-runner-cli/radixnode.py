@@ -53,7 +53,9 @@ def version(args):
              action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store"),
-    argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
+    argument("-t", "--trustednode", required=True,
+             help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
+             action="store"),
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
 ])
 def setup_docker(args):
@@ -74,7 +76,8 @@ def setup_docker(args):
 
     Docker.fetchComposeFile(composefileurl)
     keystore_password = Base.generatekey(keyfile_path=os.getcwd())
-    trustednode_ip=args.trustednode.rsplit('@',1)[-1]
+
+    trustednode_ip = Helpers.parse_trustednode(args.trustednode)
     Base.fetch_universe_json(trustednode_ip)
 
     compose_file_name = composefileurl.rsplit('/', 1)[-1]
@@ -145,7 +148,8 @@ def start_systemd(args):
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
     keystore_password = SystemD.generatekey(node_secrets_dir)
-    SystemD.fetch_universe_json(args.trustednode, node_dir)
+    trustednode_ip = Helpers.parse_trustednode(args.trustednode)
+    SystemD.fetch_universe_json(trustednode_ip, node_dir)
 
     SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)

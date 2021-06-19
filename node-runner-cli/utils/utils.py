@@ -119,7 +119,6 @@ class Helpers:
         else:
             return False
 
-
     @staticmethod
     def merge(source, destination):
         for key, value in source.items():
@@ -131,3 +130,14 @@ class Helpers:
                 destination[key] = value
 
         return destination
+
+
+    @staticmethod
+    def parse_trustednode(trustednode):
+        import re
+        if not bool(re.match(r"radix//.*@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", trustednode)):
+            print(f"Trusted node {trustednode} does match pattern radix://public_key@ip. Please enter right value")
+            sys.exit()
+        return trustednode.rsplit('@', 1)[-1]
+
+
