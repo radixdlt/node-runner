@@ -74,7 +74,8 @@ def setup_docker(args):
 
     Docker.fetchComposeFile(composefileurl)
     keystore_password = Base.generatekey(keyfile_path=os.getcwd())
-    Base.fetch_universe_json(args.trustednode)
+    trustednode_ip=args.trustednode.rsplit('@',1)[-1]
+    Base.fetch_universe_json(trustednode_ip)
 
     compose_file_name = composefileurl.rsplit('/', 1)[-1]
     action = "update" if args.update else "start"
