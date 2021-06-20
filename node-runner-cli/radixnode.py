@@ -612,27 +612,33 @@ if __name__ == "__main__":
         if dockercli_args.dockercommand is None:
             dockercli.print_help()
         else:
-            dockercli_args.func(sys.argv[2:])
+            dockercli_args.func(dockercli_args)
 
     elif args.subcommand == "systemd":
         systemdcli_args = systemdcli.parse_args(sys.argv[2:])
         if systemdcli_args.systemdcommand is None:
             systemdcli.print_help()
         else:
-            systemdcli_args.func(sys.argv[2:])
+            systemdcli_args.func(systemdcli_args)
 
     elif args.subcommand == "api":
         apicli_args = apicli.parse_args(sys.argv[2:])
         if apicli_args.apicommand is None:
             apicli.print_help()
         else:
-            apicli_args.func(sys.argv[2:])
+            apicli_args.func(apicli_args)
     elif args.subcommand == "monitoring":
         monitoringcli_args = monitoringcli.parse_args(sys.argv[2:])
         if monitoringcli_args.monitoringcommand is None:
             monitoringcli.print_help()
         else:
-            monitoringcli_args.func(sys.argv[2:])
+            monitoringcli_args.func(monitoringcli_args)
+    elif args.subcommand == "auth":
+        authcli_args = authcli.parse_args(sys.argv[2:])
+        if authcli_args.authcommand is None:
+            authcli.print_help()
+        else:
+            authcli_args.func(authcli_args)
     elif args.subcommand == "version":
         version()
     elif args.subcommand == "optimise-node":
