@@ -66,7 +66,7 @@ class Helpers:
     @staticmethod
     def get_nginx_user(usertype, default_username):
         nginx_password = f'NGINX_{usertype.upper()}_PASSWORD'
-        nginx_username = f'NGINX_{default_username}_USERNAME'
+        nginx_username = f'NGINX_{default_username.upper()}_USERNAME'
         if os.environ.get('%s' % nginx_password) is None:
             print(f"""
             ------
