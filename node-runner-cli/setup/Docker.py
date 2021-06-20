@@ -11,19 +11,19 @@ import yaml
 class Docker(Base):
 
     @staticmethod
-    def setup_nginx_Password():
+    def setup_nginx_Password(usertype, username):
         print('-----------------------------')
-        print('Setting up nginx password')
-        nginx_password = getpass.getpass("Enter your nginx password: ")
+        print(f'Setting up nginx user of type {usertype} with {username}')
+        nginx_password = getpass.getpass(f"Enter your nginx the password: ")
         run_shell_command(['docker', 'run', '--rm', '-v',
                            os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
                            'radixdlt/htpasswd:v1.0.0',
-                           'htpasswd', '-bc', '/secrets/htpasswd.admin', 'admin', nginx_password])
+                           'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
         print(
-            """
-            Setup NGINX_ADMIN_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
+            f"""
+            Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
-            echo 'export NGINX_ADMIN_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            echo 'export NGINX_{usertype.upper()}PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
         return nginx_password
 

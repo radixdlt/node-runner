@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import getpass
 import os
 import os.path
@@ -19,7 +20,18 @@ from setup import Base, Docker, SystemD
 urllib3.disable_warnings()
 
 cli = ArgumentParser()
-subparsers = cli.add_subparsers(dest="subcommand")
+cli.add_argument('subcommand', help='Subcommand to run',
+                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth"])
+dockercli = ArgumentParser(
+    description='Docker commands')
+docker_parser = dockercli.add_subparsers(dest="dockercommand")
+systemdcli = ArgumentParser(
+    description='Systemd commands')
+systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
+apicli = ArgumentParser(
+    description='API commands')
+api_parser = apicli.add_subparsers(dest="apicommand")
+
 cwd = os.getcwd()
 
 
@@ -27,7 +39,77 @@ def argument(*name_or_flags, **kwargs):
     return list(name_or_flags), kwargs
 
 
-def subcommand(args=[], parent=subparsers):
+def subcommand(args=[], parent=docker_parser):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
+
+
+def dockercommand(args=[], parent=docker_parser):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
+
+
+def systemdcommand(args=[], parent=systemd_parser):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
+
+
+def systemdcommand(args=[], parent=systemd_parser):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
+
+
+def apicommand(args=[], parent=api_parser):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
+
+
+monitoringcli = ArgumentParser(
+    description='API command')
+monitoring_parser = monitoringcli.add_subparsers(dest="monitoringcommand")
+
+
+def monitoringcommand(args=[], parent=monitoring_parser):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
+
+
+authcli = ArgumentParser(
+    description='API command')
+auth_parser = authcli.add_subparsers(dest="authcommand")
+
+
+def authcommand(args=[], parent=auth_parser):
     def decorator(func):
         parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
         for arg in args:
@@ -41,24 +123,23 @@ def cli_version():
     return __version__
 
 
-@subcommand([])
 def version(args):
     print(f"Cli - Version : {cli_version()}")
 
 
-@subcommand([
+@dockercommand([
 
     argument("-r", "--release",
              help="Version of node software to install such as 1.0-beta.34",
              action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
-             action="store"),
+             action="store", choices=["fullnode", "archivenode"]),
     argument("-t", "--trustednode", required=True,
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
 ])
-def setup_docker(args):
+def setup(args):
     if not args.release:
         release = latest_release()
     else:
@@ -102,18 +183,18 @@ def setup_docker(args):
             """)
 
 
-@subcommand([
+@systemdcommand([
     argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
-             action="store"),
+             action="store", choices=["fullnode", "archivenode"]),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
     argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
-def start_systemd(args):
+def setup(args):
     if not args.release:
         release = latest_release()
     else:
@@ -183,11 +264,12 @@ def start_systemd(args):
         print("Nginx not configured or not updated")
 
 
-@subcommand([
+@systemdcommand([
     argument("-s", "--services", default="all",
-             help="Name of the service either to be stopped. Valid values nginx or radixdlt-node", action="store")
+             help="Name of the service either to be stopped. Valid values nginx or radixdlt-node",
+             choices=["all", "nginx", "radixdlt-node"], action="store")
 ])
-def stop_systemd(args):
+def stop(args):
     if args.services == "all":
         SystemD.stop_nginx_service()
         SystemD.stop_node_service()
@@ -200,20 +282,20 @@ def stop_systemd(args):
         sys.exit()
 
 
-@subcommand([
+@dockercommand([
     argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
-def start_docker(args):
+def start(args):
     keystore_password = Base.generatekey(keyfile_path=os.getcwd())
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
-@subcommand([
+@dockercommand([
     argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true"),
 ])
-def stop_docker(args):
+def stop(args):
     if args.removevolumes:
         print(
             """ 
@@ -222,14 +304,14 @@ def stop_docker(args):
     Docker.run_docker_compose_down(args.composefile, args.removevolumes)
 
 
-@subcommand([])
-def configure_docker(args):
+@dockercommand([])
+def configure(args):
     Base.install_dependecies()
     Base.add_user_docker_group()
 
 
-@subcommand([])
-def configure_systemd(args):
+@systemdcommand([])
+def configure(args):
     Base.install_dependecies()
     SystemD.install_java()
     SystemD.setup_user()
@@ -240,15 +322,43 @@ def configure_systemd(args):
     SystemD.sudoers_instructions()
 
 
-@subcommand(
-    [argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD", action="store")])
+@authcommand(
+    [
+        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
+                 choices=["DOCKER", "SYSTEMD"], action="store"),
+        argument("-u", "--username", default="admin", help="Name of admin user", action="store")
+    ])
 def set_admin_password(args):
+    set_auth(args, usertype="admin")
+
+
+@authcommand(
+    [
+        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
+                 choices=["DOCKER", "SYSTEMD"], action="store"),
+        argument("-u", "--username", default="metrics", help="Name of metrics user", action="store")
+    ])
+def set_admin_password(args):
+    set_auth(args, usertype="metrics")
+
+
+@authcommand(
+    [
+        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
+                 choices=["DOCKER", "SYSTEMD"], action="store"),
+        argument("-u", "--username", default="superadmin", help="Name of metrics user", action="store")
+    ])
+def set_admin_password(args):
+    set_auth(args, usertype="superadmin")
+
+
+def set_auth(args, usertype):
     if args.setupmode == "DOCKER":
-        Docker.setup_nginx_Password()
+        Docker.setup_nginx_Password(usertype, args.username)
     elif args.setupmode == "SYSTEMD":
         SystemD.checkUser()
         SystemD.install_nginx()
-        SystemD.setup_nginx_password("/etc/nginx/secrets")
+        SystemD.setup_nginx_password("/etc/nginx/secrets", usertype, args.username)
     else:
         print("Invalid setupmode specified. It should be either DOCKER or SYSTEMD.")
 
@@ -258,7 +368,7 @@ def set_admin_password(args):
 """
 
 
-@subcommand()
+@apicommand()
 def get_node_address(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
@@ -269,7 +379,7 @@ def get_node_address(args):
     Helpers.send_request(prepared)
 
 
-@subcommand()
+@apicommand()
 def get_peers(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
@@ -280,7 +390,7 @@ def get_peers(args):
     Helpers.send_request(prepared)
 
 
-@subcommand()
+@apicommand()
 def register_validator(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
@@ -309,7 +419,7 @@ def register_validator(args):
     Helpers.send_request(prepared)
 
 
-@subcommand()
+@apicommand()
 def validator_info(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
@@ -322,7 +432,7 @@ def validator_info(args):
     Helpers.send_request(prepared)
 
 
-@subcommand()
+@apicommand()
 def system_info(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user()
@@ -335,11 +445,11 @@ def system_info(args):
     Helpers.send_request(prepared)
 
 
-@subcommand(
+@monitoringcommand(
     [argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
               help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
               action="store")])
-def setup_monitoring(args):
+def setup(args):
     if args.setupmode == "QUICK_SETUP_MODE":
         monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/monitoring'
         print(f"Downloading artifacts from {monitor_url_dir}\n")
@@ -363,7 +473,7 @@ def setup_monitoring(args):
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
 
-@subcommand(
+@monitoringcommand(
     [
         argument("-f", "--composefile", default="monitoring/node-monitoring.yml", action="store"),
         argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
@@ -371,7 +481,7 @@ def setup_monitoring(args):
                  action="store")
     ]
 )
-def start_monitoring(args):
+def start(args):
     if args.setupmode == "QUICK_SETUP_MODE":
         Monitoring.start_monitoring(f"monitoring/node-monitoring.yml")
     elif args.setupmode == "PRODUCTION_MODE":
@@ -381,12 +491,12 @@ def start_monitoring(args):
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
 
-@subcommand([
+@monitoringcommand([
     argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
              help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
              action="store"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
-def stop_monitoring(args):
+def stop(args):
     if args.setupmode == "QUICK_SETUP_MODE":
         Monitoring.stop_monitoring(f"monitoring/node-monitoring.yml", args.removevolumes)
     elif args.setupmode == "PRODUCTION_MODE":
@@ -396,7 +506,6 @@ def stop_monitoring(args):
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
 
-@subcommand()
 def optimise_node(args):
     Base.setup_node_optimisation_config(cli_version())
 
@@ -490,10 +599,43 @@ def check_latest_cli():
 
 if __name__ == "__main__":
 
-    args = cli.parse_args()
+    args = cli.parse_args(sys.argv[1:2])
+
     if args.subcommand is None:
         cli.print_help()
     else:
         if args.subcommand != "version":
             check_latest_cli()
-        args.func(args)
+
+    if args.subcommand == "docker":
+        dockercli_args = dockercli.parse_args(sys.argv[2:])
+        if dockercli_args.dockercommand is None:
+            dockercli.print_help()
+        else:
+            dockercli_args.func(sys.argv[2:])
+
+    elif args.subcommand == "systemd":
+        systemdcli_args = systemdcli.parse_args(sys.argv[2:])
+        if systemdcli_args.systemdcommand is None:
+            systemdcli.print_help()
+        else:
+            systemdcli_args.func(sys.argv[2:])
+
+    elif args.subcommand == "api":
+        apicli_args = apicli.parse_args(sys.argv[2:])
+        if apicli_args.apicommand is None:
+            apicli.print_help()
+        else:
+            apicli_args.func(sys.argv[2:])
+    elif args.subcommand == "monitoring":
+        monitoringcli_args = monitoringcli.parse_args(sys.argv[2:])
+        if monitoringcli_args.monitoringcommand is None:
+            monitoringcli.print_help()
+        else:
+            monitoringcli_args.func(sys.argv[2:])
+    elif args.subcommand == "version":
+        version()
+    elif args.subcommand == "optimise-node":
+        optimise_node()
+    else:
+        print(f"Invalid subcommand {args.subcommand}")

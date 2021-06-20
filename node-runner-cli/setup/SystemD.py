@@ -21,7 +21,7 @@ class SystemD(Base):
 
     @staticmethod
     def create_service_user_password():
-        #TODO AutoApprove
+        # TODO AutoApprove
         run_shell_command('sudo passwd radixdlt', shell=True)
 
     @staticmethod
@@ -72,7 +72,7 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time):
         if os.path.isfile(f"{filepath}/{filename}"):
-            #TODO AutoApprove
+            # TODO AutoApprove
             backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
             if Helpers.check_Yes(backup_yes):
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
@@ -184,7 +184,7 @@ class SystemD(Base):
             Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
             run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
-        #TODO AutoApprove
+        # TODO AutoApprove
         continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
         if Helpers.check_Yes(continue_nginx):
             run_shell_command(
@@ -226,17 +226,17 @@ class SystemD(Base):
             run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
 
     @staticmethod
-    def setup_nginx_password(secrets_dir):
+    def setup_nginx_password(secrets_dir, usertype, username):
         run_shell_command(f'sudo mkdir -p {secrets_dir}', shell=True)
         print('-----------------------------')
-        print('Setting up nginx password')
-        run_shell_command(f'sudo touch {secrets_dir}/htpasswd.admin', fail_on_error=True, shell=True)
-        run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.admin admin', shell=True)
+        print(f'Setting up nginx password for user of type {usertype}')
+        run_shell_command(f'sudo touch {secrets_dir}/htpasswd.{usertype}', fail_on_error=True, shell=True)
+        run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.{usertype} {username}', shell=True)
         print(
-            """Setup NGINX_ADMIN_PASSWORD environment variable using below command . Replace the string 
+            f"""Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 
             'nginx_password_of_your_choice' with your password 
 
-            $ echo 'export NGINX_ADMIN_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            $ echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             $ source ~/.bashrc
             """)
 
