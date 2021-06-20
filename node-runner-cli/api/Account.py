@@ -32,6 +32,25 @@ class Account(API):
         """
         Account.post_on_account(data)
 
+    @staticmethod
+    def un_register_validator():
+        validator_id = Validation.get_validator_id()
+        data = f"""
+         {{
+            "jsonrpc": "2.0",
+            "method": "account.submit_transaction_single_step",
+            "params": {{
+                "actions": [
+                    {{
+                        "type": "UnregisterValidator",
+                        "validator": "{validator_id}"
+                    }}
+                ]
+            }},
+            "id": 1
+        }}
+        """
+        Account.post_on_account(data)
 
     @staticmethod
     def post_on_account(data):
@@ -44,4 +63,18 @@ class Account(API):
                                auth=HTTPBasicAuth(user["name"], user["password"]))
 
         prepared = req.prepare()
+        prepared.headers['Content-Type'] = 'application/json'
         Helpers.send_request(prepared)
+
+    @staticmethod
+    def get_info():
+
+        data = f"""
+            {{
+                "jsonrpc": "2.0",
+                "method": "account.get_info",
+                "params": [],
+                "id": 1
+            }}
+        """
+        Account.post_on_account(data)

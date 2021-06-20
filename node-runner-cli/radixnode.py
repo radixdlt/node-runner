@@ -10,6 +10,7 @@ import requests
 import urllib3
 
 from api.Account import Account
+from api.RestApi import RestApi
 from api.Validation import Validation
 from github.github import latest_release
 from requests.auth import HTTPBasicAuth
@@ -29,7 +30,7 @@ cli.add_argument('subcommand', help='Subcommand to run',
 apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["validation", "account"])
+                                 choices=["validation", "account", "health", "version", "universe", "metrics"])
 
 cwd = os.getcwd()
 
@@ -366,17 +367,6 @@ def get_current_epoch_data(args):
     Validation.get_current_epoch_data()
 
 
-@validationcommand()
-def get_peers(args):
-    node_host = 'localhost'
-    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
-    req = requests.Request('GET',
-                           f'https://{node_host}/system/peers',
-                           auth=HTTPBasicAuth(user["name"], user["password"]))
-    prepared = req.prepare()
-    Helpers.send_request(prepared)
-
-
 @accountcommand()
 def register_validator(args):
     validator_name = input("Name of your validator:")
@@ -395,6 +385,16 @@ def system_info(args):
 
     prepared.headers['Content-Type'] = 'application/json'
     Helpers.send_request(prepared)
+
+
+@accountcommand()
+def unregister_validator(args):
+    Account.un_register_validator()
+
+
+@accountcommand()
+def get_info(args):
+    Account.get_info()
 
 
 @monitoringcommand(
@@ -596,8 +596,16 @@ if __name__ == "__main__":
         else:
             if apicli_args.apicommand == "validation":
                 handle_validation()
-            if apicli_args.apicommand == "account":
+            elif apicli_args.apicommand == "account":
                 handle_account()
+            elif apicli_args.apicommand == "health":
+                RestApi.get_health()
+            elif apicli_args.apicommand == "version":
+                RestApi.get_version()
+            elif apicli_args.apicommand == "universe":
+                RestApi.get_universe()
+            elif apicli_args.apicommand == "metrics":
+                RestApi.get_metrics()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 
