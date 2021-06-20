@@ -239,6 +239,12 @@ class SystemD(Base):
             $ echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             $ source ~/.bashrc
             """)
+        if username not in ["admin", "metrics", "superadmin"]:
+            print(
+            f"""
+            echo 'export NGINX_{usertype.upper()}_USERNAME="{username}"' >> ~/.bashrc
+            """
+            )
 
     @staticmethod
     def start_nginx_service():

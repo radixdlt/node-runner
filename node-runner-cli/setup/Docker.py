@@ -19,12 +19,20 @@ class Docker(Base):
                            os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
                            'radixdlt/htpasswd:v1.0.0',
                            'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
+
+
         print(
             f"""
             Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
             echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
+        if username not in ["admin", "metrics", "superadmin"]:
+            print(
+            f"""
+            echo 'export NGINX_{usertype.upper()}_USERNAME="{username}"' >> ~/.bashrc
+            """
+            )
         return nginx_password
 
     @staticmethod
