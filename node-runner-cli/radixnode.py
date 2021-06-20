@@ -338,7 +338,7 @@ def set_admin_password(args):
                  choices=["DOCKER", "SYSTEMD"], action="store"),
         argument("-u", "--username", default="metrics", help="Name of metrics user", action="store")
     ])
-def set_admin_password(args):
+def set_metrics_password(args):
     set_auth(args, usertype="metrics")
 
 
@@ -348,7 +348,7 @@ def set_admin_password(args):
                  choices=["DOCKER", "SYSTEMD"], action="store"),
         argument("-u", "--username", default="superadmin", help="Name of metrics user", action="store")
     ])
-def set_admin_password(args):
+def set_superadmin_password(args):
     set_auth(args, usertype="superadmin")
 
 
