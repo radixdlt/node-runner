@@ -123,7 +123,7 @@ def cli_version():
     return __version__
 
 
-def version(args):
+def version():
     print(f"Cli - Version : {cli_version()}")
 
 
@@ -506,7 +506,7 @@ def stop(args):
         print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
 
 
-def optimise_node(args):
+def optimise_node():
     Base.setup_node_optimisation_config(cli_version())
 
 
