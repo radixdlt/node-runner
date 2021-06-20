@@ -50,7 +50,7 @@ class Helpers:
 
     @staticmethod
     def send_request(prepared, print_request=False, print_response=True):
-        if print_request:
+        if print_request or os.getenv("PRINT_REQUEST") is not None:
             Helpers.pretty_print_request(prepared)
         s = requests.Session()
         resp = s.send(prepared, verify=False)

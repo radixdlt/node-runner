@@ -8,6 +8,8 @@ from pathlib import Path
 
 import requests
 import urllib3
+
+from api import Api
 from github.github import latest_release
 from requests.auth import HTTPBasicAuth
 from utils.utils import run_shell_command
@@ -370,13 +372,7 @@ def set_auth(args, usertype):
 
 @apicommand()
 def get_node_address(args):
-    node_host = 'localhost'
-    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
-    req = requests.Request('GET',
-                           f'https://{node_host}/node',
-                           auth=HTTPBasicAuth(user["name"], user["password"]))
-    prepared = req.prepare()
-    Helpers.send_request(prepared)
+    Api.get_node_info()
 
 
 @apicommand()

@@ -20,7 +20,6 @@ class Docker(Base):
                            'radixdlt/htpasswd:v1.0.0',
                            'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
 
-
         print(
             f"""
             Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
@@ -29,7 +28,7 @@ class Docker(Base):
             """)
         if username not in ["admin", "metrics", "superadmin"]:
             print(
-            f"""
+                f"""
             echo 'export NGINX_{usertype.upper()}_USERNAME="{username}"' >> ~/.bashrc
             """
             )
@@ -62,7 +61,7 @@ class Docker(Base):
 
         composefile_yaml = yaml.safe_load(resp.content)
 
-        #TODO AutoApprove
+        # TODO AutoApprove
         prompt_external_db = input("Do you want to configure data directory for the ledger [Y/n]?:")
         if Helpers.check_Yes(prompt_external_db):
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
@@ -79,7 +78,7 @@ class Docker(Base):
     def merge_external_db_config(composefile_yaml):
         data_dir_path = Base.get_data_dir()
 
-        #TODO fix the issue where volumes array gets merged correctly
+        # TODO fix the issue where volumes array gets merged correctly
         external_data_yaml = yaml.safe_load(f"""
         services:
           core:
