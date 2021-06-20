@@ -8,7 +8,7 @@ from utils.utils import Helpers
 class Api:
 
     @staticmethod
-    def get_node_info():
+    def get_validator_info():
         scheme = os.getenv("API_SCHEME", "https")
         node_host = os.getenv("NODE_END_POINT", f'{scheme}://localhost')
         user = Helpers.get_nginx_user(usertype="admin", default_username="admin")

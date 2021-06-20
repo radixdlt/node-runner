@@ -371,8 +371,8 @@ def set_auth(args, usertype):
 
 
 @apicommand()
-def get_node_address(args):
-    Api.get_node_info()
+def get_validator_info(args):
+    Api.get_validator_info()
 
 
 @apicommand()
