@@ -9,7 +9,8 @@ from pathlib import Path
 import requests
 import urllib3
 
-from api import Api
+from api.Account import Account
+from api.Validation import Validation
 from github.github import latest_release
 from requests.auth import HTTPBasicAuth
 from utils.utils import run_shell_command
@@ -24,71 +25,63 @@ urllib3.disable_warnings()
 cli = ArgumentParser()
 cli.add_argument('subcommand', help='Subcommand to run',
                  choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth"])
-dockercli = ArgumentParser(
-    description='Docker commands')
-docker_parser = dockercli.add_subparsers(dest="dockercommand")
-systemdcli = ArgumentParser(
-    description='Systemd commands')
-systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
+
 apicli = ArgumentParser(
     description='API commands')
-api_parser = apicli.add_subparsers(dest="apicommand")
+api_parser = apicli.add_argument(dest="apicommand",
+                                 choices=["validation", "account"])
 
 cwd = os.getcwd()
+
+
+def get_decorator(args, parent):
+    def decorator(func):
+        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
+
+    return decorator
 
 
 def argument(*name_or_flags, **kwargs):
     return list(name_or_flags), kwargs
 
 
-def subcommand(args=[], parent=docker_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
+dockercli = ArgumentParser(
+    description='Docker commands')
+docker_parser = dockercli.add_subparsers(dest="dockercommand")
 
 
 def dockercommand(args=[], parent=docker_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
+    return get_decorator(args, parent)
 
 
-def systemdcommand(args=[], parent=systemd_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
+systemdcli = ArgumentParser(
+    description='Systemd commands')
+systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
 
 
 def systemdcommand(args=[], parent=systemd_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
+    return get_decorator(args, parent)
 
 
-def apicommand(args=[], parent=api_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
+validationcli = ArgumentParser(
+    description='validation commands')
+validation_parser = validationcli.add_subparsers(dest="validationcommand")
 
-    return decorator
+
+def validationcommand(args=[], parent=validation_parser):
+    return get_decorator(args, parent)
+
+
+accountcli = ArgumentParser(
+    description='account commands')
+account_parser = accountcli.add_subparsers(dest="accountcommand")
+
+
+def accountcommand(args=[], parent=account_parser):
+    return get_decorator(args, parent)
 
 
 monitoringcli = ArgumentParser(
@@ -97,13 +90,7 @@ monitoring_parser = monitoringcli.add_subparsers(dest="monitoringcommand")
 
 
 def monitoringcommand(args=[], parent=monitoring_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
+    return get_decorator(args, parent)
 
 
 authcli = ArgumentParser(
@@ -112,13 +99,7 @@ auth_parser = authcli.add_subparsers(dest="authcommand")
 
 
 def authcommand(args=[], parent=auth_parser):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
+    return get_decorator(args, parent)
 
 
 def cli_version():
@@ -370,12 +351,22 @@ def set_auth(args, usertype):
 """
 
 
-@apicommand()
+@validationcommand()
 def get_validator_info(args):
-    Api.get_validator_info()
+    Validation.get_validator_info()
 
 
-@apicommand()
+@validationcommand()
+def get_next_epoch_data(args):
+    Validation.get_next_epoch_data()
+
+
+@validationcommand()
+def get_current_epoch_data(args):
+    Validation.get_current_epoch_data()
+
+
+@validationcommand()
 def get_peers(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
@@ -386,49 +377,14 @@ def get_peers(args):
     Helpers.send_request(prepared)
 
 
-@apicommand()
+@accountcommand()
 def register_validator(args):
-    node_host = 'localhost'
-    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
     validator_name = input("Name of your validator:")
     validator_url = input("Info URL of your validator:")
-    data = f"""
-    {{"actions":
-        [
-        {{"action":"RegisterValidator",
-        "params":{{
-            "name": "{validator_name}",
-            "url": "{validator_url}"
-            }}
-        }}
-        ]
-    }}
-    """
-    req = requests.Request('POST',
-                           f'https://{node_host}/node/execute',
-                           data=data,
-                           auth=HTTPBasicAuth(user["name"], user["password"]))
-    prepared = req.prepare()
-
-    # prepared.body = json.dumps(u"""%s""" % data)
-    prepared.headers['Content-Type'] = 'application/json'
-    Helpers.send_request(prepared)
+    Account.register_validator(validator_name, validator_url)
 
 
-@apicommand()
-def validator_info(args):
-    node_host = 'localhost'
-    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
-    req = requests.Request('POST',
-                           f'https://{node_host}/node/validator',
-                           auth=HTTPBasicAuth(user["name"], user["password"]))
-    prepared = req.prepare()
-
-    prepared.headers['Content-Type'] = 'application/json'
-    Helpers.send_request(prepared)
-
-
-@apicommand()
+@validationcommand()
 def system_info(args):
     node_host = 'localhost'
     user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
@@ -593,6 +549,22 @@ def check_latest_cli():
                 sys.exit()
 
 
+def handle_validation():
+    args = validationcli.parse_args(sys.argv[3:])
+    if args.validationcommand is None:
+        validationcli.print_help()
+    else:
+        args.func(args)
+
+
+def handle_account():
+    args = accountcli.parse_args(sys.argv[3:])
+    if args.accountcommand is None:
+        accountcli.print_help()
+    else:
+        args.func(args)
+
+
 if __name__ == "__main__":
 
     args = cli.parse_args(sys.argv[1:2])
@@ -618,11 +590,17 @@ if __name__ == "__main__":
             systemdcli_args.func(systemdcli_args)
 
     elif args.subcommand == "api":
-        apicli_args = apicli.parse_args(sys.argv[2:])
+        apicli_args = apicli.parse_args(sys.argv[2:3])
         if apicli_args.apicommand is None:
             apicli.print_help()
         else:
-            apicli_args.func(apicli_args)
+            if apicli_args.apicommand == "validation":
+                handle_validation()
+            if apicli_args.apicommand == "account":
+                handle_account()
+            else:
+                print(f"Invalid api command {apicli_args.apicommand}")
+
     elif args.subcommand == "monitoring":
         monitoringcli_args = monitoringcli.parse_args(sys.argv[2:])
         if monitoringcli_args.monitoringcommand is None:
