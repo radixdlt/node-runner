@@ -177,8 +177,8 @@ def setup(args):
             ---------------------------------------------------------------
             Bring up node by updating the file {compose_file_name}
             You can do it through cli using below command
-                radixnode stop-docker  -f {compose_file_name}
-                radixnode start-docker -f {compose_file_name} -t {args.trustednode}
+                radixnode docker stop  -f {compose_file_name}
+                radixnode docker start -f {compose_file_name} -t {args.trustednode}
             ----------------------------------------------------------------
             """)
 
@@ -371,7 +371,7 @@ def set_auth(args, usertype):
 @apicommand()
 def get_node_address(args):
     node_host = 'localhost'
-    user = Helpers.get_nginx_user()
+    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
     req = requests.Request('GET',
                            f'https://{node_host}/node',
                            auth=HTTPBasicAuth(user["name"], user["password"]))
@@ -382,7 +382,7 @@ def get_node_address(args):
 @apicommand()
 def get_peers(args):
     node_host = 'localhost'
-    user = Helpers.get_nginx_user()
+    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
     req = requests.Request('GET',
                            f'https://{node_host}/system/peers',
                            auth=HTTPBasicAuth(user["name"], user["password"]))
@@ -393,7 +393,7 @@ def get_peers(args):
 @apicommand()
 def register_validator(args):
     node_host = 'localhost'
-    user = Helpers.get_nginx_user()
+    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
     validator_name = input("Name of your validator:")
     validator_url = input("Info URL of your validator:")
     data = f"""
@@ -422,7 +422,7 @@ def register_validator(args):
 @apicommand()
 def validator_info(args):
     node_host = 'localhost'
-    user = Helpers.get_nginx_user()
+    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
     req = requests.Request('POST',
                            f'https://{node_host}/node/validator',
                            auth=HTTPBasicAuth(user["name"], user["password"]))
@@ -435,7 +435,7 @@ def validator_info(args):
 @apicommand()
 def system_info(args):
     node_host = 'localhost'
-    user = Helpers.get_nginx_user()
+    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
     req = requests.Request('GET',
                            f'https://{node_host}/system/info',
                            auth=HTTPBasicAuth(user["name"], user["password"]))
@@ -557,7 +557,7 @@ class Monitoring():
 
     @staticmethod
     def start_monitoring(composefile):
-        user = Helpers.get_nginx_user()
+        user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
         if os.environ.get('%s' % NODE_END_POINT) is None:
             print(
                 f"{NODE_END_POINT} environment not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "

@@ -13,7 +13,7 @@ class Docker(Base):
     @staticmethod
     def setup_nginx_Password(usertype, username):
         print('-----------------------------')
-        print(f'Setting up nginx user of type {usertype} with {username}')
+        print(f'Setting up nginx user of type {usertype} with username {username}')
         nginx_password = getpass.getpass(f"Enter your nginx the password: ")
         run_shell_command(['docker', 'run', '--rm', '-v',
                            os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
@@ -23,7 +23,7 @@ class Docker(Base):
             f"""
             Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
-            echo 'export NGINX_{usertype.upper()}PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
         return nginx_password
 

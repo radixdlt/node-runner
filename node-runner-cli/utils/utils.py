@@ -64,22 +64,24 @@ class Helpers:
         return resp
 
     @staticmethod
-    def get_nginx_user():
-        nginx_admin_password = 'NGINX_ADMIN_PASSWORD'
-        nginx_admin_username = 'NGINX_ADMIN_USERNAME'
-        if os.environ.get('%s' % nginx_admin_password) is None:
-            print("""
+    def get_nginx_user(usertype, default_username):
+        nginx_password = f'NGINX_{usertype.upper()}_PASSWORD'
+        nginx_username = f'NGINX_{default_username}_USERNAME'
+        if os.environ.get('%s' % nginx_password) is None:
+            print(f"""
             ------
-            NGINX_ADMIN_PASSWORD is missing !
-            Setup NGINX_ADMIN_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
+            NGINX_{usertype.upper()}_PASSWORD is missing !
+            Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
-            echo 'export NGINX_ADMIN_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
             sys.exit()
         else:
+            if os.getenv(nginx_username) is None:
+                print (f"Using default name of usertype {usertype} as {default_username}")
             return dict({
-                "name": os.getenv(nginx_admin_username, 'admin'),
-                "password": os.environ.get("%s" % nginx_admin_password)
+                "name": os.getenv(nginx_username, default_username),
+                "password": os.environ.get("%s" % nginx_password)
             })
 
     @staticmethod
