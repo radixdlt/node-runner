@@ -440,23 +440,23 @@ def radix_engine_get_configuration(args):
 
 
 @systemapicommand()
-def radix_engine_get_data():
-    System.radix_engine_get_data(args)
+def radix_engine_get_data(args):
+    System.radix_engine_get_data()
 
 
 @systemapicommand()
-def sync_get_configuration():
-    System.sync_get_configuration(args)
+def sync_get_configuration(args):
+    System.sync_get_configuration()
 
 
 @systemapicommand()
-def sync_get_data():
-    System.sync_get_data(args)
+def sync_get_data(args):
+    System.sync_get_data()
 
 
 @systemapicommand()
 def networking_get_configuration(args):
-    System.networking_get_configuration(args)
+    System.networking_get_configuration()
 
 
 @systemapicommand()
