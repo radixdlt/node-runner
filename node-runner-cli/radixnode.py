@@ -539,7 +539,6 @@ def optimise_node():
     Base.setup_node_optimisation_config(cli_version())
 
 
-
 def check_latest_cli():
     cli_latest_version = latest_release("radixdlt/node-runner")
 

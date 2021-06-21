@@ -102,9 +102,21 @@ class SystemD(Base):
             host.ip={hostip}
             db.location=/data
             node_api.port=3334
-            client_api.enable={enable_client_api}
             client_api.port=8081
             log.level=debug
+            api.archive.enable={enable_client_api}
+            api.construction.enable={enable_client_api}
+            api.account.enable=true
+            api.health.enable=true
+            api.metrics.enable=true
+            api.system.enable=true
+            api.validation.enable=true
+            api.version.enable=true
+            api.universe.enable=true
+            
+            api.node.bind.address=0.0.0.0
+            api.archive.bind.address=0.0.0.0  
+
         """
         run_shell_command(command, shell=True)
 
