@@ -11,7 +11,7 @@ from env_vars import NODE_END_POINT, NODE_HOST_IP_OR_NAME
 from utils.utils import Helpers, run_shell_command
 
 
-class Monitoring():
+class Monitoring:
 
     @staticmethod
     def setup_prometheus_yml(default_prometheus_yaml_url):
@@ -42,16 +42,16 @@ class Monitoring():
         # TODO fix the issue where volumes array gets merged correctly
         scrape_config = yaml.safe_load(f"""
             scrape_configs:
-                - job_name: mynode
-                    scheme: https
-                    basic_auth:
-                      username: {user["name"]}
-                      password: {user["password"]}
-                    tls_config:
-                      insecure_skip_verify: true
-                    static_configs:
-                      - targets:
-                          - {node_ip}
+              - job_name: mynode
+                scheme: https
+                basic_auth:
+                  username: {user["name"]}
+                  password: {user["password"]}
+                tls_config:
+                  insecure_skip_verify: true
+                static_configs:
+                  - targets:
+                      - {node_ip}
            """)
         final_conf = Helpers.merge(scrape_config, default_prometheus_yaml)
         return final_conf
@@ -92,7 +92,7 @@ class Monitoring():
     @staticmethod
     def start_monitoring(composefile):
         user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
-        node_endpoint = Monitoring.NODE_HOST_IP_OR_NAME()
+        node_endpoint = Monitoring.get_node_host_ip()
         run_shell_command(f'docker-compose -f {composefile} up -d',
                           env={
                               "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
