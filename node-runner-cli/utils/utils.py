@@ -77,8 +77,8 @@ class Helpers:
             """)
             sys.exit()
         else:
-            if os.getenv(nginx_username) is None:
-                print (f"Using default name of usertype {usertype} as {default_username}")
+            # if os.getenv(nginx_username) is None:
+            #     print (f"Using default name of usertype {usertype} as {default_username}")
             return dict({
                 "name": os.getenv(nginx_username, default_username),
                 "password": os.environ.get("%s" % nginx_password)

@@ -29,7 +29,8 @@ cli.add_argument('subcommand', help='Subcommand to run',
 apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["validation", "account", "health", "version", "universe", "metrics"])
+                                 choices=["validation", "account", "health", "version", "universe", "metrics",
+                                          "system"])
 
 cwd = os.getcwd()
 
@@ -393,82 +394,82 @@ def get_info(args):
 
 
 @systemapicommand()
-def api_get_configuration():
+def api_get_configuration(args):
     System.api_get_configuration()
 
 
 @systemapicommand()
 def api_get_data():
-    System.api_get_data()
+    System.api_get_data(args)
 
 
 @systemapicommand()
-def bft_get_configuration():
+def bft_get_configuration(args):
     System.bft_get_configuration()
 
 
 @systemapicommand()
 def bft_get_data():
-    System.bft_get_data()
+    System.bft_get_data(args)
 
 
 @systemapicommand()
-def mempool_get_configuration():
+def mempool_get_configuration(args):
     System.mempool_get_configuration()
 
 
 @systemapicommand()
 def mempool_get_data():
-    System.mempool_get_data()
+    System.mempool_get_data(args)
 
 
 @systemapicommand()
-def ledger_get_latest_proof():
+def ledger_get_latest_proof(args):
     System.ledger_get_latest_proof()
 
 
 @systemapicommand()
-def ledger_get_latest_epoch_proof():
+def ledger_get_latest_epoch_proof(args):
     System.ledger_get_latest_epoch_proof()
 
 
 @systemapicommand()
-def radix_engine_get_configuration():
+def radix_engine_get_configuration(args):
     System.radix_engine_get_configuration()
 
 
 @systemapicommand()
 def radix_engine_get_data():
-    System.radix_engine_get_data()
+    System.radix_engine_get_data(args)
 
 
 @systemapicommand()
 def sync_get_configuration():
-    System.sync_get_configuration()
+    System.sync_get_configuration(args)
 
 
 @systemapicommand()
 def sync_get_data():
-    System.sync_get_data()
+    System.sync_get_data(args)
 
 
 @systemapicommand()
-def networking_get_configuration():
-    System.networking_get_configuration()
+def networking_get_configuration(args):
+    System.networking_get_configuration(args)
 
 
 @systemapicommand()
-def networking_get_peers():
+def networking_get_peers(args):
     System.networking_get_peers()
 
 
 @systemapicommand()
-def networking_get_data():
+def networking_get_data(args):
     System.networking_get_data()
 
 
 @systemapicommand()
-def checkpoints_get_checkpoints():
+def checkpoints_get_checkpoints(args):
     System.checkpoints_get_checkpoints()
 
 
