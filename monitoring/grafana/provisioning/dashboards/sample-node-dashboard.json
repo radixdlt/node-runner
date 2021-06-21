@@ -15,11 +15,12 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 1,
-  "iteration": 1624282481492,
+  "id": 3,
+  "iteration": 1624284183952,
   "links": [],
   "panels": [
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -98,7 +99,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -172,7 +173,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -253,7 +254,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -312,7 +313,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -372,7 +373,7 @@
       "type": "stat"
     },
     {
-      "collapsed": true,
+      "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
@@ -386,7 +387,7 @@
       "type": "row"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -465,7 +466,7 @@
       "type": "bargauge"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -522,7 +523,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -594,7 +595,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -662,7 +663,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -734,7 +735,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -803,7 +804,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -875,7 +876,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -932,7 +933,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -988,7 +989,7 @@
       "type": "stat"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1051,7 +1052,7 @@
       "type": "bargauge"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1122,7 +1123,7 @@
       "type": "row"
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1181,7 +1182,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -1278,7 +1279,7 @@
       }
     },
     {
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1339,7 +1340,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": null,
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -1438,6 +1439,26 @@
   "tags": [],
   "templating": {
     "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "description": null,
+        "error": null,
+        "hide": 2,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "prometheus",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "Prometheus",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
     ]
   },
   "time": {
@@ -1447,6 +1468,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Radix Node Dashboard",
-  "uid": "radix_node_dashboard",
-  "version": 1
+  "uid": "updated",
+  "version": 13
 }
