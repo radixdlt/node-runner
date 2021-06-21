@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import getpass
 import os
 import os.path
 import sys
@@ -11,9 +10,9 @@ import urllib3
 
 from api.Account import Account
 from api.RestApi import RestApi
+from api.System import System
 from api.Validation import Validation
 from github.github import latest_release
-from requests.auth import HTTPBasicAuth
 from utils.utils import run_shell_command
 from utils.utils import Helpers
 from version import __version__
@@ -82,6 +81,15 @@ account_parser = accountcli.add_subparsers(dest="accountcommand")
 
 
 def accountcommand(args=[], parent=account_parser):
+    return get_decorator(args, parent)
+
+
+systemapicli = ArgumentParser(
+    description='systemapi commands')
+systemapi_parser = systemapicli.add_subparsers(dest="systemapicommand")
+
+
+def systemapicommand(args=[], parent=systemapi_parser):
     return get_decorator(args, parent)
 
 
@@ -374,19 +382,6 @@ def register_validator(args):
     Account.register_validator(validator_name, validator_url)
 
 
-@validationcommand()
-def system_info(args):
-    node_host = 'localhost'
-    user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
-    req = requests.Request('GET',
-                           f'https://{node_host}/system/info',
-                           auth=HTTPBasicAuth(user["name"], user["password"]))
-    prepared = req.prepare()
-
-    prepared.headers['Content-Type'] = 'application/json'
-    Helpers.send_request(prepared)
-
-
 @accountcommand()
 def unregister_validator(args):
     Account.un_register_validator()
@@ -395,6 +390,86 @@ def unregister_validator(args):
 @accountcommand()
 def get_info(args):
     Account.get_info()
+
+
+@systemapicommand()
+def api_get_configuration():
+    System.api_get_configuration()
+
+
+@systemapicommand()
+def api_get_data():
+    System.api_get_data()
+
+
+@systemapicommand()
+def bft_get_configuration():
+    System.bft_get_configuration()
+
+
+@systemapicommand()
+def bft_get_data():
+    System.bft_get_data()
+
+
+@systemapicommand()
+def mempool_get_configuration():
+    System.mempool_get_configuration()
+
+
+@systemapicommand()
+def mempool_get_data():
+    System.mempool_get_data()
+
+
+@systemapicommand()
+def ledger_get_latest_proof():
+    System.ledger_get_latest_proof()
+
+
+@systemapicommand()
+def ledger_get_latest_epoch_proof():
+    System.ledger_get_latest_epoch_proof()
+
+
+@systemapicommand()
+def radix_engine_get_configuration():
+    System.radix_engine_get_configuration()
+
+
+@systemapicommand()
+def radix_engine_get_data():
+    System.radix_engine_get_data()
+
+
+@systemapicommand()
+def sync_get_configuration():
+    System.sync_get_configuration()
+
+
+@systemapicommand()
+def sync_get_data():
+    System.sync_get_data()
+
+
+@systemapicommand()
+def networking_get_configuration():
+    System.networking_get_configuration()
+
+
+@systemapicommand()
+def networking_get_peers():
+    System.networking_get_peers()
+
+
+@systemapicommand()
+def networking_get_data():
+    System.networking_get_data()
+
+
+@systemapicommand()
+def checkpoints_get_checkpoints():
+    System.checkpoints_get_checkpoints()
 
 
 @monitoringcommand(
@@ -565,6 +640,14 @@ def handle_account():
         args.func(args)
 
 
+def handle_systemapi():
+    args = systemapicli.parse_args(sys.argv[3:])
+    if args.systemapicommand is None:
+        systemapicli.print_help()
+    else:
+        args.func(args)
+
+
 if __name__ == "__main__":
 
     args = cli.parse_args(sys.argv[1:2])
@@ -606,6 +689,8 @@ if __name__ == "__main__":
                 RestApi.get_universe()
             elif apicli_args.apicommand == "metrics":
                 RestApi.get_metrics()
+            elif apicli_args.apicommand == "system":
+                handle_systemapi()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 
