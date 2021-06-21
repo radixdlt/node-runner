@@ -1227,7 +1227,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "total_peers{instance=\"$instance\"}",
+          "expr": "total_peers",
           "interval": "",
           "legendFormat": "Peers",
           "refId": "A"
@@ -1381,7 +1381,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "total_validators{instance=\"$instance\"}",
+          "expr": "total_validators",
           "interval": "",
           "legendFormat": "Validators",
           "refId": "A"
@@ -1438,16 +1438,6 @@
   "tags": [],
   "templating": {
     "list": [
-      {
-        "description": "If case you are running many nodes, use this var to target a single on",
-        "error": null,
-        "hide": 2,
-        "label": null,
-        "name": "instance",
-        "query": "metrics-exporter:8099",
-        "skipUrlSync": false,
-        "type": "constant"
-      }
     ]
   },
   "time": {
