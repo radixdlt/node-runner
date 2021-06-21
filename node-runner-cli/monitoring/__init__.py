@@ -1,9 +1,13 @@
+import sys
+
 import requests
 import os
 import os.path
 from pathlib import Path
 
-from env_vars import NODE_END_POINT
+import yaml
+
+from env_vars import NODE_END_POINT, NODE_HOST_IP_OR_NAME
 from utils.utils import Helpers, run_shell_command
 
 
@@ -15,9 +19,42 @@ class Monitoring():
         prepared = req.prepare()
 
         resp = Helpers.send_request(prepared, print_response=False)
+
+        if not resp.ok:
+            print(f" Errored downloading file {default_prometheus_yaml_url}. Exitting ... ")
+            sys.exit()
+
+        default_prometheus_yaml = yaml.safe_load(resp.content)
+        prometheus_yaml = Monitoring.merge_auth_config(default_prometheus_yaml, Monitoring.get_node_host_ip())
+
+        def represent_none(self, _):
+            return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+        yaml.add_representer(type(None), represent_none)
         Path("monitoring/prometheus").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/prometheus/prometheus.yml", 'wb') as f:
-            f.write(resp.content)
+
+        with open("monitoring/prometheus/prometheus.yml", 'w') as f:
+            yaml.dump(prometheus_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+
+    @staticmethod
+    def merge_auth_config(default_prometheus_yaml, node_ip):
+        user = Helpers.get_nginx_user("metrics", "metrics")
+        # TODO fix the issue where volumes array gets merged correctly
+        scrape_config = yaml.safe_load(f"""
+            scrape_configs:
+                - job_name: mynode
+                    scheme: https
+                    basic_auth:
+                      username: {user["name"]}
+                      password: {user["password"]}
+                    tls_config:
+                      insecure_skip_verify: true
+                    static_configs:
+                      - targets:
+                          - {node_ip}
+           """)
+        final_conf = Helpers.merge(scrape_config, default_prometheus_yaml)
+        return final_conf
 
     @staticmethod
     def setup_datasource(default_datasource_cfg_url):
@@ -55,19 +92,24 @@ class Monitoring():
     @staticmethod
     def start_monitoring(composefile):
         user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
-        if os.environ.get('%s' % NODE_END_POINT) is None:
-            print(
-                f"{NODE_END_POINT} environment not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
-                "the node.")
-            ip = Helpers.get_public_ip()
-            node_endpoint = f"https://{ip}"
-        else:
-            node_endpoint = os.environ.get(NODE_END_POINT)
+        node_endpoint = Monitoring.NODE_HOST_IP_OR_NAME()
         run_shell_command(f'docker-compose -f {composefile} up -d',
                           env={
                               "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
                               f"{NODE_END_POINT}": node_endpoint
                           }, shell=True)
+
+    @staticmethod
+    def get_node_host_ip():
+        if os.environ.get('%s' % NODE_HOST_IP_OR_NAME) is None:
+            print(
+                f"{NODE_HOST_IP_OR_NAME} environment not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
+                "the node.")
+            ip = Helpers.get_public_ip()
+            node_endpoint = f"{ip}"
+        else:
+            node_endpoint = os.environ.get(NODE_HOST_IP_OR_NAME)
+        return node_endpoint
 
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
