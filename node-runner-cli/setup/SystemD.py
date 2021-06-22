@@ -103,8 +103,8 @@ class SystemD(Base):
             network.p2p.seed_nodes={trustednode}:30000
             network.host_ip={hostip}
             db.location=/data
-            node_api.port=3334
-            client_api.port=8081
+            client_api_enabled=3334
+            api.archive.port=8081
             log.level=debug
             api.archive.enable={enable_client_api}
             api.construction.enable={enable_client_api}
