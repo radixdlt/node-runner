@@ -1,6 +1,8 @@
 import os
 import sys
 from pathlib import Path
+
+from env_vars import UNZIPPED_NODE_DIST_FOLDER
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 
@@ -160,7 +162,8 @@ class SystemD(Base):
             okay = input("Should the directory be removed [Y/n]?:")
             if Helpers.check_Yes(okay):
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
-        run_shell_command(f'mv radixdlt-{node_version}/* {node_dir}/{node_version}', shell=True)
+        unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"radixdlt-{node_version}")
+        run_shell_command(f'mv {unzipped_folder_name}/* {node_dir}/{node_version}', shell=True)
 
     @staticmethod
     def start_node_service():
@@ -253,7 +256,7 @@ class SystemD(Base):
             """)
         if username not in ["admin", "metrics", "superadmin"]:
             print(
-            f"""
+                f"""
             echo 'export NGINX_{usertype.upper()}_USERNAME="{username}"' >> ~/.bashrc
             """
             )
