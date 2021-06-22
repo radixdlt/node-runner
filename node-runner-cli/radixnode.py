@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import os
 import os.path
 import sys
@@ -16,6 +17,8 @@ from github.github import latest_release
 from monitoring import Monitoring
 from utils.utils import run_shell_command
 from utils.utils import Helpers
+from utils.utils import bcolors
+
 from version import __version__
 from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, NODE_END_POINT, \
     DISABLE_VERSION_CHECK
@@ -397,9 +400,23 @@ def get_current_epoch_data(args):
 
 @accountcommand()
 def register_validator(args):
-    validator_name = input("Name of your validator:")
-    validator_url = input("Info URL of your validator:")
-    Account.register_validator(validator_name, validator_url)
+    request_data = {
+        "jsonrpc": "2.0",
+        "method": "account.submit_transaction_single_step",
+        "params": {
+            "actions": []
+        },
+        "id": 1
+    }
+    validator_id = Validation.get_validator_id()
+    request_data = Account.register_or_update_steps(request_data, validator_id)
+    request_data = Account.add_update_rake(request_data, validator_id)
+    request_data = Account.setup_update_delegation(request_data, validator_id)
+    request_data = Account.add_change_ownerid(request_data, validator_id)
+
+    print(f"{bcolors.WARNING}About to update node account with following")
+    print(json.dumps(request_data, indent=4, sort_keys=True))
+    Account.post_on_account(json.dumps(request_data))
 
 
 @accountcommand()
