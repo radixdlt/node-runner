@@ -98,10 +98,10 @@ class SystemD(Base):
             ntp.pool=pool.ntp.org
             universe.location=/etc/radixdlt/node/universe.json
             node.key.path=/etc/radixdlt/node/secrets/validator.ks
-            network.tcp.listen_port=30001
-            network.tcp.broadcast_port=30000
-            network.seeds={trustednode}:30000
-            host.ip={hostip}
+            network.p2p.listen_port=30001
+            network.p2p.broadcast_port=30000
+            network.p2p.seed_nodes={trustednode}:30000
+            network.host_ip={hostip}
             db.location=/data
             node_api.port=3334
             client_api.port=8081

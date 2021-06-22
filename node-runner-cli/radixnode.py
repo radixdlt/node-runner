@@ -276,6 +276,24 @@ def stop(args):
         sys.exit()
 
 
+@systemdcommand([
+    argument("-s", "--services", default="all",
+             help="Name of the service either to be started. Valid values nginx or radixdlt-node",
+             choices=["all", "nginx", "radixdlt-node"], action="store")
+])
+def restart(args):
+    if args.services == "all":
+        SystemD.restart_node_service()
+        SystemD.restart_nginx_service()
+    elif args.services == "nginx":
+        SystemD.restart_nginx_service()
+    elif args.services == "radixdlt-node":
+        SystemD.restart_node_service()
+    else:
+        print(f"Invalid service name {args.services}")
+        sys.exit()
+
+
 @dockercommand([
     argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
@@ -400,8 +418,8 @@ def api_get_configuration(args):
 
 
 @systemapicommand()
-def api_get_data():
-    System.api_get_data(args)
+def api_get_data(args):
+    System.api_get_data()
 
 
 @systemapicommand()
@@ -410,8 +428,8 @@ def bft_get_configuration(args):
 
 
 @systemapicommand()
-def bft_get_data():
-    System.bft_get_data(args)
+def bft_get_data(args):
+    System.bft_get_data()
 
 
 @systemapicommand()
@@ -420,8 +438,8 @@ def mempool_get_configuration(args):
 
 
 @systemapicommand()
-def mempool_get_data():
-    System.mempool_get_data(args)
+def mempool_get_data(args):
+    System.mempool_get_data()
 
 
 @systemapicommand()
