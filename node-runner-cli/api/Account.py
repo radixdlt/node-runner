@@ -75,7 +75,7 @@ class Account(API):
         data = {
             "type": "UpdateRake",
             "validator": validator_id,
-            "percentage": percentage
+            "percentage": percentage/100
         }
         return data
 
@@ -102,8 +102,9 @@ class Account(API):
         ask_add_or_change_info = input("Do you want add or change the validator name and info url [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_info):
             ask_registration_or_update = input(
-                f"{bcolors.BOLD}Is this first time you registering (R) validator  or  you want update (U) the registration. Valid "
-                "options: [R/U]?")
+                f"{bcolors.BOLD}Is this first time you registering (R) validator  or  you want update (U) the "
+                f"registration. Valid "
+                f"options: [R/U]?{bcolors.ENDC}")
             if ask_registration_or_update.upper() == "R":
                 registertion_action_command = "RegisterValidator"
             elif ask_registration_or_update.upper() == "U":
@@ -112,8 +113,8 @@ class Account(API):
                 print("Entered value is invalid")
                 sys.exit()
 
-            validator_name = input("Name of your validator:")
-            validator_url = input("Info URL of your validator:")
+            validator_name = input(f"{bcolors.OKBLUE}Name of your validator:")
+            validator_url = input(f"{bcolors.OKBLUE}Info URL of your validator:{bcolors.ENDC}")
             register_action = Account.get_register_validator_action(validator_name, validator_url,
                                                                     registertion_action_command, validator_id)
             request_data["params"]["actions"].append(register_action)
@@ -123,7 +124,7 @@ class Account(API):
     def add_update_rake(request_data, validator_id):
         print(
             f"{bcolors.WARNING} Validator fee may be decreased at any time, but increasing it incurs a delay of "
-            f"approx. 2 weeks. Please set it carefully")
+            f"approx. 2 weeks. Please set it carefully{bcolors.ENDC}")
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]")
         if Helpers.check_Yes(ask_validator_fee_setup):
             percentage = int(input("Enter the percentage value between 1 to 100 as the validator fees."))
@@ -158,7 +159,7 @@ class Account(API):
         print(
             f"{bcolors.WARNING} Please ensure you set owner account to a valid Radix account that you control (such "
             f"as one created with the Desktop Wallet), as this will also be where any validator fee emissions will be "
-            f"credited. It is strongly advised to NOT use the Radix account of your node itself. ")
+            f"credited. It is strongly advised to NOT use the Radix account of your node itself.{bcolors.ENDC} ")
         ask_add_or_change_ownerid = input("Add or Change owner id [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_ownerid):
             owner_id = input("Enter the owner id:").strip

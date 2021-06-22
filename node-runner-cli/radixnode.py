@@ -414,9 +414,13 @@ def register_validator(args):
     request_data = Account.setup_update_delegation(request_data, validator_id)
     request_data = Account.add_change_ownerid(request_data, validator_id)
 
-    print(f"{bcolors.WARNING}About to update node account with following")
-    print(json.dumps(request_data, indent=4, sort_keys=True))
-    Account.post_on_account(json.dumps(request_data))
+    print(f"{bcolors.WARNING}About to update node account with following{bcolors.ENDC}")
+    print(f"{bcolors.OKBLUE}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")
+    submit_changes = input(f"{bcolors.WARNING}Do you want to continue [Y/n]{bcolors.ENDC}")
+    if Helpers.check_Yes(submit_changes):
+        Account.post_on_account(json.dumps(request_data))
+    print(f"{bcolors.OKBLUE} Changes were not submitted.{bcolors.ENDC}")
+
 
 
 @accountcommand()
