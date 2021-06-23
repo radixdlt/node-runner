@@ -409,6 +409,7 @@ def register_validator(args):
         "id": 1
     }
     validator_id = Validation.get_validator_id()
+    user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
     request_data = Account.register_or_update_steps(request_data, validator_id)
     request_data = Account.add_update_rake(request_data, validator_id)
     request_data = Account.setup_update_delegation(request_data, validator_id)

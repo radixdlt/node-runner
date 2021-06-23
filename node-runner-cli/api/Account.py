@@ -143,7 +143,7 @@ class Account(API):
 
     @staticmethod
     def setup_update_delegation(request_data, validator_id):
-        print("--------Validator fees-----\n")
+        print("--------Allow delegation-----\n")
         print(
             f"{bcolors.WARNING}\nEnabling allowDelegation means anyone can delegate stake to your node. Disabling it "
             f"later will not remove this stake.{bcolors.ENDC}")
