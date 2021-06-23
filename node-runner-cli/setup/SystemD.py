@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from env_vars import UNZIPPED_NODE_DIST_FOLDER
+from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 
@@ -121,6 +121,19 @@ class SystemD(Base):
 
         """
         run_shell_command(command, shell=True)
+
+        if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
+            lines = []
+            while True:
+                line = input()
+                if line:
+                    lines.append(line)
+                else:
+                    break
+            text = '\n'.join(lines)
+            run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
+
+
 
     @staticmethod
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
