@@ -59,7 +59,6 @@ class Account(API):
         resp = Helpers.send_request(prepared)
         Helpers.json_response_check(resp)
 
-
     @staticmethod
     def get_info():
         data = f"""
@@ -133,11 +132,14 @@ class Account(API):
             f"approx. 2 weeks. Please set it carefully{bcolors.ENDC}")
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
-            percentage = int(input("Enter the percentage value between 1 to 100 as the validator fees:"))
+
+            percentage = Helpers.check_percentage_input()
 
             update_rake = Account.get_update_rake_action(percentage, validator_id)
             request_data["params"]["actions"].append(update_rake)
         return request_data
+
+
 
     @staticmethod
     def setup_update_delegation(request_data, validator_id):

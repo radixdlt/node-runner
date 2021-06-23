@@ -133,7 +133,6 @@ class Helpers:
 
         return destination
 
-
     @staticmethod
     def parse_trustednode(trustednode):
         import re
@@ -151,6 +150,25 @@ class Helpers:
                     f"{bcolors.FAIL}\n Failed to submit changes Check the response for the error details{bcolors.ENDC}")
         elif not resp.ok:
             print(f"{bcolors.FAIL}\n Failed to submit changes")
+
+    @staticmethod
+    def check_percentage_input():
+        while True:
+            try:
+                str_percentage = input(
+                    f'{bcolors.BOLD}Enter the percentage value between 1.00 to 100.00 as the validator fees:{bcolors.ENDC}')
+                percentage = float(str_percentage)
+                integral, fractional = str_percentage.split('.')
+                if len(fractional) == 2 and len(integral) < 2:
+                    break
+                else:
+                    print(
+                        f"{bcolors.WARNING}The percentage value should between 1.00 to 100.00 as the validator fees!{bcolors.ENDC}")
+            except ValueError:
+                pass
+            print(
+                f"{bcolors.FAIL}The percentage value should between 1.00 to 100.00 as the validator fees!{bcolors.ENDC}")
+        return percentage
 
 
 class bcolors:
