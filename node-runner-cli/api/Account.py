@@ -116,7 +116,7 @@ class Account(API):
                 print("Entered value is invalid")
                 sys.exit()
 
-            validator_name = input(f"{bcolors.OKBLUE}Name of your validator:")
+            validator_name = input(f"{bcolors.OKBLUE}Name of your validator:{bcolors.ENDC}")
             validator_url = input(f"{bcolors.OKBLUE}Info URL of your validator:{bcolors.ENDC}")
             register_action = Account.get_register_validator_action(validator_name, validator_url,
                                                                     registertion_action_command, validator_id)
