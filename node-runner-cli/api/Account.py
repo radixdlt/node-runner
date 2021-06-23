@@ -172,8 +172,8 @@ class Account(API):
             f"credited. It is strongly advised to NOT use the Radix account of your node itself.{bcolors.ENDC} ")
         ask_add_or_change_ownerid = input("\nAdd or Change owner id [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_ownerid):
-            owner_id = input("Enter the owner id:").strip
-            update_validator_owner_address = Account.get_update_validator_owner_address_action(owner_id, validator_id)
+            owner_id = input("Enter the owner id:")
+            update_validator_owner_address = Account.get_update_validator_owner_address_action(owner_id.strip(), validator_id)
             request_data["params"]["actions"].append(update_validator_owner_address)
 
         return request_data

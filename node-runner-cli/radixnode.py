@@ -416,6 +416,7 @@ def register_validator(args):
     request_data = Account.add_change_ownerid(request_data, validator_id)
 
     print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
+    print(f"")
     print(f"{bcolors.BOLD}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")
     submit_changes = input(f"{bcolors.BOLD}\nDo you want to continue [Y/n]{bcolors.ENDC}")
     if Helpers.check_Yes(submit_changes):
