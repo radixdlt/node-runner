@@ -82,7 +82,7 @@ class Account(API):
     @staticmethod
     def get_update_allow_delegation_flag_action(allowDelegation, validator_id):
         data = {
-            "type": "UpdateRake",
+            "type": "UpdateAllowDelegationFlag",
             "validator": validator_id,
             "allowDelegation": allowDelegation
         }
@@ -91,7 +91,7 @@ class Account(API):
     @staticmethod
     def get_update_validator_owner_address_action(owner_id, validator_id):
         data = {
-            "type": "UpdateRake",
+            "type": "UpdateValidatorOwnerAddress",
             "validator": validator_id,
             "owner": owner_id
         }

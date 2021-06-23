@@ -419,7 +419,8 @@ def register_validator(args):
     submit_changes = input(f"{bcolors.WARNING}Do you want to continue [Y/n]{bcolors.ENDC}")
     if Helpers.check_Yes(submit_changes):
         Account.post_on_account(json.dumps(request_data))
-    print(f"{bcolors.OKBLUE} Changes were not submitted.{bcolors.ENDC}")
+    else:
+        print(f"{bcolors.OKBLUE} Changes were not submitted.{bcolors.ENDC}")
 
 
 
