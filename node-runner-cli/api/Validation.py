@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -65,3 +67,4 @@ class Validation(API):
             return json.loads(resp.content)["result"]["address"]
         else:
             print("Error occured fetching validator address")
+            sys.exit()

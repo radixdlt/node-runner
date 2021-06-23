@@ -159,7 +159,7 @@ class Helpers:
                     f'{bcolors.BOLD}Enter the percentage value between 1.00 to 100.00 as the validator fees:{bcolors.ENDC}')
                 percentage = float(str_percentage)
                 integral, fractional = str_percentage.split('.')
-                if len(fractional) == 2 and len(integral) < 2:
+                if len(fractional) == 2 and len(integral) <= 2:
                     break
                 else:
                     print(
@@ -168,7 +168,7 @@ class Helpers:
                 pass
             print(
                 f"{bcolors.FAIL}The percentage value should between 1.00 to 100.00 as the validator fees!{bcolors.ENDC}")
-        return percentage
+        return int(percentage * 100)
 
 
 class bcolors:
