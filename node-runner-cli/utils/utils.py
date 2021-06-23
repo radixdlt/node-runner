@@ -142,6 +142,16 @@ class Helpers:
             sys.exit()
         return trustednode.rsplit('@', 1)[-1]
 
+    @staticmethod
+    def json_response_check(resp):
+        if Helpers.is_json(resp.content):
+            json_response = json.loads(resp.content)
+            if "error" in json_response:
+                print(
+                    f"{bcolors.FAIL}\n Failed to submit changes Check the response for the error details{bcolors.ENDC}")
+        elif not resp.ok:
+            print(f"{bcolors.FAIL}\n Failed to submit changes")
+
 
 class bcolors:
     HEADER = '\033[95m'

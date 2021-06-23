@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -55,7 +56,9 @@ class Account(API):
 
         prepared = req.prepare()
         prepared.headers['Content-Type'] = 'application/json'
-        Helpers.send_request(prepared)
+        resp = Helpers.send_request(prepared)
+        Helpers.json_response_check(resp)
+
 
     @staticmethod
     def get_info():
@@ -99,10 +102,11 @@ class Account(API):
 
     @staticmethod
     def register_or_update_steps(request_data, validator_id):
-        ask_add_or_change_info = input("Do you want add or change the validator name and info url [Y/n]?")
+        ask_add_or_change_info = input("\nDo you want add or change the validator name and info url [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_info):
+            print("--------Registration-----\n")
             ask_registration_or_update = input(
-                f"{bcolors.BOLD}Is this first time you registering (R) validator  or  you want update (U) the "
+                f"{bcolors.BOLD}\nIs this first time you registering (R) validator  or  you want update (U) the "
                 f"registration. Valid "
                 f"options: [R/U]?{bcolors.ENDC}")
             if ask_registration_or_update.upper() == "R":
@@ -122,12 +126,14 @@ class Account(API):
 
     @staticmethod
     def add_update_rake(request_data, validator_id):
+        print("--------Validator fees-----\n")
+
         print(
-            f"{bcolors.WARNING} Validator fee may be decreased at any time, but increasing it incurs a delay of "
+            f"{bcolors.WARNING}\nValidator fee may be decreased at any time, but increasing it incurs a delay of "
             f"approx. 2 weeks. Please set it carefully{bcolors.ENDC}")
-        ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]")
+        ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
-            percentage = int(input("Enter the percentage value between 1 to 100 as the validator fees."))
+            percentage = int(input("Enter the percentage value between 1 to 100 as the validator fees:"))
 
             update_rake = Account.get_update_rake_action(percentage, validator_id)
             request_data["params"]["actions"].append(update_rake)
@@ -135,12 +141,13 @@ class Account(API):
 
     @staticmethod
     def setup_update_delegation(request_data, validator_id):
+        print("--------Validator fees-----\n")
         print(
-            f"{bcolors.WARNING} Enabling allowDelegation means anyone can delegate stake to your node. Disabling it "
-            f"later will not remove this stake. ")
-        ask_allow_delegation = input("Setup or update delegation [Y/n]?")
+            f"{bcolors.WARNING}\nEnabling allowDelegation means anyone can delegate stake to your node. Disabling it "
+            f"later will not remove this stake.{bcolors.ENDC}")
+        ask_allow_delegation = input("\nSetup or update delegation [Y/n]?")
         if Helpers.check_Yes(ask_allow_delegation):
-            allow_delegation = input("Do you want allow delegation [Y/n]")
+            allow_delegation = input("\nDo you want allow delegation [Y/n]")
             if allow_delegation.lower() in ("yes", "true", "y"):
                 update_allow_delegation_flag = Account.get_update_allow_delegation_flag_action(True,
                                                                                                validator_id)
@@ -156,11 +163,12 @@ class Account(API):
 
     @staticmethod
     def add_change_ownerid(request_data, validator_id):
+        print("--------Change owner id-----\n")
         print(
-            f"{bcolors.WARNING} Please ensure you set owner account to a valid Radix account that you control (such "
+            f"{bcolors.WARNING}\nPlease ensure you set owner account to a valid Radix account that you control (such "
             f"as one created with the Desktop Wallet), as this will also be where any validator fee emissions will be "
             f"credited. It is strongly advised to NOT use the Radix account of your node itself.{bcolors.ENDC} ")
-        ask_add_or_change_ownerid = input("Add or Change owner id [Y/n]?")
+        ask_add_or_change_ownerid = input("\nAdd or Change owner id [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_ownerid):
             owner_id = input("Enter the owner id:").strip
             update_validator_owner_address = Account.get_update_validator_owner_address_action(owner_id, validator_id)
