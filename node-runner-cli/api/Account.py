@@ -75,7 +75,7 @@ class Account(API):
         data = {
             "type": "UpdateRake",
             "validator": validator_id,
-            "percentage": percentage/100
+            "percentage": percentage
         }
         return data
 
