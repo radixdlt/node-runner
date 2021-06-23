@@ -123,6 +123,7 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
         if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
+            print("Add overides")
             lines = []
             while True:
                 line = input()
@@ -130,8 +131,8 @@ class SystemD(Base):
                     lines.append(line)
                 else:
                     break
-            text = '\n'.join(lines)
-            run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
+            for text in lines:
+                run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
 
 
 
