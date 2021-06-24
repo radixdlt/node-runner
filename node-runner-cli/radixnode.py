@@ -408,12 +408,14 @@ def register_validator(args):
         },
         "id": 1
     }
-    validator_id = Validation.get_validator_id()
+
+    validator_info = Validation.get_validator_info_json()
+
     user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
-    request_data = Account.register_or_update_steps(request_data, validator_id)
-    request_data = Account.add_update_rake(request_data, validator_id)
-    request_data = Account.setup_update_delegation(request_data, validator_id)
-    request_data = Account.add_change_ownerid(request_data, validator_id)
+    request_data = Account.register_or_update_steps(request_data, validator_info)
+    request_data = Account.add_update_rake(request_data, validator_info)
+    request_data = Account.setup_update_delegation(request_data, validator_info)
+    request_data = Account.add_change_ownerid(request_data, validator_info)
 
     print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
     print(f"")
@@ -423,7 +425,6 @@ def register_validator(args):
         Account.post_on_account(json.dumps(request_data))
     else:
         print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC}")
-
 
 
 @accountcommand()

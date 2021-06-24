@@ -4,6 +4,8 @@ from datetime import datetime
 import requests
 import sys, os
 
+from env_vars import PRINT_REQUEST
+
 
 def printCommand(cmd):
     print('-----------------------------')
@@ -50,7 +52,7 @@ class Helpers:
 
     @staticmethod
     def send_request(prepared, print_request=False, print_response=True):
-        if print_request or os.getenv("PRINT_REQUEST") is not None:
+        if print_request or os.getenv(PRINT_REQUEST) is not None:
             Helpers.pretty_print_request(prepared)
         s = requests.Session()
         resp = s.send(prepared, verify=False)
@@ -156,19 +158,21 @@ class Helpers:
         while True:
             try:
                 str_percentage = input(
-                    f'{bcolors.BOLD}Enter the percentage value between 1.00 to 100.00 as the validator fees:{bcolors.ENDC}')
+                    f'{bcolors.BOLD}Enter the percentage value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
                 percentage = float(str_percentage)
                 integral, fractional = str_percentage.split('.')
                 if len(fractional) == 2 and len(integral) <= 2:
                     break
-                else:
-                    print(
-                        f"{bcolors.WARNING}The percentage value should between 1.00 to 100.00 as the validator fees!{bcolors.ENDC}")
             except ValueError:
                 pass
             print(
-                f"{bcolors.FAIL}The percentage value should between 1.00 to 100.00 as the validator fees!{bcolors.ENDC}")
+                f"{bcolors.FAIL}The percentage value should between 0.00 to 100.00 as the validator fees!{bcolors.ENDC}")
         return int(percentage * 100)
+
+    @staticmethod
+    def print_coloured_line(text,color="\033[0m"):
+        print(f"{color}{text}{bcolors.ENDC}")
+        return f"{color}{text}{bcolors.ENDC}"
 
 
 class bcolors:

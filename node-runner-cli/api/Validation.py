@@ -61,10 +61,34 @@ class Validation(API):
         return Helpers.send_request(prepared)
 
     @staticmethod
-    def get_validator_id():
+    def get_validator_info_json():
         resp = Validation.get_validator_info()
-        if Helpers.is_json(resp.content):
-            return json.loads(resp.content)["result"]["address"]
+        if Helpers.is_json(resp.content) and "error" not in resp.content:
+
+            def check_key(key):
+                if key not in resp.content.result:
+                    print(f"'{key}' not present in the json response of validator get_node_info")
+                    sys.exit()
+
+            def get_attribute(data, attribute, default_value):
+                return data.get(attribute) or default_value
+
+            check_key("registered")
+            check_key("allowsDelegation")
+            check_key("percentage")
+            check_key("owner")
+            check_key("address")
+
+            validator = {
+                "name": get_attribute(resp.content.result, "name", ""),
+                "url": get_attribute(resp.content.result, "url", ""),
+                "registered": resp.content.result["registered"],
+                "allowsDelegation": resp.content.result["allowsDelegation"],
+                "percentage": resp.content.result["percentage"],
+                "owner": resp.content.result["owner"],
+                "address": resp.content.result["address"],
+            }
+            return validator
         else:
-            print("Error occured fetching validator address")
+            print("Error occured fetching validator get_node_info")
             sys.exit()
