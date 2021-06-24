@@ -47,7 +47,8 @@ class RestApi(API):
             Helpers.print_coloured_line("Error retriveing health\n", bcolors.FAIL)
         if health.content.status != "UP":
             Helpers.print_coloured_line(
-                "Node is not in sync. Rerun the command once node is completely synced. Exitting "
-                "now...\n",
+                "Node is not in sync. Rerun the command once node is completely synced",
                 bcolors.WARNING)
-            sys.exit()
+            proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
+            if not Helpers.check_Yes(proceed):
+                sys.exit()
