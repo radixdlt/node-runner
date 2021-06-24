@@ -161,7 +161,7 @@ class Helpers:
                     f'{bcolors.BOLD}Enter the percentage value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
                 percentage = float(str_percentage)
                 integral, fractional = str_percentage.split('.')
-                if len(fractional) == 2 and len(integral) <= 2:
+                if len(fractional) <= 2 and len(integral) <= 2:
                     break
             except ValueError:
                 pass
@@ -170,9 +170,11 @@ class Helpers:
         return int(percentage * 100)
 
     @staticmethod
-    def print_coloured_line(text,color="\033[0m"):
-        print(f"{color}{text}{bcolors.ENDC}")
-        return f"{color}{text}{bcolors.ENDC}"
+    def print_coloured_line(text,color="\033[0m",return_string=False):
+        if not return_string:
+            print(f"{color}{text}{bcolors.ENDC}")
+        else:
+            return f"{color}{text}{bcolors.ENDC}"
 
 
 class bcolors:

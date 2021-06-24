@@ -48,10 +48,12 @@ class RestApi(API):
             Helpers.print_coloured_line("Error retrieving health\n", bcolors.FAIL)
             sys.exit()
 
-        if Helpers.is_json(health.content) and json.loads(health.content).status != "UP":
-            Helpers.print_coloured_line(
-                "Node is not in sync. Rerun the command once node is completely synced",
-                bcolors.WARNING)
-            proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
-            if not Helpers.check_Yes(proceed):
-                sys.exit()
+        if Helpers.is_json(health.content):
+            resp_content = json.loads(health.content)
+            if resp_content["status"] != "UP":
+                Helpers.print_coloured_line(
+                    "Node is not in sync. Rerun the command once node is completely synced",
+                    bcolors.WARNING)
+                proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
+                if not Helpers.check_Yes(proceed):
+                    sys.exit()

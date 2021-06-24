@@ -6,7 +6,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from api.Api import API
-from utils.utils import Helpers
+from utils.utils import Helpers, bcolors
 
 
 class Validation(API):
@@ -63,10 +63,14 @@ class Validation(API):
     @staticmethod
     def get_validator_info_json():
         resp = Validation.get_validator_info()
-        if Helpers.is_json(resp.content) and "error" not in resp.content:
+        if not resp.ok or  not Helpers.is_json(resp.content):
+            Helpers.print_coloured_line("Failed retrieving information from get_node_info method",bcolors.FAIL)
+            sys.exit()
+        resp_content = json.loads(resp.content)
+        if Helpers.is_json(resp.content) and "error" not in resp_content:
 
             def check_key(key):
-                if key not in resp.content.result:
+                if key not in resp_content["result"]:
                     print(f"'{key}' not present in the json response of validator get_node_info")
                     sys.exit()
 
@@ -80,13 +84,13 @@ class Validation(API):
             check_key("address")
 
             validator = {
-                "name": get_attribute(resp.content.result, "name", ""),
-                "url": get_attribute(resp.content.result, "url", ""),
-                "registered": resp.content.result["registered"],
-                "allowsDelegation": resp.content.result["allowsDelegation"],
-                "percentage": resp.content.result["percentage"],
-                "owner": resp.content.result["owner"],
-                "address": resp.content.result["address"],
+                "name": get_attribute(resp_content["result"], "name", ""),
+                "url": get_attribute(resp_content["result"], "url", ""),
+                "registered": resp_content["result"]["registered"],
+                "allowsDelegation": resp_content["result"]["allowsDelegation"],
+                "percentage": resp_content["result"]["percentage"],
+                "owner": resp_content["result"]["owner"],
+                "address": resp_content["result"]["address"],
             }
             return validator
         else:

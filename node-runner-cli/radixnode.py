@@ -422,10 +422,10 @@ def register_validator(args):
     print(f"")
     print(f"{bcolors.BOLD}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")
     submit_changes = input(f"{bcolors.BOLD}\nDo you want to continue [Y/n]{bcolors.ENDC}")
-    if Helpers.check_Yes(submit_changes):
+    if Helpers.check_Yes(submit_changes) and len(request_data["params"]["actions"]) != 0:
         Account.post_on_account(json.dumps(request_data))
     else:
-        print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC}")
+        print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
 
 
 @accountcommand()
