@@ -25,7 +25,6 @@ class RestApi(API):
         prepared.headers['Content-Type'] = 'application/json'
         return Helpers.send_request(prepared)
 
-
     @staticmethod
     def get_version():
         RestApi.get_request("admin", "admin", "version")
@@ -40,12 +39,15 @@ class RestApi(API):
 
     @staticmethod
     def check_health():
+        error = False
         Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
         health = RestApi.get_health()
-        Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
+
         if not health.ok:
-            Helpers.print_coloured_line("Error retriveing health\n", bcolors.FAIL)
-        if health.content.status != "UP":
+            Helpers.print_coloured_line("Error retrieving health\n", bcolors.FAIL)
+            sys.exit()
+
+        if Helpers.is_json(health.content) and health.content.status != "UP":
             Helpers.print_coloured_line(
                 "Node is not in sync. Rerun the command once node is completely synced",
                 bcolors.WARNING)
