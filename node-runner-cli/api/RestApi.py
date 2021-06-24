@@ -1,3 +1,4 @@
+import json
 import sys
 
 import requests
@@ -47,7 +48,7 @@ class RestApi(API):
             Helpers.print_coloured_line("Error retrieving health\n", bcolors.FAIL)
             sys.exit()
 
-        if Helpers.is_json(health.content) and health.content.status != "UP":
+        if Helpers.is_json(health.content) and json.loads(health).content.status != "UP":
             Helpers.print_coloured_line(
                 "Node is not in sync. Rerun the command once node is completely synced",
                 bcolors.WARNING)
