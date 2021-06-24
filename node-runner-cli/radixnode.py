@@ -408,6 +408,7 @@ def register_validator(args):
         },
         "id": 1
     }
+    RestApi.check_health()
 
     validator_info = Validation.get_validator_info_json()
 
@@ -429,6 +430,7 @@ def register_validator(args):
 
 @accountcommand()
 def unregister_validator(args):
+    RestApi.check_health()
     Account.un_register_validator()
 
 

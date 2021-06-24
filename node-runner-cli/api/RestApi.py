@@ -1,14 +1,16 @@
+import sys
+
 import requests
 from requests.auth import HTTPBasicAuth
 
 from api.Api import API
-from utils.utils import Helpers
+from utils.utils import Helpers, bcolors
 
 
 class RestApi(API):
     @staticmethod
     def get_health():
-        RestApi.get_request("admin", "admin", "health")
+        return RestApi.get_request("admin", "admin", "health")
 
     @staticmethod
     def get_request(usertype, username, api_path):
@@ -21,7 +23,8 @@ class RestApi(API):
 
         prepared = req.prepare()
         prepared.headers['Content-Type'] = 'application/json'
-        Helpers.send_request(prepared)
+        return Helpers.send_request(prepared)
+
 
     @staticmethod
     def get_version():
@@ -34,3 +37,17 @@ class RestApi(API):
     @staticmethod
     def get_metrics():
         RestApi.get_request("metrics", "metrics", "metrics")
+
+    @staticmethod
+    def check_health():
+        Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
+        health = RestApi.get_health()
+        Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
+        if not health.ok:
+            Helpers.print_coloured_line("Error retriveing health\n", bcolors.FAIL)
+        if health.content.status != "UP":
+            Helpers.print_coloured_line(
+                "Node is not in sync. Rerun the command once node is completely synced. Exitting "
+                "now...\n",
+                bcolors.WARNING)
+            sys.exit()
