@@ -125,12 +125,12 @@ To list all subcommands
 ```shell script
 # To list the subcommands
 radixnode -h
-usage: radixnode [-h]
-                 {version,setup-docker,start-systemd,stop-systemd,start-docker,stop-docker,configure-docker,configure-systemd,set-admin-password,get-node-address,get-peers,register-validator,validator-info,system-info,setup-monitoring,stop-monitoring}
-                 ...
+usage: radixnode.py [-h]
+                    {docker,systemd,api,monitoring,version,optimise-node,auth}
 
 positional arguments:
-  {version,setup-docker,start-systemd,stop-systemd,start-docker,stop-docker,configure-docker,configure-systemd,set-admin-password,get-node-address,get-peers,register-validator,validator-info,system-info,setup-monitoring,stop-monitoring}
+  {docker,systemd,api,monitoring,version,optimise-node,auth}
+                        Subcommand to run
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -139,19 +139,16 @@ optional arguments:
 To list options/arguements for the subcommand
 ```shell script
 # Check the options for a subcommand such as start-docker
-radixnode setup-docker -h
+radixnode docker -h
 
-usage: radixnode setup-docker [-h] [-r RELEASE] -n NODETYPE -t TRUSTEDNODE
-                              [-u]
+usage: radixnode.py [-h] {setup,start,stop,configure} ...
+
+Docker commands
+
+positional arguments:
+  {setup,start,stop,configure}
 
 optional arguments:
   -h, --help            show this help message and exit
-  -r RELEASE, --release RELEASE
-                        Version of node software to install such as
-                        1.0-beta.34
-  -n NODETYPE, --nodetype NODETYPE
-                        Type of node fullnode or archivenode
-  -t TRUSTEDNODE, --trustednode TRUSTEDNODE
-                        Trusted node on radix network
-  -u, --update          Update the node to new version of composefile
+
 ```
