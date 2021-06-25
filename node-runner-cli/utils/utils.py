@@ -4,6 +4,8 @@ from datetime import datetime
 import requests
 import sys, os
 
+from env_vars import PRINT_REQUEST
+
 
 def printCommand(cmd):
     print('-----------------------------')
@@ -50,7 +52,7 @@ class Helpers:
 
     @staticmethod
     def send_request(prepared, print_request=False, print_response=True):
-        if print_request:
+        if print_request or os.getenv(PRINT_REQUEST) is not None:
             Helpers.pretty_print_request(prepared)
         s = requests.Session()
         resp = s.send(prepared, verify=False)
@@ -64,21 +66,24 @@ class Helpers:
         return resp
 
     @staticmethod
-    def get_nginx_user():
-        nginx_admin_password = 'NGINX_ADMIN_PASSWORD'
-        if os.environ.get('%s' % nginx_admin_password) is None:
-            print("""
+    def get_nginx_user(usertype, default_username):
+        nginx_password = f'NGINX_{usertype.upper()}_PASSWORD'
+        nginx_username = f'NGINX_{default_username.upper()}_USERNAME'
+        if os.environ.get('%s' % nginx_password) is None:
+            print(f"""
             ------
-            NGINX_ADMIN_PASSWORD is missing !
-            Setup NGINX_ADMIN_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
+            NGINX_{usertype.upper()}_PASSWORD is missing !
+            Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
-            echo 'export NGINX_ADMIN_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             """)
             sys.exit()
         else:
+            # if os.getenv(nginx_username) is None:
+            #     print (f"Using default name of usertype {usertype} as {default_username}")
             return dict({
-                "name": "admin",
-                "password": os.environ.get("%s" % nginx_admin_password)
+                "name": os.getenv(nginx_username, default_username),
+                "password": os.environ.get("%s" % nginx_password)
             })
 
     @staticmethod
@@ -110,3 +115,75 @@ class Helpers:
             application_path = os.path.dirname(os.path.abspath(__file__))
 
         return application_path
+
+    @staticmethod
+    def check_Yes(answer):
+        if answer.lower() == "y":
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def merge(source, destination):
+        for key, value in source.items():
+            if isinstance(value, dict):
+                # get node or create one
+                node = destination.setdefault(key, {})
+                Helpers.merge(value, node)
+            else:
+                destination[key] = value
+
+        return destination
+
+    @staticmethod
+    def parse_trustednode(trustednode):
+        import re
+        if not bool(re.match(r"radix://(.*)@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", trustednode)):
+            print(f"Trusted node {trustednode} does match pattern radix://public_key@ip. Please enter right value")
+            sys.exit()
+        return trustednode.rsplit('@', 1)[-1]
+
+    @staticmethod
+    def json_response_check(resp):
+        if Helpers.is_json(resp.content):
+            json_response = json.loads(resp.content)
+            if "error" in json_response:
+                print(
+                    f"{bcolors.FAIL}\n Failed to submit changes Check the response for the error details{bcolors.ENDC}")
+        elif not resp.ok:
+            print(f"{bcolors.FAIL}\n Failed to submit changes")
+
+    @staticmethod
+    def check_percentage_input():
+        while True:
+            try:
+                str_percentage = input(
+                    f'{bcolors.BOLD}Enter the percentage value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
+                percentage = float(str_percentage)
+                integral, fractional = str_percentage.split('.')
+                if len(fractional) <= 2 and len(integral) <= 2:
+                    break
+            except ValueError:
+                pass
+            print(
+                f"{bcolors.FAIL}The percentage value should between 0.00 to 100.00 as the validator fees!{bcolors.ENDC}")
+        return int(percentage * 100)
+
+    @staticmethod
+    def print_coloured_line(text,color="\033[0m",return_string=False):
+        if not return_string:
+            print(f"{color}{text}{bcolors.ENDC}")
+        else:
+            return f"{color}{text}{bcolors.ENDC}"
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'

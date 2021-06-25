@@ -11,38 +11,37 @@ from utils.utils import run_shell_command, Helpers
 class Base:
     @staticmethod
     def install_dependecies():
-        run_shell_command(['sudo', 'apt', 'update'])
-        run_shell_command(['sudo', 'apt', 'install', 'docker.io'])
-        run_shell_command(['sudo', 'apt', 'install', 'wget', 'unzip'])
-        run_shell_command(['sudo', 'apt', 'install', 'docker-compose'])
-        run_shell_command(['sudo', 'apt', 'install', 'rng-tools'])
-        run_shell_command(['sudo', 'rngd', '-r', '/dev/random'])
+        run_shell_command('sudo apt update', shell=True)
+        run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
+        run_shell_command('sudo rngd -r /dev/random', shell=True)
 
     @staticmethod
     def add_user_docker_group():
 
-        run_shell_command(['sudo', 'groupadd', 'docker'], fail_on_error=False)
+        run_shell_command('sudo groupadd docker', shell=True, fail_on_error=False)
         is_in_docker_group = run_shell_command('groups | grep docker', shell=True, fail_on_error=False)
         if is_in_docker_group.returncode != 0:
-            run_shell_command(['sudo', 'usermod', '-aG', 'docker', os.environ.get('USER')])
+            run_shell_command(f"sudo usermod -aG docker  {os.environ.get('USER')}", shell=True)
             print('Exit ssh login and relogin back for user addition to group "docker" to take effect')
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path="."):
         run_shell_command(
-            ['sudo', 'wget', '--no-check-certificate', '-O', f'{extraction_path}/universe.json',
-             'https://' + trustenode + '/universe.json'])
+            f'sudo wget --no-check-certificate -O {extraction_path}/universe.json https://{trustenode}/universe.json',
+            shell=True)
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name="validator.ks"):
         print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/validator.ks'):
+            #TODO AutoApprove
             print(f"Node key file already exist at location {keyfile_path}")
             keystore_password = getpass.getpass("Enter the password of the existing keystore file 'validator.ks':")
         else:
+            #TODO AutoApprove
             ask_keystore_exists = input \
                 ("Do you have keystore file named 'validator.ks' already from previous node Y/n?:")
-            if ask_keystore_exists == "Y":
+            if Helpers.check_Yes(ask_keystore_exists):
                 print(
                     f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")
                 sys.exit()
@@ -97,14 +96,14 @@ class Base:
         print(f"Downloading artifacts from {ansible_dir}\n")
         Base.download_ansible_file(ansible_dir, 'ansible/project/provision.yml')
         ask_setup_limits = input \
-            ("Do you want to setup ulimits Y/n?:")
-        setup_limits = "true" if ask_setup_limits == "Y" else "false"
+            ("Do you want to setup ulimits [Y/n]?:")
+        setup_limits = "true" if Helpers.check_Yes(ask_setup_limits) else "false"
         run_shell_command(
             f"ansible-playbook ansible/project/provision.yml -e setup_limits={setup_limits}",
             shell=True)
         ask_setup_swap = input \
-            ("Do you want to setup swap space Y/n?:")
-        if ask_setup_swap == "Y":
+            ("Do you want to setup swap space [Y/n]?:")
+        if Helpers.check_Yes(ask_setup_swap):
             setup_swap = "true"
             ask_swap_size = input \
                 ("Enter swap size in GB. Example - 1G or 3G or 8G ?:")
@@ -113,3 +112,10 @@ class Base:
                 shell=True)
         else:
             setup_swap = "false"
+
+    @staticmethod
+    def get_data_dir():
+        #TODO AutoApprove
+        data_dir_path = input("Enter the absolute path to data DB folder:")
+        run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
+        return data_dir_path
