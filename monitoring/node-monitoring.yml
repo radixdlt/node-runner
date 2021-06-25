@@ -17,18 +17,6 @@ services:
         max-size: "1m"
         max-file: "30"
 
-  metrics-exporter:
-    image: radixdlt/metrics-exporter:1.0-beta.34
-    restart: unless-stopped
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    ports:
-      - "8099:8099"
-    environment:
-      METRICS_EXPORTER_BASIC_AUTH: "${BASIC_AUTH_USER_CREDENTIALS}"
-      METRICS_EXPORTER_ROOT_API_URL: "${NODE_END_POINT}"
-      METRICS_EXPORTER_COLLECT_JSON_RPC_METRICS: "false"
-
   grafana:
       image: grafana/grafana:7.5.4
       ports:

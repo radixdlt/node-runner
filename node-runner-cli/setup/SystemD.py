@@ -1,8 +1,10 @@
 import os
 import sys
 from pathlib import Path
+
+from env_vars import UNZIPPED_NODE_DIST_FOLDER, APPEND_DEFAULT_CONFIG_OVERIDES
 from setup.Base import Base
-from utils.utils import run_shell_command
+from utils.utils import run_shell_command, Helpers
 
 
 class SystemD(Base):
@@ -21,6 +23,7 @@ class SystemD(Base):
 
     @staticmethod
     def create_service_user_password():
+        # TODO AutoApprove
         run_shell_command('sudo passwd radixdlt', shell=True)
 
     @staticmethod
@@ -71,8 +74,9 @@ class SystemD(Base):
     @staticmethod
     def backup_file(filepath, filename, backup_time):
         if os.path.isfile(f"{filepath}/{filename}"):
-            backup_yes = input(f"{filename} file exists. Do you want to back up Y/n:")
-            if backup_yes == "Y":
+            # TODO AutoApprove
+            backup_yes = input(f"{filename} file exists. Do you want to back up [Y/n]:")
+            if Helpers.check_Yes(backup_yes):
                 Path(f"{backup_time}").mkdir(parents=True, exist_ok=True)
                 run_shell_command(f"cp {filepath}/{filename} {backup_time}/{filename}", shell=True)
 
@@ -94,17 +98,43 @@ class SystemD(Base):
             ntp.pool=pool.ntp.org
             universe.location=/etc/radixdlt/node/universe.json
             node.key.path=/etc/radixdlt/node/secrets/validator.ks
-            network.tcp.listen_port=30001
-            network.tcp.broadcast_port=30000
-            network.seeds={trustednode}:30000
-            host.ip={hostip}
+            network.p2p.listen_port=30001
+            network.p2p.broadcast_port=30000
+            network.p2p.seed_nodes={trustednode}:30000
+            network.host_ip={hostip}
             db.location=/data
-            node_api.port=3334
-            client_api.enable={enable_client_api}
-            client_api.port=8081
+            api.node.port=3334
+            api.archive.port=8081
             log.level=debug
+            api.archive.enable={enable_client_api}
+            api.construction.enable={enable_client_api}
+            api.account.enable=true
+            api.health.enable=true
+            api.metrics.enable=true
+            api.system.enable=true
+            api.validation.enable=true
+            api.version.enable=true
+            api.universe.enable=true
+            
+            api.node.bind.address=0.0.0.0
+            api.archive.bind.address=0.0.0.0  
+
         """
         run_shell_command(command, shell=True)
+
+        if (os.getenv(APPEND_DEFAULT_CONFIG_OVERIDES)) is not None:
+            print("Add overides")
+            lines = []
+            while True:
+                line = input()
+                if line:
+                    lines.append(line)
+                else:
+                    break
+            for text in lines:
+                run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
+
+
 
     @staticmethod
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
@@ -143,10 +173,11 @@ class SystemD(Base):
         run_shell_command(f'mkdir -p {node_dir}/{node_version}', shell=True)
         if os.listdir(f'{node_dir}/{node_version}'):
             print(f"Directory {node_dir}/{node_version} is not empty")
-            okay = input("Should the directory be removed Y/n :")
-            if okay == "Y":
+            okay = input("Should the directory be removed [Y/n]?:")
+            if Helpers.check_Yes(okay):
                 run_shell_command(f"rm -rf {node_dir}/{node_version}/*", shell=True)
-        run_shell_command(f'mv radixdlt-{node_version}/* {node_dir}/{node_version}', shell=True)
+        unzipped_folder_name = os.getenv(UNZIPPED_NODE_DIST_FOLDER, f"radixdlt-{node_version}")
+        run_shell_command(f'mv {unzipped_folder_name}/* {node_dir}/{node_version}', shell=True)
 
     @staticmethod
     def start_node_service():
@@ -177,13 +208,14 @@ class SystemD(Base):
             print(f"Node type - {node_type} specificed should be either archivenode or fullnode")
             sys.exit()
 
-        backup_yes = input("Do you want to backup existing nginx config Y/n:")
-        if backup_yes == "Y":
+        backup_yes = input("Do you want to backup existing nginx config [Y/n]?:")
+        if Helpers.check_Yes(backup_yes):
             Path(f"{backup_time}/nginx-config").mkdir(parents=True, exist_ok=True)
             run_shell_command(f"sudo cp -r {nginx_etc_dir} {backup_time}/nginx-config", shell=True)
 
-        continue_nginx = input("Do you want to continue with nginx setup Y/n:")
-        if continue_nginx == "Y":
+        # TODO AutoApprove
+        continue_nginx = input("Do you want to continue with nginx setup [Y/n]?:")
+        if Helpers.check_Yes(continue_nginx):
             run_shell_command(
                 ['wget', '--no-check-certificate', '-O', 'radixdlt-nginx.zip', nginx_config_location_Url])
             run_shell_command(f'sudo unzip radixdlt-nginx.zip -d {nginx_etc_dir}', shell=True)
@@ -199,7 +231,7 @@ class SystemD(Base):
         if os.path.isfile(f'{secrets_dir}/server.key') and os.path.isfile(f'{secrets_dir}/server.pem'):
             print(f"Files  {secrets_dir}/server.key and os.path.isfile(f'{secrets_dir}/server.pem already exists")
             answer = input("Do you want to regenerate y/n :")
-            if answer == "y":
+            if Helpers.check_Yes(answer):
                 run_shell_command(f"""
                      sudo openssl req  -nodes -new -x509 -nodes -subj '/CN=localhost' \
                       -keyout "{secrets_dir}/server.key" \
@@ -216,26 +248,32 @@ class SystemD(Base):
         if os.path.isfile(f'{secrets_dir}/dhparam.pem'):
             print(f"File {secrets_dir}/dhparam.pem already exists")
             answer = input("Do you want to regenerate y/n :")
-            if answer == "y":
+            if Helpers.check_Yes(answer):
                 run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
         else:
             print("Generating a dhparam.pem file")
             run_shell_command(f"sudo openssl dhparam -out {secrets_dir}/dhparam.pem  4096", shell=True)
 
     @staticmethod
-    def setup_nginx_password(secrets_dir):
+    def setup_nginx_password(secrets_dir, usertype, username):
         run_shell_command(f'sudo mkdir -p {secrets_dir}', shell=True)
         print('-----------------------------')
-        print('Setting up nginx password')
-        run_shell_command(f'sudo touch {secrets_dir}/htpasswd.admin', fail_on_error=True, shell=True)
-        run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.admin admin', shell=True)
+        print(f'Setting up nginx password for user of type {usertype}')
+        run_shell_command(f'sudo touch {secrets_dir}/htpasswd.{usertype}', fail_on_error=True, shell=True)
+        run_shell_command(f'sudo htpasswd -c {secrets_dir}/htpasswd.{usertype} {username}', shell=True)
         print(
-            """Setup NGINX_ADMIN_PASSWORD environment variable using below command . Replace the string 
+            f"""Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 
             'nginx_password_of_your_choice' with your password 
 
-            $ echo 'export NGINX_ADMIN_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            $ echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
             $ source ~/.bashrc
             """)
+        if username not in ["admin", "metrics", "superadmin"]:
+            print(
+                f"""
+            echo 'export NGINX_{usertype.upper()}_USERNAME="{username}"' >> ~/.bashrc
+            """
+            )
 
     @staticmethod
     def start_nginx_service():
