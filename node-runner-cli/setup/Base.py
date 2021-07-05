@@ -31,32 +31,32 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="validator.ks"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
         print('-----------------------------')
-        if os.path.isfile(f'{keyfile_path}/validator.ks'):
+        if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
             #TODO AutoApprove
             print(f"Node key file already exist at location {keyfile_path}")
-            keystore_password = getpass.getpass("Enter the password of the existing keystore file 'validator.ks':")
+            keystore_password = getpass.getpass(f"Enter the password of the existing keystore file '{keyfile_name}':")
         else:
             #TODO AutoApprove
             ask_keystore_exists = input \
-                ("Do you have keystore file named 'validator.ks' already from previous node Y/n?:")
+                (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
             if Helpers.check_Yes(ask_keystore_exists):
                 print(
-                    f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")
+                    f"Copy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
                 sys.exit()
             else:
                 print(f"""
-                Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/validator.ks
+                Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
                 """)
-                keystore_password = getpass.getpass("Enter the password of the new file 'validator.ks':")
+                keystore_password = getpass.getpass(f"Enter the password of the new file '{keyfile_name}':")
                 # TODO keygen image needs to be updated
                 run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
                                    'radixdlt/keygen:1.0-beta.31',
-                                   '--keystore=/keygen/key/validator.ks',
+                                   f'--keystore=/keygen/key/{keyfile_name}',
                                    '--password=' + keystore_password], quite=True
                                   )
-                run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/validator.ks'])
+                run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/{keyfile_name}'])
 
         return keystore_password
 
@@ -115,7 +115,7 @@ class Base:
 
     @staticmethod
     def get_data_dir():
-        #TODO AutoApprove
+        # TODO AutoApprove
         data_dir_path = input("Enter the absolute path to data DB folder:")
         run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path

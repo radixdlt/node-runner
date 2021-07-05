@@ -75,7 +75,7 @@ class Docker(Base):
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
-    def merge_external_db_config(composefile_yaml):
+    def merge_external_db_config(composefile_yaml, keyfile_name="node-keystore.ks"):
         data_dir_path = Base.get_data_dir()
 
         # TODO fix the issue where volumes array gets merged correctly
@@ -85,7 +85,7 @@ class Docker(Base):
             volumes:
               - "core_ledger:/home/radixdlt/RADIXDB"
               - "./universe.json:/home/radixdlt/universe.json"
-              - "./validator.ks:/home/radixdlt/validator.ks"
+              - "./{keyfile_name}:/home/radixdlt/node-keystore.ks"
         volumes:
           core_ledger:
             driver: local
