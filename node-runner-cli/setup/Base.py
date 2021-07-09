@@ -129,7 +129,7 @@ class Base:
             network_id = 2
         elif network_prompt.lower() in ["m", "mainnet"]:
             network_id = 1
-        elif network_prompt.lower() in [1, 2, 3, 4, 5, 6, 7, 8]:
+        elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
             network_id = os.getenv(NETWORK_ID)
         else:
             print("Input for network id is wrong. Exiting command")
