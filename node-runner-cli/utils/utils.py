@@ -168,7 +168,7 @@ class Helpers:
                 pass
             print(
                 f"{bcolors.FAIL}The validatorFee value should between 0.00 to 100.00 as the validator fees!{bcolors.ENDC}")
-        return int(validatorFee)
+        return round(validatorFee, 2)
 
     @staticmethod
     def print_coloured_line(text, color="\033[0m", return_string=False):
