@@ -124,18 +124,18 @@ class Base:
     @staticmethod
     def get_network_id():
         # Network id
-        network_prompt = input("Enter the network you want to connect [S]Stokenet or [M]Mainnet:")
+        network_prompt = input("Enter the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
         if network_prompt.lower() in ["s", "stokenet"]:
             network_id = 2
         elif network_prompt.lower() in ["m", "mainnet"]:
             network_id = 1
-        elif os.getenv(NETWORK_ID, None) is not None:
+        elif network_prompt.lower() in [1, 2, 3, 4, 5, 6, 7, 8]:
             network_id = os.getenv(NETWORK_ID)
         else:
             print("Input for network id is wrong. Exiting command")
             sys.exit()
         return network_id
-    
+
     @staticmethod
     def path_to_genesis_json(network_id):
         if network_id not in [1, 2]:
