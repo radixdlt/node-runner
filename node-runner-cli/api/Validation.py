@@ -79,7 +79,7 @@ class Validation(API):
 
             check_key("registered")
             check_key("allowsDelegation")
-            check_key("percentage")
+            check_key("validatorFee")
             check_key("owner")
             check_key("address")
 
@@ -88,7 +88,7 @@ class Validation(API):
                 "url": get_attribute(resp_content["result"], "url", ""),
                 "registered": resp_content["result"]["registered"],
                 "allowsDelegation": resp_content["result"]["allowsDelegation"],
-                "percentage": resp_content["result"]["percentage"],
+                "validatorFee": resp_content["result"]["validatorFee"],
                 "owner": resp_content["result"]["owner"],
                 "address": resp_content["result"]["address"],
             }
