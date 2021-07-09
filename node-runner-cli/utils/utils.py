@@ -179,9 +179,9 @@ class Helpers:
 
     @staticmethod
     def get_keyfile_path():
-        radixnode_dir = f"{Path.home()}/radixnode"
+        radixnode_dir = f"{Path.home()}/node-config"
         print(f"Path to keyfile is {radixnode_dir}")
-        run_shell_command(f'sudo mkdir -p {radixnode_dir}', shell=True)
+        run_shell_command(f'mkdir -p {radixnode_dir}', shell=True)
         return str(radixnode_dir)
 
 

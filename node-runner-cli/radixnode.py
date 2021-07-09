@@ -301,7 +301,7 @@ def restart(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
 def start(args):
-    keystore_password = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    keystore_password,keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
