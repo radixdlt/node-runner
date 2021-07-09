@@ -148,29 +148,29 @@ class Account(API):
             f"{bcolors.WARNING}\nEnabling allowDelegation means anyone can delegate stake to your node. Disabling it "
             f"later will not remove this stake.{bcolors.ENDC}")
 
-        Helpers.print_coloured_line(f"\nCurrent setting for allowing delegation : {validator_info['allowsDelegation']}",
+        Helpers.print_coloured_line(f"\nCurrent setting for allowing delegation : {validator_info['allowDelegation']}",
                                     bcolors.BOLD)
         allow_delegation = input(
             Helpers.print_coloured_line(
                 "\nEnter the new allow delegation setting [true/false].Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
         if allow_delegation.lower() == "true":
-            if not bool(validator_info['allowsDelegation']):
+            if not bool(validator_info['allowDelegation']):
                 request_data["params"]["actions"].append(Account.get_update_allow_delegation_flag_action(True,
                                                                                                          validator_info[
                                                                                                              'address']))
             else:
                 Helpers.print_coloured_line(
-                    f"\nThere is no change in the delegation status from the current one {validator_info['allowsDelegation']}"
+                    f"\nThere is no change in the delegation status from the current one {validator_info['allowDelegation']}"
                     f". So not updating this action", bcolors.WARNING)
         elif allow_delegation.lower() == "false":
-            if bool(validator_info['allowsDelegation']):
+            if bool(validator_info['allowDelegation']):
                 request_data["params"]["actions"].append(Account.get_update_allow_delegation_flag_action(False,
                                                                                                          validator_info[
                                                                                                              'address']))
             else:
                 Helpers.print_coloured_line(
-                    f"\nThere is no change in the delegation status from the current one {validator_info['allowsDelegation']}"
+                    f"\nThere is no change in the delegation status from the current one {validator_info['allowDelegation']}"
                     f"\nSo not updating this action")
         return request_data
 

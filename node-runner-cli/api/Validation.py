@@ -78,7 +78,7 @@ class Validation(API):
                 return data.get(attribute) or default_value
 
             check_key("registered")
-            check_key("allowsDelegation")
+            check_key("allowDelegation")
             check_key("validatorFee")
             check_key("owner")
             check_key("address")
@@ -87,7 +87,7 @@ class Validation(API):
                 "name": get_attribute(resp_content["result"], "name", ""),
                 "url": get_attribute(resp_content["result"], "url", ""),
                 "registered": resp_content["result"]["registered"],
-                "allowsDelegation": resp_content["result"]["allowsDelegation"],
+                "allowDelegation": resp_content["result"]["allowDelegation"],
                 "validatorFee": resp_content["result"]["validatorFee"],
                 "owner": resp_content["result"]["owner"],
                 "address": resp_content["result"]["address"],
