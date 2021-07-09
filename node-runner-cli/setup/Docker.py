@@ -3,9 +3,11 @@ import os
 import sys
 
 import requests
+
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 import yaml
+from deepmerge import always_merger
 
 
 class Docker(Base):
@@ -43,7 +45,7 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def fetchComposeFile(composefileurl):
+    def setup_compose_file(composefileurl, file_location):
         compose_file_name = composefileurl.rsplit('/', 1)[-1]
         if os.path.isfile(compose_file_name):
             backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
@@ -71,6 +73,16 @@ class Docker(Base):
 
         yaml.add_representer(type(None), represent_none)
 
+        network_id = Base.get_network_id()
+
+        if network_id not in [1, 2]:
+            genesis_json = input("Enter absolute path to genesis json:")
+        else:
+            genesis_json = None
+
+        composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json)
+        composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
+
         with open(compose_file_name, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
@@ -84,8 +96,6 @@ class Docker(Base):
           core:
             volumes:
               - "core_ledger:/home/radixdlt/RADIXDB"
-              - "./universe.json:/home/radixdlt/universe.json"
-              - "./{keyfile_name}:/home/radixdlt/node-keystore.ks"
         volumes:
           core_ledger:
             driver: local
@@ -94,9 +104,44 @@ class Docker(Base):
               type: none
               device: {data_dir_path}
         """)
-        final_conf = Helpers.merge(external_data_yaml, composefile_yaml)
+        final_conf = always_merger.merge(composefile_yaml, external_data_yaml)
         return final_conf
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):
         Helpers.docker_compose_down(composefile, removevolumes)
+
+    @staticmethod
+    def merge_keyfile_path(composefile_yaml, keyfile_location):
+        key_yaml = yaml.safe_load(f"""
+        services:
+          core:
+            volumes:
+             - "{keyfile_location}:/home/radixdlt/node-keystore.ks"
+        """)
+        final_conf = always_merger.merge(composefile_yaml, key_yaml)
+        return final_conf
+
+    @staticmethod
+    def merge_network_info(composefile_yaml, network_id, genesis_json=None):
+
+        network_info_yml = yaml.safe_load(f"""
+        services:
+          core:
+            environment:
+              RADIXDLT_NETWORK_ID: {network_id}
+        """)
+        if genesis_json:
+            genesis_info_yml = yaml.safe_load(f"""
+            services:
+              core:
+                environment:
+                  RADIXDLT_GENESIS_FILE: "/home/radixdlt/genesis.json"
+                volumes:
+                - "{genesis_json}:/home/radixdlt/genesis.json"
+            """)
+            # network_info_yml = Helpers.merge(genesis_info_yml, network_info_yml)
+            network_info_yml = always_merger.merge(network_info_yml, genesis_info_yml)
+
+        yml_to_return = always_merger.merge(network_info_yml, composefile_yaml)
+        return yml_to_return

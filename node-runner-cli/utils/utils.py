@@ -3,6 +3,7 @@ import subprocess
 from datetime import datetime
 import requests
 import sys, os
+from pathlib import Path
 
 from env_vars import PRINT_REQUEST
 
@@ -170,11 +171,18 @@ class Helpers:
         return int(percentage * 100)
 
     @staticmethod
-    def print_coloured_line(text,color="\033[0m",return_string=False):
+    def print_coloured_line(text, color="\033[0m", return_string=False):
         if not return_string:
             print(f"{color}{text}{bcolors.ENDC}")
         else:
             return f"{color}{text}{bcolors.ENDC}"
+
+    @staticmethod
+    def get_keyfile_path():
+        radixnode_dir = f"{Path.home()}/radixnode"
+        print(f"Path to keyfile is {radixnode_dir}")
+        run_shell_command(f'sudo mkdir -p {radixnode_dir}', shell=True)
+        return str(radixnode_dir)
 
 
 class bcolors:

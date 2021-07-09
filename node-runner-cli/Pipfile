@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 requests = "==2.25.1"
 PyYAML = "==5.4.1"
+deepmerge = "==0.3.0"
 
 [requires]
 python_version = "3.7.6"

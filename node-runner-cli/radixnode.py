@@ -152,11 +152,10 @@ def setup(args):
         print(" Quitting ....")
         sys.exit()
 
-    Docker.fetchComposeFile(composefileurl)
-    keystore_password = Base.generatekey(keyfile_path=os.getcwd())
+    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    Docker.setup_compose_file(composefileurl,file_location)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
-    Base.fetch_universe_json(trustednode_ip)
 
     compose_file_name = composefileurl.rsplit('/', 1)[-1]
     action = "update" if args.update else "start"
@@ -302,7 +301,7 @@ def restart(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
 def start(args):
-    keystore_password = Base.generatekey(keyfile_path=os.getcwd())
+    keystore_password = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 

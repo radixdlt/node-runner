@@ -5,6 +5,7 @@ from pathlib import Path
 
 import requests
 
+from env_vars import NETWORK_ID
 from utils.utils import run_shell_command, Helpers
 
 
@@ -34,11 +35,11 @@ class Base:
     def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
         print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
-            #TODO AutoApprove
+            # TODO AutoApprove
             print(f"Node key file already exist at location {keyfile_path}")
             keystore_password = getpass.getpass(f"Enter the password of the existing keystore file '{keyfile_name}':")
         else:
-            #TODO AutoApprove
+            # TODO AutoApprove
             ask_keystore_exists = input \
                 (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
             if Helpers.check_Yes(ask_keystore_exists):
@@ -58,7 +59,7 @@ class Base:
                                   )
                 run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/{keyfile_name}'])
 
-        return keystore_password
+        return keystore_password, f'{keyfile_path}/{keyfile_name}'
 
     @staticmethod
     def download_ansible_file(ansible_dir, file):
@@ -119,3 +120,18 @@ class Base:
         data_dir_path = input("Enter the absolute path to data DB folder:")
         run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path
+
+    @staticmethod
+    def get_network_id():
+        # Network id
+        network_prompt = input("Enter the network you want to connect [S]Stokenet or [M]Mainnet:")
+        if network_prompt.lower() in ["s", "stokenet"]:
+            network_id = 2
+        elif network_prompt.lower() in ["m", "mainnet"]:
+            network_id = 1
+        elif os.getenv(NETWORK_ID, None) is not None:
+            network_id = os.getenv(NETWORK_ID)
+        else:
+            print("Input for network id is wrong. Exiting command")
+            sys.exit()
+        return network_id
