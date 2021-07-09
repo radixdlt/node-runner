@@ -412,7 +412,7 @@ def register_validator(args):
 
     user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
     request_data = Account.register_or_update_steps(request_data, validator_info)
-    request_data = Account.add_update_rake(request_data, validator_info)
+    request_data = Account.add_validation_fee(request_data, validator_info)
     request_data = Account.setup_update_delegation(request_data, validator_info)
     request_data = Account.add_change_ownerid(request_data, validator_info)
 

@@ -68,7 +68,7 @@ class Account(API):
         Account.post_on_account(data)
 
     @staticmethod
-    def get_update_rake_action(validatorFee, validator_id):
+    def get_validation_fee_action(validatorFee, validator_id):
         # TODO is this validatorFee by number or decimal?
         data = {
             "type": "UpdateValidatorFee",
@@ -125,20 +125,20 @@ class Account(API):
         return request_data
 
     @staticmethod
-    def add_update_rake(request_data, validator_info):
+    def add_validation_fee(request_data, validator_info):
         print("\n--------Validator fees-----\n")
 
         print(
             f"{bcolors.WARNING}\nValidator fee may be decreased at any time, but increasing it incurs a delay of "
             f"approx. 2 weeks. Please set it carefully{bcolors.ENDC}")
-        Helpers.print_coloured_line(f"Current validator fees are {int(validator_info['validatorFee']) / 100}",
+        Helpers.print_coloured_line(f"Current validator fees are {validator_info['validatorFee']}",
                                     bcolors.OKBLUE)
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
             validatorFee = Helpers.check_validatorFee_input()
 
-            update_rake = Account.get_update_rake_action(validatorFee, validator_info['address'])
-            request_data["params"]["actions"].append(update_rake)
+            validation_fee = Account.get_validation_fee_action(validatorFee, validator_info['address'])
+            request_data["params"]["actions"].append(validation_fee)
         return request_data
 
     @staticmethod
