@@ -100,7 +100,7 @@ class SystemD(Base):
         cat > {node_dir}/default.config << EOF
             ntp=false
             ntp.pool=pool.ntp.org
-            network_id={network_id}
+            network.id={network_id}
             {network_genesis_file_for_testnets}
             node.key.path=/etc/radixdlt/node/secrets/{keyfile_name}
             network.p2p.listen_port=30001

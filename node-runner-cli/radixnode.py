@@ -226,7 +226,6 @@ def setup(args):
     SystemD.checkUser()
     keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir)
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
-    SystemD.fetch_universe_json(trustednode_ip, node_dir)
 
     SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
