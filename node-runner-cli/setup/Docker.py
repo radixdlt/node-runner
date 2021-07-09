@@ -144,7 +144,6 @@ class Docker(Base):
             network_info_yml = always_merger.merge(network_info_yml, genesis_info_yml)
             composefile_yaml["services"]["core"]["volumes"].remove(
                 "./node-keystore.ks:/home/radixdlt/node-keystore.ks")
-            composefile_yaml["services"]["core"]["environment"].pop("RADIXDLT_NETWORK_ID")
         composefile_yaml["services"]["core"]["environment"].pop("RADIXDLT_NETWORK_ID")
         yml_to_return = always_merger.merge(network_info_yml, composefile_yaml)
         return yml_to_return
