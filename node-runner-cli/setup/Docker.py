@@ -4,6 +4,7 @@ import sys
 
 import requests
 
+from env_vars import IMAGE_OVERRIDE
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 import yaml
@@ -79,6 +80,9 @@ class Docker(Base):
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
 
+        if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
+            composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
+
         with open(compose_file_name, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
@@ -141,3 +145,18 @@ class Docker(Base):
 
         yml_to_return = always_merger.merge(network_info_yml, composefile_yaml)
         return yml_to_return
+
+    @staticmethod
+    def merge_image_overrides(composefile_yaml):
+        prompt_core_image = input("Enter the core image along with repo:")
+        prompt_nginx_image = input("Enter the nginx image along with repo:")
+        images_yml = yaml.safe_load(f"""
+                    services:
+                      core:
+                       image: {prompt_core_image}
+                      nginx:
+                       image: {prompt_nginx_image}
+                    """)
+
+        final_conf = always_merger.merge(composefile_yaml, images_yml)
+        return final_conf
