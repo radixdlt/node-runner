@@ -135,3 +135,12 @@ class Base:
             print("Input for network id is wrong. Exiting command")
             sys.exit()
         return network_id
+    
+    @staticmethod
+    def path_to_genesis_json(network_id):
+        if network_id not in [1, 2]:
+            genesis_json_location = input("Enter absolute path to genesis json:")
+        else:
+            genesis_json_location = None
+
+        return genesis_json_location

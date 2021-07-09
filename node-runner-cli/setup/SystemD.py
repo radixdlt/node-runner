@@ -64,8 +64,8 @@ class SystemD(Base):
     @staticmethod
     def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
         run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
-        keystore_password = Base.generatekey(keyfile_path)
-        return keystore_password
+        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name)
+        return keystore_password, keyfile_location
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
@@ -91,12 +91,17 @@ class SystemD(Base):
 
     @staticmethod
     def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks"):
+        network_id = SystemD.get_network_id()
+        genesis_json_location = Base.path_to_genesis_json(network_id)
+
+        network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
             ntp.pool=pool.ntp.org
-            universe.location=/etc/radixdlt/node/universe.json
+            network_id={network_id}
+            {network_genesis_file_for_testnets}
             node.key.path=/etc/radixdlt/node/secrets/{keyfile_name}
             network.p2p.listen_port=30001
             network.p2p.broadcast_port=30000

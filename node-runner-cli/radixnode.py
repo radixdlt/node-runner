@@ -153,7 +153,7 @@ def setup(args):
         sys.exit()
 
     keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
-    Docker.setup_compose_file(composefileurl,file_location)
+    Docker.setup_compose_file(composefileurl, file_location)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
 
@@ -224,7 +224,7 @@ def setup(args):
 
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
-    keystore_password = SystemD.generatekey(node_secrets_dir)
+    keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir)
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
     SystemD.fetch_universe_json(trustednode_ip, node_dir)
 
