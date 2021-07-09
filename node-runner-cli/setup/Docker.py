@@ -75,7 +75,7 @@ class Docker(Base):
         yaml.add_representer(type(None), represent_none)
 
         network_id = Base.get_network_id()
-        genesis_json_location = Base.path_to_genesis_json()
+        genesis_json_location = Base.path_to_genesis_json(network_id)
 
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
