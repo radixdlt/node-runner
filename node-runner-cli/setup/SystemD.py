@@ -292,6 +292,8 @@ class SystemD(Base):
     @staticmethod
     def stop_nginx_service():
         run_shell_command('sudo systemctl stop nginx', shell=True)
+        run_shell_command('sudo systemctl disable nginx', shell=True)
+
 
     @staticmethod
     def checkUser():
@@ -316,3 +318,4 @@ class SystemD(Base):
     @staticmethod
     def stop_node_service():
         run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
+        run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)
