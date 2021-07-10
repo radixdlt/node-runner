@@ -397,7 +397,7 @@ def get_current_epoch_data(args):
 
 
 @accountcommand()
-def register_validator(args):
+def update_validator_config(args):
     request_data = {
         "jsonrpc": "2.0",
         "method": "account.submit_transaction_single_step",
@@ -427,10 +427,10 @@ def register_validator(args):
         print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
 
 
-@accountcommand()
-def unregister_validator(args):
-    RestApi.check_health()
-    Account.un_register_validator()
+# @accountcommand()
+# def unregister_validator(args):
+#     RestApi.check_health()
+#     Account.un_register_validator()
 
 
 @accountcommand()
