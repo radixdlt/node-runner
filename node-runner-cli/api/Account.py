@@ -10,7 +10,16 @@ from utils.utils import bcolors
 class Account(API):
 
     @staticmethod
-    def get_register_validator_action(name, url, register_or_update, validator_id):
+    def get_register_validator_action(register_or_update, validator_id):
+
+        data = {
+            "type": register_or_update,
+            "validator": validator_id,
+        }
+        return data
+
+    @staticmethod
+    def update_meta_validator_action(name, url, register_or_update, validator_id):
 
         data = {
             "type": register_or_update,
@@ -96,20 +105,40 @@ class Account(API):
         return data
 
     @staticmethod
-    def register_or_update_steps(request_data, validator_info):
-        ask_add_or_change_info = input("\nDo you want register or add/change the validator name and info url [Y/n]?")
-        if Helpers.check_Yes(ask_add_or_change_info):
+    def register_steps(request_data, validator_info):
+        print("\n--------Registration-----\n")
+        Helpers.print_coloured_line(f"Current registration status: {validator_info['registered']}",
+                                    bcolors.OKBLUE)
+        ask_registration = input(
+            Helpers.print_coloured_line(
+                "\nEnter the new registration setting [true/false].Press enter if no change required ",
+                bcolors.BOLD, return_string=True))
+        registration_action_command = None
+        if ask_registration.lower() == "true":
+            registration_action_command = "RegisterValidator"
+        elif ask_registration.lower() == "false":
+            registration_action_command = "UnregisterValidator"
+        else:
+            Helpers.print_coloured_line("There are no changes to apply or user input is wrong", bcolors.WARNING)
 
-            print("\n--------Registration-----\n")
-            Helpers.print_coloured_line(f"Current name: {validator_info['name']}", bcolors.OKBLUE)
-            Helpers.print_coloured_line(f"Current url: {validator_info['url']}", bcolors.OKBLUE)
+        if registration_action_command is not None:
+            register_action = Account.get_register_validator_action(
+                registration_action_command,
+                validator_info['address'])
+            request_data["params"]["actions"].append(register_action)
+        return request_data
+
+    @staticmethod
+    def update_steps(request_data, validator_info):
+        print("\n--------Update validator meta info-----\n")
+        Helpers.print_coloured_line(f"Current name: {validator_info['name']}", bcolors.OKBLUE)
+        Helpers.print_coloured_line(f"Current url: {validator_info['url']}", bcolors.OKBLUE)
+        ask_add_or_change_info = input("\nDo you want add/change the validator name and info url [Y/n]?")
+        if Helpers.check_Yes(ask_add_or_change_info):
             Helpers.print_coloured_line(f"Current registration status: {validator_info['registered']}",
                                         bcolors.OKBLUE)
 
-            if not bool(validator_info['registered']):
-                registration_action_command = "RegisterValidator"
-            else:
-                registration_action_command = "UpdateValidator"
+            registration_action_command = "UpdateValidator"
 
             validator_name = input(
                 Helpers.print_coloured_line(f"Enter the Name of your validator to be updated:", bcolors.OKBLUE,
@@ -118,10 +147,10 @@ class Account(API):
                 Helpers.print_coloured_line(f"Enter Info URL of your validator to be updated:", bcolors.OKBLUE,
                                             return_string=True))
 
-            register_action = Account.get_register_validator_action(validator_name, validator_url,
-                                                                    registration_action_command,
-                                                                    validator_info['address'])
-            request_data["params"]["actions"].append(register_action)
+            update_validator_meta_action = Account.update_meta_validator_action(validator_name, validator_url,
+                                                                                registration_action_command,
+                                                                                validator_info['address'])
+            request_data["params"]["actions"].append(update_validator_meta_action)
         return request_data
 
     @staticmethod

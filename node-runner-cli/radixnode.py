@@ -411,7 +411,7 @@ def register_validator(args):
     validator_info = Validation.get_validator_info_json()
 
     user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
-    request_data = Account.register_or_update_steps(request_data, validator_info)
+    request_data = Account.register_steps(request_data, validator_info)
     request_data = Account.add_validation_fee(request_data, validator_info)
     request_data = Account.setup_update_delegation(request_data, validator_info)
     request_data = Account.add_change_ownerid(request_data, validator_info)
