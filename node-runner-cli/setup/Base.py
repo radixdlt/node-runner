@@ -5,6 +5,7 @@ from pathlib import Path
 
 import requests
 
+from env_vars import NETWORK_ID
 from utils.utils import run_shell_command, Helpers
 
 
@@ -31,34 +32,34 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="validator.ks"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
         print('-----------------------------')
-        if os.path.isfile(f'{keyfile_path}/validator.ks'):
-            #TODO AutoApprove
+        if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
+            # TODO AutoApprove
             print(f"Node key file already exist at location {keyfile_path}")
-            keystore_password = getpass.getpass("Enter the password of the existing keystore file 'validator.ks':")
+            keystore_password = getpass.getpass(f"Enter the password of the existing keystore file '{keyfile_name}':")
         else:
-            #TODO AutoApprove
+            # TODO AutoApprove
             ask_keystore_exists = input \
-                ("Do you have keystore file named 'validator.ks' already from previous node Y/n?:")
+                (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
             if Helpers.check_Yes(ask_keystore_exists):
                 print(
-                    f"Copy the keystore file 'validator.ks' to the location {keyfile_path} and then rerun the command")
+                    f"Copy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
                 sys.exit()
             else:
                 print(f"""
-                Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/validator.ks
+                Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
                 """)
-                keystore_password = getpass.getpass("Enter the password of the new file 'validator.ks':")
+                keystore_password = getpass.getpass(f"Enter the password of the new file '{keyfile_name}':")
                 # TODO keygen image needs to be updated
                 run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
                                    'radixdlt/keygen:1.0-beta.31',
-                                   '--keystore=/keygen/key/validator.ks',
+                                   f'--keystore=/keygen/key/{keyfile_name}',
                                    '--password=' + keystore_password], quite=True
                                   )
-                run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/validator.ks'])
+                run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/{keyfile_name}'])
 
-        return keystore_password
+        return keystore_password, f'{keyfile_path}/{keyfile_name}'
 
     @staticmethod
     def download_ansible_file(ansible_dir, file):
@@ -115,7 +116,31 @@ class Base:
 
     @staticmethod
     def get_data_dir():
-        #TODO AutoApprove
+        # TODO AutoApprove
         data_dir_path = input("Enter the absolute path to data DB folder:")
         run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path
+
+    @staticmethod
+    def get_network_id():
+        # Network id
+        network_prompt = input("Enter the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
+        if network_prompt.lower() in ["s", "stokenet"]:
+            network_id = 2
+        elif network_prompt.lower() in ["m", "mainnet"]:
+            network_id = 1
+        elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+            network_id = network_prompt
+        else:
+            print("Input for network id is wrong. Exiting command")
+            sys.exit()
+        return network_id
+
+    @staticmethod
+    def path_to_genesis_json(network_id):
+        if network_id not in [1, 2]:
+            genesis_json_location = input("Enter absolute path to genesis json:")
+        else:
+            genesis_json_location = None
+
+        return genesis_json_location

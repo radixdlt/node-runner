@@ -3,6 +3,7 @@ import subprocess
 from datetime import datetime
 import requests
 import sys, os
+from pathlib import Path
 
 from env_vars import PRINT_REQUEST
 
@@ -154,27 +155,34 @@ class Helpers:
             print(f"{bcolors.FAIL}\n Failed to submit changes")
 
     @staticmethod
-    def check_percentage_input():
+    def check_validatorFee_input():
         while True:
             try:
-                str_percentage = input(
-                    f'{bcolors.BOLD}Enter the percentage value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
-                percentage = float(str_percentage)
-                integral, fractional = str_percentage.split('.')
+                str_validatorFee = input(
+                    f'{bcolors.BOLD}Enter the validatorFee value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
+                validatorFee = float(str_validatorFee)
+                integral, fractional = str_validatorFee.split('.')
                 if len(fractional) <= 2 and len(integral) <= 2:
                     break
             except ValueError:
                 pass
             print(
-                f"{bcolors.FAIL}The percentage value should between 0.00 to 100.00 as the validator fees!{bcolors.ENDC}")
-        return int(percentage * 100)
+                f"{bcolors.FAIL}The validatorFee value should between 0.00 to 100.00 as the validator fees!{bcolors.ENDC}")
+        return round(validatorFee, 2)
 
     @staticmethod
-    def print_coloured_line(text,color="\033[0m",return_string=False):
+    def print_coloured_line(text, color="\033[0m", return_string=False):
         if not return_string:
             print(f"{color}{text}{bcolors.ENDC}")
         else:
             return f"{color}{text}{bcolors.ENDC}"
+
+    @staticmethod
+    def get_keyfile_path():
+        radixnode_dir = f"{Path.home()}/node-config"
+        print(f"Path to keyfile is {radixnode_dir}")
+        run_shell_command(f'mkdir -p {radixnode_dir}', shell=True)
+        return str(radixnode_dir)
 
 
 class bcolors:

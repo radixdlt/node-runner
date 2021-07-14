@@ -152,11 +152,10 @@ def setup(args):
         print(" Quitting ....")
         sys.exit()
 
-    Docker.fetchComposeFile(composefileurl)
-    keystore_password = Base.generatekey(keyfile_path=os.getcwd())
+    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    Docker.setup_compose_file(composefileurl, file_location)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
-    Base.fetch_universe_json(trustednode_ip)
 
     compose_file_name = composefileurl.rsplit('/', 1)[-1]
     action = "update" if args.update else "start"
@@ -225,9 +224,8 @@ def setup(args):
 
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
-    keystore_password = SystemD.generatekey(node_secrets_dir)
+    keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir)
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
-    SystemD.fetch_universe_json(trustednode_ip, node_dir)
 
     SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
@@ -302,7 +300,7 @@ def restart(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
 def start(args):
-    keystore_password = Base.generatekey(keyfile_path=os.getcwd())
+    keystore_password,keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
@@ -399,7 +397,7 @@ def get_current_epoch_data(args):
 
 
 @accountcommand()
-def register_validator(args):
+def update_validator_config(args):
     request_data = {
         "jsonrpc": "2.0",
         "method": "account.submit_transaction_single_step",
@@ -413,8 +411,9 @@ def register_validator(args):
     validator_info = Validation.get_validator_info_json()
 
     user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
-    request_data = Account.register_or_update_steps(request_data, validator_info)
-    request_data = Account.add_update_rake(request_data, validator_info)
+    request_data = Account.register_steps(request_data, validator_info)
+    request_data = Account.update_steps(request_data, validator_info)
+    request_data = Account.add_validation_fee(request_data, validator_info)
     request_data = Account.setup_update_delegation(request_data, validator_info)
     request_data = Account.add_change_ownerid(request_data, validator_info)
 
@@ -428,10 +427,10 @@ def register_validator(args):
         print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
 
 
-@accountcommand()
-def unregister_validator(args):
-    RestApi.check_health()
-    Account.un_register_validator()
+# @accountcommand()
+# def unregister_validator(args):
+#     RestApi.check_health()
+#     Account.un_register_validator()
 
 
 @accountcommand()

@@ -3,9 +3,12 @@ import os
 import sys
 
 import requests
+
+from env_vars import IMAGE_OVERRIDE
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 import yaml
+from deepmerge import always_merger
 
 
 class Docker(Base):
@@ -43,7 +46,7 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def fetchComposeFile(composefileurl):
+    def setup_compose_file(composefileurl, file_location):
         compose_file_name = composefileurl.rsplit('/', 1)[-1]
         if os.path.isfile(compose_file_name):
             backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
@@ -71,11 +74,20 @@ class Docker(Base):
 
         yaml.add_representer(type(None), represent_none)
 
+        network_id = Base.get_network_id()
+        genesis_json_location = Base.path_to_genesis_json(network_id)
+
+        composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
+        composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
+
+        if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
+            composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
+
         with open(compose_file_name, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
-    def merge_external_db_config(composefile_yaml):
+    def merge_external_db_config(composefile_yaml, keyfile_name="node-keystore.ks"):
         data_dir_path = Base.get_data_dir()
 
         # TODO fix the issue where volumes array gets merged correctly
@@ -84,8 +96,6 @@ class Docker(Base):
           core:
             volumes:
               - "core_ledger:/home/radixdlt/RADIXDB"
-              - "./universe.json:/home/radixdlt/universe.json"
-              - "./validator.ks:/home/radixdlt/validator.ks"
         volumes:
           core_ledger:
             driver: local
@@ -94,9 +104,61 @@ class Docker(Base):
               type: none
               device: {data_dir_path}
         """)
-        final_conf = Helpers.merge(external_data_yaml, composefile_yaml)
+        final_conf = always_merger.merge(composefile_yaml, external_data_yaml)
         return final_conf
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):
         Helpers.docker_compose_down(composefile, removevolumes)
+
+    @staticmethod
+    def merge_keyfile_path(composefile_yaml, keyfile_location):
+        key_yaml = yaml.safe_load(f"""
+        services:
+          core:
+            volumes:
+             - "{keyfile_location}:/home/radixdlt/node-keystore.ks"
+        """)
+        final_conf = always_merger.merge(composefile_yaml, key_yaml)
+        return final_conf
+
+    @staticmethod
+    def merge_network_info(composefile_yaml, network_id, genesis_json=None):
+
+        network_info_yml = yaml.safe_load(f"""
+        services:
+          core:
+            environment:
+              RADIXDLT_NETWORK_ID: {network_id}
+        """)
+        if genesis_json:
+            genesis_info_yml = yaml.safe_load(f"""
+            services:
+              core:
+                environment:
+                  RADIXDLT_GENESIS_FILE: "/home/radixdlt/genesis.json"
+                volumes:
+                - "{genesis_json}:/home/radixdlt/genesis.json"
+            """)
+            # network_info_yml = Helpers.merge(genesis_info_yml, network_info_yml)
+            network_info_yml = always_merger.merge(network_info_yml, genesis_info_yml)
+            composefile_yaml["services"]["core"]["volumes"].remove(
+                "./node-keystore.ks:/home/radixdlt/node-keystore.ks")
+        composefile_yaml["services"]["core"]["environment"].pop("RADIXDLT_NETWORK_ID")
+        yml_to_return = always_merger.merge(network_info_yml, composefile_yaml)
+        return yml_to_return
+
+    @staticmethod
+    def merge_image_overrides(composefile_yaml):
+        prompt_core_image = input("Enter the core image along with repo:")
+        prompt_nginx_image = input("Enter the nginx image along with repo:")
+        images_yml = yaml.safe_load(f"""
+                    services:
+                      core:
+                       image: {prompt_core_image}
+                      nginx:
+                       image: {prompt_nginx_image}
+                    """)
+
+        final_conf = always_merger.merge(composefile_yaml, images_yml)
+        return final_conf

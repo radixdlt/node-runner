@@ -62,10 +62,10 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="validator.ks"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
         run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
-        keystore_password = Base.generatekey(keyfile_path)
-        return keystore_password
+        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name)
+        return keystore_password, keyfile_location
 
     @staticmethod
     def fetch_universe_json(trustenode, extraction_path):
@@ -90,14 +90,19 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type):
+    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks"):
+        network_id = SystemD.get_network_id()
+        genesis_json_location = Base.path_to_genesis_json(network_id)
+
+        network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
             ntp.pool=pool.ntp.org
-            universe.location=/etc/radixdlt/node/universe.json
-            node.key.path=/etc/radixdlt/node/secrets/validator.ks
+            network.id={network_id}
+            {network_genesis_file_for_testnets}
+            node.key.path=/etc/radixdlt/node/secrets/{keyfile_name}
             network.p2p.listen_port=30001
             network.p2p.broadcast_port=30000
             network.p2p.seed_nodes={trustednode}:30000
@@ -133,8 +138,6 @@ class SystemD(Base):
                     break
             for text in lines:
                 run_shell_command(f"echo {text} >> {node_dir}/default.config", shell=True)
-
-
 
     @staticmethod
     def setup_service_file(node_version_dir, node_dir="/etc/radixdlt/node",
@@ -289,6 +292,8 @@ class SystemD(Base):
     @staticmethod
     def stop_nginx_service():
         run_shell_command('sudo systemctl stop nginx', shell=True)
+        run_shell_command('sudo systemctl disable nginx', shell=True)
+
 
     @staticmethod
     def checkUser():
@@ -313,3 +318,4 @@ class SystemD(Base):
     @staticmethod
     def stop_node_service():
         run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
+        run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)

@@ -10,7 +10,16 @@ from utils.utils import bcolors
 class Account(API):
 
     @staticmethod
-    def get_register_validator_action(name, url, register_or_update, validator_id):
+    def get_register_validator_action(register_or_update, validator_id):
+
+        data = {
+            "type": register_or_update,
+            "validator": validator_id,
+        }
+        return data
+
+    @staticmethod
+    def update_meta_validator_action(name, url, register_or_update, validator_id):
 
         data = {
             "type": register_or_update,
@@ -68,12 +77,12 @@ class Account(API):
         Account.post_on_account(data)
 
     @staticmethod
-    def get_update_rake_action(percentage, validator_id):
-        # TODO is this percentage by number or decimal?
+    def get_validation_fee_action(validatorFee, validator_id):
+        # TODO is this validatorFee by number or decimal?
         data = {
-            "type": "UpdateRake",
+            "type": "UpdateValidatorFee",
             "validator": validator_id,
-            "percentage": percentage
+            "validatorFee": validatorFee
         }
         return data
 
@@ -96,20 +105,40 @@ class Account(API):
         return data
 
     @staticmethod
-    def register_or_update_steps(request_data, validator_info):
-        ask_add_or_change_info = input("\nDo you want register or add/change the validator name and info url [Y/n]?")
-        if Helpers.check_Yes(ask_add_or_change_info):
+    def register_steps(request_data, validator_info):
+        print("\n--------Registration-----\n")
+        Helpers.print_coloured_line(f"Current registration status: {validator_info['registered']}",
+                                    bcolors.OKBLUE)
+        ask_registration = input(
+            Helpers.print_coloured_line(
+                "\nEnter the new registration setting [true/false].Press enter if no change required ",
+                bcolors.BOLD, return_string=True))
+        registration_action_command = None
+        if ask_registration.lower() == "true":
+            registration_action_command = "RegisterValidator"
+        elif ask_registration.lower() == "false":
+            registration_action_command = "UnregisterValidator"
+        else:
+            Helpers.print_coloured_line("There are no changes to apply or user input is wrong", bcolors.WARNING)
 
-            print("\n--------Registration-----\n")
-            Helpers.print_coloured_line(f"Current name: {validator_info['name']}", bcolors.OKBLUE)
-            Helpers.print_coloured_line(f"Current url: {validator_info['url']}", bcolors.OKBLUE)
+        if registration_action_command is not None:
+            register_action = Account.get_register_validator_action(
+                registration_action_command,
+                validator_info['address'])
+            request_data["params"]["actions"].append(register_action)
+        return request_data
+
+    @staticmethod
+    def update_steps(request_data, validator_info):
+        print("\n--------Update validator meta info-----\n")
+        Helpers.print_coloured_line(f"Current name: {validator_info['name']}", bcolors.OKBLUE)
+        Helpers.print_coloured_line(f"Current url: {validator_info['url']}", bcolors.OKBLUE)
+        ask_add_or_change_info = input("\nDo you want add/change the validator name and info url [Y/n]?")
+        if Helpers.check_Yes(ask_add_or_change_info):
             Helpers.print_coloured_line(f"Current registration status: {validator_info['registered']}",
                                         bcolors.OKBLUE)
 
-            if not bool(validator_info['registered']):
-                registration_action_command = "RegisterValidator"
-            else:
-                registration_action_command = "UpdateValidator"
+            registration_action_command = "UpdateValidator"
 
             validator_name = input(
                 Helpers.print_coloured_line(f"Enter the Name of your validator to be updated:", bcolors.OKBLUE,
@@ -118,27 +147,27 @@ class Account(API):
                 Helpers.print_coloured_line(f"Enter Info URL of your validator to be updated:", bcolors.OKBLUE,
                                             return_string=True))
 
-            register_action = Account.get_register_validator_action(validator_name, validator_url,
-                                                                    registration_action_command,
-                                                                    validator_info['address'])
-            request_data["params"]["actions"].append(register_action)
+            update_validator_meta_action = Account.update_meta_validator_action(validator_name, validator_url,
+                                                                                registration_action_command,
+                                                                                validator_info['address'])
+            request_data["params"]["actions"].append(update_validator_meta_action)
         return request_data
 
     @staticmethod
-    def add_update_rake(request_data, validator_info):
+    def add_validation_fee(request_data, validator_info):
         print("\n--------Validator fees-----\n")
 
         print(
             f"{bcolors.WARNING}\nValidator fee may be decreased at any time, but increasing it incurs a delay of "
             f"approx. 2 weeks. Please set it carefully{bcolors.ENDC}")
-        Helpers.print_coloured_line(f"Current validator fees are {int(validator_info['percentage']) / 100}",
+        Helpers.print_coloured_line(f"Current validator fees are {validator_info['validatorFee']}",
                                     bcolors.OKBLUE)
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
-            percentage = Helpers.check_percentage_input()
+            validatorFee = Helpers.check_validatorFee_input()
 
-            update_rake = Account.get_update_rake_action(percentage, validator_info['address'])
-            request_data["params"]["actions"].append(update_rake)
+            validation_fee = Account.get_validation_fee_action(validatorFee, validator_info['address'])
+            request_data["params"]["actions"].append(validation_fee)
         return request_data
 
     @staticmethod
@@ -148,29 +177,29 @@ class Account(API):
             f"{bcolors.WARNING}\nEnabling allowDelegation means anyone can delegate stake to your node. Disabling it "
             f"later will not remove this stake.{bcolors.ENDC}")
 
-        Helpers.print_coloured_line(f"\nCurrent setting for allowing delegation : {validator_info['allowsDelegation']}",
+        Helpers.print_coloured_line(f"\nCurrent setting for allowing delegation : {validator_info['allowDelegation']}",
                                     bcolors.BOLD)
         allow_delegation = input(
             Helpers.print_coloured_line(
                 "\nEnter the new allow delegation setting [true/false].Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
         if allow_delegation.lower() == "true":
-            if not bool(validator_info['allowsDelegation']):
+            if not bool(validator_info['allowDelegation']):
                 request_data["params"]["actions"].append(Account.get_update_allow_delegation_flag_action(True,
                                                                                                          validator_info[
                                                                                                              'address']))
             else:
                 Helpers.print_coloured_line(
-                    f"\nThere is no change in the delegation status from the current one {validator_info['allowsDelegation']}"
+                    f"\nThere is no change in the delegation status from the current one {validator_info['allowDelegation']}"
                     f". So not updating this action", bcolors.WARNING)
         elif allow_delegation.lower() == "false":
-            if bool(validator_info['allowsDelegation']):
+            if bool(validator_info['allowDelegation']):
                 request_data["params"]["actions"].append(Account.get_update_allow_delegation_flag_action(False,
                                                                                                          validator_info[
                                                                                                              'address']))
             else:
                 Helpers.print_coloured_line(
-                    f"\nThere is no change in the delegation status from the current one {validator_info['allowsDelegation']}"
+                    f"\nThere is no change in the delegation status from the current one {validator_info['allowDelegation']}"
                     f"\nSo not updating this action")
         return request_data
 
