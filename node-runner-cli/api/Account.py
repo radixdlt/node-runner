@@ -138,7 +138,7 @@ class Account(API):
             Helpers.print_coloured_line(f"Current registration status: {validator_info['registered']}",
                                         bcolors.OKBLUE)
 
-            registration_action_command = "UpdateValidator"
+            registration_action_command = "UpdateValidatorMetadata"
 
             validator_name = input(
                 Helpers.print_coloured_line(f"Enter the Name of your validator to be updated:", bcolors.OKBLUE,
