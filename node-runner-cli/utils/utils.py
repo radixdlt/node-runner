@@ -161,7 +161,7 @@ class Helpers:
                 str_validatorFee = input(
                     f'{bcolors.BOLD}Enter the validatorFee value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
                 validatorFee = float(str_validatorFee)
-                if 0 < validatorFee < 100:
+                if 0 <= validatorFee <= 100:
                     break
             except ValueError:
                 pass
