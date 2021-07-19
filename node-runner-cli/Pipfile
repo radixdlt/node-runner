@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-requests = "==2.25.1"
+requests = "==2.88.1"
 PyYAML = "==5.4.1"
 deepmerge = "==0.3.0"
 
