@@ -183,6 +183,15 @@ class Helpers:
         run_shell_command(f'mkdir -p {radixnode_dir}', shell=True)
         return str(radixnode_dir)
 
+    @staticmethod
+    def get_basic_auth_header(user):
+        import base64
+        data = f"{user['name']}:{user['password']}"
+        encodedBytes = base64.b64encode(data.encode("utf-8"))
+        encodedStr = str(encodedBytes, "utf-8")
+        headers = {
+            'Authorization': f'Basic {encodedStr}'}
+        return headers
 
 class bcolors:
     HEADER = '\033[95m'
