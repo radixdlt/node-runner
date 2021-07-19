@@ -202,11 +202,12 @@ class System(API):
     def post_on_system(data):
         node_host = System.get_host_info()
         user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
+        headers = Helpers.get_basic_auth_header(user)
 
         req = requests.Request('POST',
                                f"{node_host}/system",
                                data=data,
-                               auth=HTTPBasicAuth(user["name"], user["password"]))
+                               headers=headers)
 
         prepared = req.prepare()
         return Helpers.send_request(prepared)

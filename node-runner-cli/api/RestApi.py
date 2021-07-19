@@ -17,10 +17,10 @@ class RestApi(API):
     def get_request(usertype, username, api_path):
         node_host = API.get_host_info()
         user = Helpers.get_nginx_user(usertype=usertype, default_username=username)
-
+        headers = Helpers.get_basic_auth_header(user)
         req = requests.Request('GET',
                                f"{node_host}/{api_path}",
-                               auth=HTTPBasicAuth(user["name"], user["password"]))
+                               headers=headers)
 
         prepared = req.prepare()
         prepared.headers['Content-Type'] = 'application/json'

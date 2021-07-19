@@ -51,11 +51,12 @@ class Validation(API):
     def post_on_validation(data):
         node_host = Validation.get_host_info()
         user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
+        headers = Helpers.get_basic_auth_header(user)
 
         req = requests.Request('POST',
                                f"{node_host}/validation",
                                data=data,
-                               auth=HTTPBasicAuth(user["name"], user["password"]))
+                               headers=headers)
 
         prepared = req.prepare()
         return Helpers.send_request(prepared)

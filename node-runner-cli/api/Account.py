@@ -53,11 +53,12 @@ class Account(API):
     def post_on_account(data):
         node_host = Account.get_host_info()
         user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
+        headers = Helpers.get_basic_auth_header(user)
 
         req = requests.Request('POST',
                                f"{node_host}/account",
                                data=data,
-                               auth=HTTPBasicAuth(user["name"], user["password"]))
+                               headers=headers)
 
         prepared = req.prepare()
         prepared.headers['Content-Type'] = 'application/json'
