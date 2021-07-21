@@ -383,8 +383,8 @@ def get_validator_info(args):
 
 
 @validationcommand()
-def get_next_epoch_data(args):
-    Validation.get_next_epoch_data()
+def get_next_epoch_set(args):
+    Validation.get_next_epoch_set()
 
 
 @validationcommand()
