@@ -64,33 +64,33 @@ class Validation(API):
     @staticmethod
     def get_validator_info_json():
         resp = Validation.get_validator_info()
-        if not resp.ok or  not Helpers.is_json(resp.content):
-            Helpers.print_coloured_line("Failed retrieving information from get_node_info method",bcolors.FAIL)
+        if not resp.ok or not Helpers.is_json(resp.content):
+            Helpers.print_coloured_line("Failed retrieving information from get_node_info method", bcolors.FAIL)
             sys.exit()
         resp_content = json.loads(resp.content)
         if Helpers.is_json(resp.content) and "error" not in resp_content:
 
-            def check_key(key):
-                if key not in resp_content["result"]:
+            def check_key(key, dest):
+                if key not in dest:
                     print(f"'{key}' not present in the json response of validator get_node_info")
                     sys.exit()
 
             def get_attribute(data, attribute, default_value):
                 return data.get(attribute) or default_value
 
-            check_key("registered")
-            check_key("allowDelegation")
-            check_key("validatorFee")
-            check_key("owner")
-            check_key("address")
+            check_key("registered", resp_content["result"]["epochInfo"]["current"])
+            check_key("allowDelegation", resp_content["result"])
+            check_key("validatorFee", resp_content["result"]["epochInfo"]["current"])
+            check_key("owner", resp_content["result"]["epochInfo"]["current"])
+            check_key("address", resp_content["result"])
 
             validator = {
                 "name": get_attribute(resp_content["result"], "name", ""),
                 "url": get_attribute(resp_content["result"], "url", ""),
-                "registered": resp_content["result"]["registered"],
+                "registered": resp_content["result"]["epochInfo"]["current"]["registered"],
                 "allowDelegation": resp_content["result"]["allowDelegation"],
-                "validatorFee": resp_content["result"]["validatorFee"],
-                "owner": resp_content["result"]["owner"],
+                "validatorFee": resp_content["result"]["epochInfo"]["current"]["validatorFee"],
+                "owner": resp_content["result"]["epochInfo"]["current"]["owner"],
                 "address": resp_content["result"]["address"],
             }
             return validator
