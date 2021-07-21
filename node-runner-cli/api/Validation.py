@@ -78,19 +78,26 @@ class Validation(API):
             def get_attribute(data, attribute, default_value):
                 return data.get(attribute) or default_value
 
-            check_key("registered", resp_content["result"]["epochInfo"]["current"])
+            epochInfo = resp_content["result"]["epochInfo"]
+
+            def check_updates_return(key):
+                return epochInfo["updates"][key] if get_attribute(
+                    epochInfo["updates"], key, None) is not None else \
+                    epochInfo["current"][key]
+
+            check_key("registered", epochInfo["current"])
             check_key("allowDelegation", resp_content["result"])
-            check_key("validatorFee", resp_content["result"]["epochInfo"]["current"])
-            check_key("owner", resp_content["result"]["epochInfo"]["current"])
+            check_key("validatorFee", epochInfo["current"])
+            check_key("owner", epochInfo["current"])
             check_key("address", resp_content["result"])
 
             validator = {
                 "name": get_attribute(resp_content["result"], "name", ""),
                 "url": get_attribute(resp_content["result"], "url", ""),
-                "registered": resp_content["result"]["epochInfo"]["current"]["registered"],
+                "registered": check_updates_return("registered"),
                 "allowDelegation": resp_content["result"]["allowDelegation"],
-                "validatorFee": resp_content["result"]["epochInfo"]["current"]["validatorFee"],
-                "owner": resp_content["result"]["epochInfo"]["current"]["owner"],
+                "validatorFee": check_updates_return("validatorFee"),
+                "owner": check_updates_return("owner"),
                 "address": resp_content["result"]["address"],
             }
             return validator
