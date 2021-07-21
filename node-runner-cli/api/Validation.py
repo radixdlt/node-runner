@@ -76,7 +76,9 @@ class Validation(API):
                     sys.exit()
 
             def get_attribute(data, attribute, default_value):
-                return data.get(attribute) or default_value
+                if attribute not in data:
+                    return default_value
+                return data.get(attribute)
 
             epochInfo = resp_content["result"]["epochInfo"]
 
