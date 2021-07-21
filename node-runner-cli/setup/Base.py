@@ -128,7 +128,9 @@ class Base:
         if network_prompt.lower() in ["s", "stokenet"]:
             network_id = 2
         elif network_prompt.lower() in ["m", "mainnet"]:
-            network_id = 1
+            print("mainnet is not live yet. Select stokenet. Exiting the command")
+            sys.exit()
+            #network_id = 1
         elif network_prompt in ["1", "2", "3", "4", "5", "6", "7", "8"]:
             network_id = network_prompt
         else:
