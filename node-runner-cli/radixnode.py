@@ -137,13 +137,9 @@ def version():
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
 ])
 def setup(args):
-    if not args.release:
-        release = latest_release()
-    else:
-        release = args.release
     composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
-                               f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radix-{args.nodetype}-compose.yml")
-    print(f"Going to setup node type {args.nodetype} for version {release} from location {composefileurl}.\n")
+                               f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
+    print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
     # TODO autoapprove
     continue_setup = input(
         "Do you want to continue [Y/n]?:")
@@ -300,7 +296,7 @@ def restart(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
 def start(args):
-    keystore_password,keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
