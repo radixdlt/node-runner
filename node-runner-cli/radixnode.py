@@ -382,9 +382,7 @@ def get_validator_info(args):
     Validation.get_validator_info()
 
 
-@validationcommand()
-def get_next_epoch_set(args):
-    Validation.get_next_epoch_set()
+
 
 
 @validationcommand()
