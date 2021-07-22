@@ -51,8 +51,6 @@ positional arguments:
 | api account register-validator | - |<ul><li>1. Name of your validator:</li><li>2. Info URL of your validator:</li></ul>| Returns the response on POST using register_validator method on /account  |
 | api account unregister-validator | - |-| Returns the response on POST using unregister_validator method on /account  |
 | api validation get-validator-info | - | - | Returns the response of POST request using get_validator_info method on /validation  |
-| api validation get-next-epoch-data | - | - | Returns the response of POST request using get_next_epoch_data method on /validation  |
-| api validation get-current-epoch-data | - | - | Returns the response of POST request using get_current_epoch_data method on /validation  |
 | api validation get-current-epoch-data | - | - | Returns the response of POST request using get_current_epoch_data method on /validation  |
 | api health | - | - | Returns the response of GET request on /health endpoint  |
 | api version | - | - | Returns the response of GET request on /version endpoint  |

@@ -24,18 +24,6 @@ class Validation(API):
         return Validation.post_on_validation(data)
 
     @staticmethod
-    def get_next_epoch_set():
-        data = f"""
-            {{
-                "jsonrpc": "2.0",
-                "method": "validation.get_next_epoch_set",
-                "params": [],
-                "id": 1
-            }}
-        """
-        return Validation.post_on_validation(data)
-
-    @staticmethod
     def get_current_epoch_data():
         data = f"""
             {{
