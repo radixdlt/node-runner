@@ -12,7 +12,7 @@ from utils.utils import Helpers, bcolors
 class Validation(API):
 
     @staticmethod
-    def get_validator_info():
+    def get_node_info():
         data = f"""
             {{
                 "jsonrpc": "2.0",
@@ -51,7 +51,7 @@ class Validation(API):
 
     @staticmethod
     def get_validator_info_json():
-        resp = Validation.get_validator_info()
+        resp = Validation.get_node_info()
         if not resp.ok or not Helpers.is_json(resp.content):
             Helpers.print_coloured_line("Failed retrieving information from get_node_info method", bcolors.FAIL)
             sys.exit()
