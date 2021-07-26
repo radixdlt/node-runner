@@ -378,8 +378,8 @@ def set_auth(args, usertype):
 
 
 @validationcommand()
-def get_validator_info(args):
-    Validation.get_validator_info()
+def get_node_info(args):
+    Validation.get_node_info()
 
 
 
