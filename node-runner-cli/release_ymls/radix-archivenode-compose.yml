@@ -24,7 +24,7 @@ services:
       RADIXDLT_NODE_API_PORT: 3333
       RADIXDLT_CLIENT_API_PORT: 8080
       RADIXDLT_UNIVERSE_API_ENABLE: "true"
-      RADIXDLT_NETWORK_ID: 2
+      RADIXDLT_NETWORK_ID: 1
       RADIX_NODE_KEYSTORE_PASSWORD: "${RADIXDLT_NODE_KEY_PASSWORD}"
 #     If you want use same user from your host, you can pass LOCAL_USER_ID enviroment variable, else it will default to 999.
 #     Command `id` will show your uid of the user from terminal. Replace it with <uid of local user> and uncomment the below line
