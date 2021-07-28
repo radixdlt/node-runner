@@ -105,7 +105,7 @@ class SystemD(Base):
             node.key.path=/etc/radixdlt/node/secrets/{keyfile_name}
             network.p2p.listen_port=30001
             network.p2p.broadcast_port=30000
-            network.p2p.seed_nodes={trustednode}:30000
+            network.p2p.seed_nodes={trustednode}
             network.host_ip={hostip}
             db.location=/data
             api.node.port=3334
