@@ -53,7 +53,7 @@ class Base:
                 keystore_password = getpass.getpass(f"Enter the password of the new file '{keyfile_name}':")
                 # TODO keygen image needs to be updated
                 run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
-                                   'radixdlt/keygen:{keygen_tag}',
+                                   f'radixdlt/keygen:{keygen_tag}',
                                    f'--keystore=/keygen/key/{keyfile_name}',
                                    '--password=' + keystore_password], quite=True
                                   )
