@@ -32,7 +32,7 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks",keygen_tag="1.0.0"):
         print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
             # TODO AutoApprove
@@ -53,7 +53,7 @@ class Base:
                 keystore_password = getpass.getpass(f"Enter the password of the new file '{keyfile_name}':")
                 # TODO keygen image needs to be updated
                 run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
-                                   'radixdlt/keygen:1.0-beta.31',
+                                   'radixdlt/keygen:{keygen_tag}',
                                    f'--keystore=/keygen/key/{keyfile_name}',
                                    '--password=' + keystore_password], quite=True
                                   )

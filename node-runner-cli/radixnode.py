@@ -126,9 +126,6 @@ def version():
 
 @dockercommand([
 
-    argument("-r", "--release",
-             help="Version of node software to install such as 1.0-beta.34",
-             action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-t", "--trustednode", required=True,
@@ -137,6 +134,7 @@ def version():
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
 ])
 def setup(args):
+    release = latest_release()
     composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
                                f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
     print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
@@ -148,7 +146,7 @@ def setup(args):
         print(" Quitting ....")
         sys.exit()
 
-    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
     Docker.setup_compose_file(composefileurl, file_location)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
@@ -220,7 +218,7 @@ def setup(args):
 
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
-    keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir)
+    keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir, keygen_tag=release)
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
 
     SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
@@ -296,7 +294,8 @@ def restart(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
 def start(args):
-    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    release = latest_release()
+    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
@@ -380,9 +379,6 @@ def set_auth(args, usertype):
 @validationcommand()
 def get_node_info(args):
     Validation.get_node_info()
-
-
-
 
 
 @validationcommand()
