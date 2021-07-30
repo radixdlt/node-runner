@@ -225,6 +225,7 @@ def setup(args):
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
+    
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
                                  node_type=args.nodetype)
 

@@ -96,6 +96,8 @@ class SystemD(Base):
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
+
+        data_folder=Base.get_data_dir()
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -107,7 +109,7 @@ class SystemD(Base):
             network.p2p.broadcast_port=30000
             network.p2p.seed_nodes={trustednode}
             network.host_ip={hostip}
-            db.location=/data
+            db.location={data_folder}
             api.node.port=3334
             api.archive.port=8081
             log.level=debug
