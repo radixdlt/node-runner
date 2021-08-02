@@ -524,11 +524,6 @@ def setup(args):
         Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
         Monitoring.setup_external_volumes()
 
-        monitoring_file_location = "monitoring/node-monitoring.yml"
-        start_monitoring_answer = input(
-            f"Do you want to start monitoring using file as {monitoring_file_location} [Y/n]?")
-        if Helpers.check_Yes(start_monitoring_answer):
-            Monitoring.start_monitoring(f"{monitoring_file_location}")
 
     elif args.setupmode == "PRODUCTION_MODE":
         print(" PRODUCTION_MODE not supported yet ")

@@ -91,13 +91,24 @@ class Monitoring:
 
     @staticmethod
     def start_monitoring(composefile):
-        user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
-        node_endpoint = Monitoring.get_node_host_ip()
-        run_shell_command(f'docker-compose -f {composefile} up -d',
-                          env={
-                              "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
-                              f"{NODE_END_POINT}": node_endpoint
-                          }, shell=True)
+        monitoring_file_location = "monitoring/node-monitoring.yml"
+        print(f"----- output of node monitoring docker compose file {composefile}")
+        run_shell_command(f"cat {composefile}", shell=True)
+        start_monitoring_answer = input(
+            f"Do you want to start monitoring using file {monitoring_file_location} [Y/n]?")
+        if Helpers.check_Yes(start_monitoring_answer):
+            user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
+            node_endpoint = Monitoring.get_node_host_ip()
+            run_shell_command(f'docker-compose -f {composefile} up -d',
+                              env={
+                                  "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
+                                  f"{NODE_END_POINT}": node_endpoint
+                              }, shell=True)
+        else:
+            print(f"""Exiting the command ..
+                     Once you verified the file {composefile}, you can start the monitoring by running
+                     $ radixnode monitoring start -f {composefile}
+             """)
 
     @staticmethod
     def get_node_host_ip():
@@ -114,3 +125,4 @@ class Monitoring:
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
         Helpers.docker_compose_down(composefile, remove_volumes)
+
