@@ -523,7 +523,8 @@ def setup(args):
                                    ["dashboard.yml", "sample-node-dashboard.json"])
         Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
         Monitoring.setup_external_volumes()
-
+        monitoring_file_location = "monitoring/node-monitoring.yml"
+        Monitoring.start_monitoring(f"{monitoring_file_location}")
 
     elif args.setupmode == "PRODUCTION_MODE":
         print(" PRODUCTION_MODE not supported yet ")

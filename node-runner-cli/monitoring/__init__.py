@@ -91,11 +91,10 @@ class Monitoring:
 
     @staticmethod
     def start_monitoring(composefile):
-        monitoring_file_location = "monitoring/node-monitoring.yml"
         print(f"----- output of node monitoring docker compose file {composefile}")
         run_shell_command(f"cat {composefile}", shell=True)
         start_monitoring_answer = input(
-            f"Do you want to start monitoring using file {monitoring_file_location} [Y/n]?")
+            f"Do you want to start monitoring using file {composefile} [Y/n]?")
         if Helpers.check_Yes(start_monitoring_answer):
             user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
             node_endpoint = Monitoring.get_node_host_ip()
