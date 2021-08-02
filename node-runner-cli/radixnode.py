@@ -126,9 +126,6 @@ def version():
 
 @dockercommand([
 
-    argument("-r", "--release",
-             help="Version of node software to install such as 1.0-beta.34",
-             action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-t", "--trustednode", required=True,
@@ -137,6 +134,7 @@ def version():
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
 ])
 def setup(args):
+    release = latest_release()
     composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
                                f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
     print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
@@ -148,7 +146,7 @@ def setup(args):
         print(" Quitting ....")
         sys.exit()
 
-    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
     Docker.setup_compose_file(composefileurl, file_location)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
@@ -220,13 +218,14 @@ def setup(args):
 
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
-    keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir)
+    keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir, keygen_tag=release)
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
 
     SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
+    
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
                                  node_type=args.nodetype)
 
@@ -296,7 +295,8 @@ def restart(args):
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
 ])
 def start(args):
-    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path())
+    release = latest_release()
+    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 
@@ -380,9 +380,6 @@ def set_auth(args, usertype):
 @validationcommand()
 def get_node_info(args):
     Validation.get_node_info()
-
-
-
 
 
 @validationcommand()
@@ -526,12 +523,8 @@ def setup(args):
                                    ["dashboard.yml", "sample-node-dashboard.json"])
         Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
         Monitoring.setup_external_volumes()
-
         monitoring_file_location = "monitoring/node-monitoring.yml"
-        start_monitoring_answer = input(
-            f"Do you want to start monitoring using file as {monitoring_file_location} [Y/n]?")
-        if Helpers.check_Yes(start_monitoring_answer):
-            Monitoring.start_monitoring(f"{monitoring_file_location}")
+        Monitoring.start_monitoring(f"{monitoring_file_location}")
 
     elif args.setupmode == "PRODUCTION_MODE":
         print(" PRODUCTION_MODE not supported yet ")

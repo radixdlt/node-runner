@@ -62,9 +62,9 @@ class SystemD(Base):
         run_shell_command('sudo chown radixdlt:radixdlt -R /data', shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
         run_shell_command(f'mkdir -p {keyfile_path}', shell=True)
-        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name)
+        keystore_password, keyfile_location = Base.generatekey(keyfile_path, keyfile_name, keygen_tag)
         return keystore_password, keyfile_location
 
     @staticmethod
@@ -96,6 +96,8 @@ class SystemD(Base):
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
+
+        data_folder=Base.get_data_dir()
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -107,7 +109,7 @@ class SystemD(Base):
             network.p2p.broadcast_port=30000
             network.p2p.seed_nodes={trustednode}
             network.host_ip={hostip}
-            db.location=/data
+            db.location={data_folder}
             api.node.port=3334
             api.archive.port=8081
             log.level=debug
@@ -293,7 +295,6 @@ class SystemD(Base):
     def stop_nginx_service():
         run_shell_command('sudo systemctl stop nginx', shell=True)
         run_shell_command('sudo systemctl disable nginx', shell=True)
-
 
     @staticmethod
     def checkUser():
