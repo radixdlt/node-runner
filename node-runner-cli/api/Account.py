@@ -30,6 +30,14 @@ class Account(API):
         return data
 
     @staticmethod
+    def update_validator_system_metadata_action(validator_id):
+        return {
+            "type": "UpdateValidatorSystemMetadata",
+            "validator": validator_id,
+        }
+
+
+    @staticmethod
     def un_register_validator():
         validator_id = Validation.get_validator_info_json()
         data = f"""

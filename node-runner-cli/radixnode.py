@@ -408,6 +408,9 @@ def update_validator_config(args):
     request_data = Account.setup_update_delegation(request_data, validator_info)
     request_data = Account.add_change_ownerid(request_data, validator_info)
 
+    update_validator_system_metadata_action = Account.update_validator_system_metadata_action(validator_info['address'])
+    request_data["params"]["actions"].append(update_validator_system_metadata_action)
+    
     print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
     print(f"")
     print(f"{bcolors.BOLD}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")
