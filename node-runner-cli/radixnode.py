@@ -158,7 +158,7 @@ def setup(args):
                                                         keyfile_name=config.settings.keydetails["keyfile_name"],
                                                         keygen_tag=config.settings.keydetails["keygen_tag"])
 
-    Docker.setup_compose_file(composefileurl, file_location,config)
+    Docker.setup_compose_file(composefileurl, file_location, config)
 
     compose_file_name = composefileurl.rsplit('/', 1)[-1]
     action = "update" if args.update else "start"
@@ -308,7 +308,16 @@ def restart(args):
 ])
 def start(args):
     release = latest_release()
-    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
+    automode = args.auto
+    if automode:
+        Docker.check_auto_setup(args)
+    config = DockerConfig(automode=automode)
+    config.set_node_type(args.nodetype)
+    config.set_keydetails()
+    config.set_core_release(release)
+    keystore_password, keyfile_location = Base.generatekey(keyfile_path=config.settings.keydetails["keyfile_path"],
+                                                           keyfile_name=config.settings.keydetails["keyfile_name"],
+                                                           keygen_tag=config.settings.keydetails["keygen_tag"])
     Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
 
 

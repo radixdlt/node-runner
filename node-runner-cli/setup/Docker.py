@@ -164,5 +164,5 @@ class Docker(Base):
         return final_conf
 
     @staticmethod
-    def check_auto_setup(cls, args):
+    def check_auto_setup(args):
         pass
