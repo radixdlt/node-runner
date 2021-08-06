@@ -15,6 +15,7 @@ from api.System import System
 from api.Validation import Validation
 from github.github import latest_release
 from monitoring import Monitoring
+from setup.DockerConfig import DockerConfig
 from utils.utils import run_shell_command
 from utils.utils import Helpers
 from utils.utils import bcolors
@@ -116,12 +117,8 @@ def authcommand(args=[], parent=auth_parser):
     return get_decorator(args, parent)
 
 
-def cli_version():
-    return __version__
-
-
 def version():
-    print(f"Cli - Version : {cli_version()}")
+    print(f"Cli - Version : {Helpers.cli_version()}")
 
 
 @dockercommand([
@@ -132,32 +129,47 @@ def version():
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
+    argument("-a", "--auto", help="Runs without prompts", action="store_false"),
 ])
 def setup(args):
     release = latest_release()
-    composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
-                               f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
-    print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
-    # TODO autoapprove
-    continue_setup = input(
-        "Do you want to continue [Y/n]?:")
+    automode = args.auto
+    if automode:
+        Docker.check_auto_setup(args)
 
-    if not Helpers.check_Yes(continue_setup):
-        print(" Quitting ....")
-        sys.exit()
+    config = DockerConfig(automode=automode)
+    config.set_node_type(args.nodetype)
+    config.set_composefile_url()
+    config.set_keydetails()
+    config.set_core_release(release)
+    config.set_data_directory()
+    config.set_network_id()
+    composefileurl = config.settings.composefileurl
 
-    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
-    Docker.setup_compose_file(composefileurl, file_location)
+    if not automode:
+        continue_setup = input(
+            "Do you want to continue [Y/n]?:")
 
-    trustednode_ip = Helpers.parse_trustednode(args.trustednode)
+        if not Helpers.check_Yes(continue_setup):
+            print(" Quitting ....")
+            sys.exit()
+
+    keystore_password, file_location = Base.generatekey(keyfile_path=config.settings.keydetails["keyfile_path"],
+                                                        keyfile_name=config.settings.keydetails["keyfile_name"],
+                                                        keygen_tag=config.settings.keydetails["keygen_tag"])
+
+    Docker.setup_compose_file(composefileurl, file_location,config)
 
     compose_file_name = composefileurl.rsplit('/', 1)[-1]
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
+
     run_shell_command(f"cat {compose_file_name}", shell=True)
-    # TODO AutoApprove
-    should_start = input(f"\nOkay to start the node [Y/n]?:")
-    if Helpers.check_Yes(should_start):
+    should_start = "n"
+    if not config.settings.automode:
+        should_start = input(f"\nOkay to start the node [Y/n]?:")
+
+    if config.settings.automode or Helpers.check_Yes(should_start):
         if action == "update":
             print(f"For update, bringing down the node using compose file {compose_file_name}")
             Docker.run_docker_compose_down(compose_file_name)
@@ -225,7 +237,7 @@ def setup(args):
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
-    
+
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
                                  node_type=args.nodetype)
 
@@ -515,7 +527,7 @@ def checkpoints_get_checkpoints(args):
               action="store")])
 def setup(args):
     if args.setupmode == "QUICK_SETUP_MODE":
-        monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/monitoring'
+        monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/monitoring'
         print(f"Downloading artifacts from {monitor_url_dir}\n")
         Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
         Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
@@ -567,17 +579,17 @@ def stop(args):
 
 
 def optimise_node():
-    Base.setup_node_optimisation_config(cli_version())
+    Base.setup_node_optimisation_config(Helpers.cli_version())
 
 
 def check_latest_cli():
     cli_latest_version = latest_release("radixdlt/node-runner")
 
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
-        if cli_version() != cli_latest_version:
+        if Helpers.cli_version() != cli_latest_version:
             os_name = "ubuntu-20.04"
             print(
-                f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {cli_version()}.\n.")
+                f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
             print(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands

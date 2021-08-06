@@ -32,7 +32,7 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks",keygen_tag="1.0.0"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
         print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
             # TODO AutoApprove
@@ -115,11 +115,14 @@ class Base:
             setup_swap = "false"
 
     @staticmethod
-    def get_data_dir():
-        # TODO AutoApprove
-        data_dir_path = input("Enter the absolute path to data DB folder:")
-        run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
-        return data_dir_path
+    def get_data_dir(mode="DOCKER"):
+        str = "Press ENTER to use default path '/data' " if mode == "SYSTEMD" else "Press ENTER not to use any"
+        data_dir_path = input(
+            f"Enter the absolute path to folder where ledger will be stored. {str}?:")
+        if data_dir_path != "":
+            run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
+            return data_dir_path
+        return None
 
     @staticmethod
     def get_network_id():

@@ -46,7 +46,7 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def setup_compose_file(composefileurl, file_location):
+    def setup_compose_file(composefileurl, file_location, config):
         compose_file_name = composefileurl.rsplit('/', 1)[-1]
         if os.path.isfile(compose_file_name):
             backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
@@ -64,9 +64,7 @@ class Docker(Base):
 
         composefile_yaml = yaml.safe_load(resp.content)
 
-        # TODO AutoApprove
-        prompt_external_db = input("Do you want to configure data directory for the ledger [Y/n]?:")
-        if Helpers.check_Yes(prompt_external_db):
+        if config.settings.data_directory:
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
 
         def represent_none(self, _):
@@ -74,8 +72,8 @@ class Docker(Base):
 
         yaml.add_representer(type(None), represent_none)
 
-        network_id = Base.get_network_id()
-        genesis_json_location = Base.path_to_genesis_json(network_id)
+        network_id = config.settings.network_id
+        genesis_json_location = config.settings.genesis_json_location
 
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
@@ -164,3 +162,7 @@ class Docker(Base):
 
         final_conf = always_merger.merge(composefile_yaml, images_yml)
         return final_conf
+
+    @staticmethod
+    def check_auto_setup(cls, args):
+        pass

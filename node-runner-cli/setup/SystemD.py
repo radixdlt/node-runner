@@ -97,7 +97,7 @@ class SystemD(Base):
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-        data_folder=Base.get_data_dir()
+        data_folder = SystemD.get_data_dir()
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -320,3 +320,8 @@ class SystemD(Base):
     def stop_node_service():
         run_shell_command('sudo systemctl stop radixdlt-node.service', shell=True)
         run_shell_command('sudo systemctl disable radixdlt-node.service', shell=True)
+
+    @staticmethod
+    def get_data_dir():
+        if not Base.get_data_dir("SYSTEMD"):
+            return "/data"

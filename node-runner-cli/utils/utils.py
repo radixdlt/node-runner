@@ -6,6 +6,7 @@ import sys, os
 from pathlib import Path
 
 from env_vars import PRINT_REQUEST
+from version import __version__
 
 
 def printCommand(cmd):
@@ -184,6 +185,16 @@ class Helpers:
         return str(radixnode_dir)
 
     @staticmethod
+    def get_keyfile_name():
+        default_keyfile_name = "node-keystore.ks"
+        value = input("\nEnter the name of keystore file. Enter to use default value {default_keyfile_name}:").strip()
+        if value != "":
+            keyfile_name = value
+        else:
+            keyfile_name = default_keyfile_name
+
+        return keyfile_name
+
     def get_basic_auth_header(user):
         import base64
         data = f"{user['name']}:{user['password']}"
@@ -192,6 +203,11 @@ class Helpers:
         headers = {
             'Authorization': f'Basic {encodedStr}'}
         return headers
+
+    @staticmethod
+    def cli_version():
+        return __version__
+
 
 class bcolors:
     HEADER = '\033[95m'
