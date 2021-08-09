@@ -50,12 +50,11 @@ positional arguments:
 | api account get-info | - | - | Returns the response from POST request using get_info method on /account |
 | api account register-validator | - |<ul><li>1. Name of your validator:</li><li>2. Info URL of your validator:</li></ul>| Returns the response on POST using register_validator method on /account  |
 | api account unregister-validator | - |-| Returns the response on POST using unregister_validator method on /account  |
-| api validation get-validator-info | - | - | Returns the response of POST request using get_validator_info method on /validation  |
+| api validation get-node-info | - | - | Returns the response of POST request using get_validator_info method on /validation  |
 | api validation get-current-epoch-data | - | - | Returns the response of POST request using get_current_epoch_data method on /validation  |
 | api health | - | - | Returns the response of GET request on /health endpoint  |
 | api version | - | - | Returns the response of GET request on /version endpoint  |
 | api universe | - | - | Returns the response of GET request on /universe endpoint  |
-| api metrics | - | - | Returns the response of GET request on /metrics endpoint  |
 | api metrics | - | - | Returns the response of GET request on /metrics endpoint  |
 | api system api-get-configuration | - | - | Returns the response of POST request using api_get_configuration on /system endpoint  |
 | api system api-get-data | - | - | Returns the response of POST request using api_get_data on /system endpoint  |
@@ -63,7 +62,6 @@ positional arguments:
 | api system bft-get-data | - | - | Returns the response of POST request using bft_get_data on /system endpoint  |
 | api system mempool-get-configuration | - | - | Returns the response of POST request using mempool_get_configuration on /system endpoint  |
 | api system mempool-get-data | - | - | Returns the response of POST request using mempool_get_data on /system endpoint  |
-| api system ledger-get-latest-proof | - | - | Returns the response of POST request using ledger_get_latest_proof on /system endpoint  |
 | api system ledger-get-latest-proof | - | - | Returns the response of POST request using ledger_get_latest_proof on /system endpoint  |
 | api system ledger-get-latest-epoch-proof | - | - | Returns the response of POST request using ledger_get_latest_epoch_proof on /system endpoint  |
 | api system radix-engine-get-configuration | - | - | Returns the response of POST request using radix_engine_get_configuration on /system endpoint  |
