@@ -237,11 +237,12 @@ class Account(API):
 
         if node_health_info["fork_vote_status"] == "VOTE_REQUIRED":
             print("--------Voting: Update system metadata----\n")
-            print(
+            ask_system_metadata_update = input(
                 f"{bcolors.WARNING}\nDo you wish to submit a transaction to the network announcing that you are "
                 f"ready for the new version?"
-                f"  It is highly recommended that you do so.{bcolors.ENDC} ")
-            update_validator_system_metadata_action = Account.update_validator_system_metadata_action(
-                validator_info['address'])
-            request_data["params"]["actions"].append(update_validator_system_metadata_action)
+                f"  It is highly recommended that you do so.{bcolors.ENDC} Enter [Y/N] or press enter to ignore ")
+            if Helpers.check_Yes(ask_system_metadata_update):
+                update_validator_system_metadata_action = Account.update_validator_system_metadata_action(
+                    validator_info['address'])
+                request_data["params"]["actions"].append(update_validator_system_metadata_action)
         return request_data
