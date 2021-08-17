@@ -225,7 +225,7 @@ def setup(args):
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
-    
+
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
                                  node_type=args.nodetype)
 
@@ -397,7 +397,7 @@ def update_validator_config(args):
         },
         "id": 1
     }
-    RestApi.check_health()
+    node_health_info = RestApi.check_health()
 
     validator_info = Validation.get_validator_info_json()
 
@@ -408,9 +408,8 @@ def update_validator_config(args):
     request_data = Account.setup_update_delegation(request_data, validator_info)
     request_data = Account.add_change_ownerid(request_data, validator_info)
 
-    update_validator_system_metadata_action = Account.update_validator_system_metadata_action(validator_info['address'])
-    request_data["params"]["actions"].append(update_validator_system_metadata_action)
-    
+    request_data = Account.update_validator_system_metadata_step(request_data, validator_info, node_health_info)
+
     print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
     print(f"")
     print(f"{bcolors.BOLD}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")

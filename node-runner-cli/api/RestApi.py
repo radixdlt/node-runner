@@ -57,3 +57,6 @@ class RestApi(API):
                 proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
                 if not Helpers.check_Yes(proceed):
                     sys.exit()
+            else:
+                return resp_content
+

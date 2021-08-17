@@ -36,7 +36,6 @@ class Account(API):
             "validator": validator_id,
         }
 
-
     @staticmethod
     def un_register_validator():
         validator_id = Validation.get_validator_info_json()
@@ -231,4 +230,18 @@ class Account(API):
                                                                                                    'address'])
             request_data["params"]["actions"].append(update_validator_owner_address)
 
+        return request_data
+
+    @staticmethod
+    def update_validator_system_metadata_step(request_data, validator_info, node_health_info):
+
+        if node_health_info["fork_vote_status"] == "VOTE_REQUIRED":
+            print("--------Voting: Update system metadata----\n")
+            print(
+                f"{bcolors.WARNING}\nDo you wish to submit a transaction to the network announcing that you are "
+                f"ready for the new version?"
+                f"  It is highly recommended that you do so.{bcolors.ENDC} ")
+            update_validator_system_metadata_action = Account.update_validator_system_metadata_action(
+                validator_info['address'])
+            request_data["params"]["actions"].append(update_validator_system_metadata_action)
         return request_data
