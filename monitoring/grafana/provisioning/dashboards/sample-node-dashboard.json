@@ -183,7 +183,7 @@
             {
               "from": "1",
               "id": 1,
-              "text": "Synced",
+              "text": "Desynced",
               "to": "1000000000",
               "type": 2,
               "value": "283"
@@ -191,7 +191,7 @@
             {
               "from": "",
               "id": 2,
-              "text": "Desynced",
+              "text": "Synced",
               "to": "",
               "type": 1,
               "value": "0"
@@ -240,7 +240,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "rate(info_counters_sync_target_state_version[$__rate_interval])",
+          "expr": "rate(info_counters_sync_target_current_diff[$__rate_interval])",
           "hide": false,
           "instant": false,
           "interval": "",
@@ -1469,5 +1469,5 @@
   "timezone": "",
   "title": "Radix Node Dashboard",
   "uid": "updated",
-  "version": 13
+  "version": 14
 }
