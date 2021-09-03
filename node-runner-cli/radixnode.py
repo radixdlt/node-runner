@@ -177,6 +177,7 @@ def setup(args):
     argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
+    argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ",action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
@@ -189,6 +190,11 @@ def setup(args):
         release = latest_release()
     else:
         release = args.release
+
+    if not args.nginxrelease:
+        nginx_release = latest_release("radixdlt/radixdlt-nginx")
+    else:
+        nginx_release = args.nginxrelease
 
     if args.nodetype == "archivenode":
         node_type_name = 'archive'
@@ -207,7 +213,7 @@ def setup(args):
 
     # TODO add method to fetch latest nginx release
     nginxconfigUrl = os.getenv(NGINX_BINARY_OVERIDE,
-                               f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{release}/radixdlt-nginx-{node_type_name}-conf.zip")
+                               f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{nginx_release}/radixdlt-nginx-{node_type_name}-conf.zip")
     # TODO AutoApprove
     continue_setup = input(
         f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
