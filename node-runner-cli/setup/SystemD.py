@@ -11,7 +11,7 @@ class SystemD(Base):
 
     @staticmethod
     def install_java():
-        run_shell_command('sudo apt install -y openjdk-11-jdk', shell=True)
+        run_shell_command('sudo apt install -y openjdk-17-jdk', shell=True)
 
     @staticmethod
     def setup_user():
