@@ -1,8 +1,13 @@
 version: '2.2'
 services:
   core:
-    image: radixdlt/radixdlt-core:1.0.0
+    image: radixdlt/radixdlt-core:1.0.3
     init: true
+    ulimits:
+      nofile:
+        soft: "65536"
+        hard: "65536"
+      memlock: "-1"
     restart: unless-stopped
     mem_limit: 12000m
     cap_add:
@@ -32,8 +37,12 @@ services:
 #      - "core_ledger:/home/radixdlt/RADIXDB"
       - "./node-keystore.ks:/home/radixdlt/node-keystore.ks"
   nginx:
-     image: radixdlt/radixdlt-nginx:1.0.0
+     image: radixdlt/radixdlt-nginx:1.0.6
      restart: unless-stopped
+     ulimits:
+       nofile:
+         soft: "65536"
+         hard: "65536"
      ports:
        - "443:443"
        - "30000:30000"

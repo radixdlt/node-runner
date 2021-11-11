@@ -159,6 +159,9 @@ class SystemD(Base):
             [Service]
             EnvironmentFile={node_secrets_path}/environment
             User=radixdlt
+            LimitNOFILE=65536
+            LimitNPROC=65536
+            LimitMEMLOCK=infinity
             WorkingDirectory={node_dir}
             ExecStart={node_dir}/{node_version_dir}/bin/radixdlt
             SuccessExitStatus=143
