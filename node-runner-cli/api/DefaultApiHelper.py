@@ -1,21 +1,11 @@
-import json
 import sys
 import system_client as system_api
 from system_client import ApiException, Configuration, ApiClient
 from system_client.api import default_api
 
-import requests
-from requests.auth import HTTPBasicAuth
 
 from api.Api import API
 from utils.utils import Helpers, bcolors
-
-
-def set_basic_auth(api_client: ApiClient, usertype: str, username: str):
-    user = Helpers.get_nginx_user(usertype=usertype, default_username=username)
-    headers = Helpers.get_basic_auth_header(user)
-    api_client.set_default_header("Authorization", headers["Authorization"])
-    return api_client
 
 
 class DefaultApiHelper(API):
@@ -25,9 +15,9 @@ class DefaultApiHelper(API):
         node_host = API.get_host_info()
         self.system_config = system_api.Configuration(node_host, verify_ssl=verify_ssl)
 
-    def health(self,print_response=False):
+    def health(self, print_response=False):
         with system_api.ApiClient(self.system_config) as api_client:
-            api_client = set_basic_auth(api_client, "admin", "admin")
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
             try:
                 api = default_api.DefaultApi(api_client)
                 health_response = api.system_health_get()
@@ -37,22 +27,9 @@ class DefaultApiHelper(API):
             except ApiException as e:
                 Helpers.handleApiException(e)
 
-    @staticmethod
-    def get_request(usertype, username, api_path):
-        node_host = API.get_host_info()
-        user = Helpers.get_nginx_user(usertype=usertype, default_username=username)
-        headers = Helpers.get_basic_auth_header(user)
-        req = requests.Request('GET',
-                               f"{node_host}/{api_path}",
-                               headers=headers)
-
-        prepared = req.prepare()
-        prepared.headers['Content-Type'] = 'application/json'
-        return Helpers.send_request(prepared)
-
     def version(self):
         with system_api.ApiClient(self.system_config) as api_client:
-            api_client = set_basic_auth(api_client, "admin", "admin")
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
             try:
                 api = default_api.DefaultApi(api_client)
                 print(api.system_version_get())
@@ -61,7 +38,7 @@ class DefaultApiHelper(API):
 
     def metrics(self):
         with system_api.ApiClient(self.system_config) as api_client:
-            api_client = set_basic_auth(api_client, "admin", "admin")
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
             try:
                 api = default_api.DefaultApi(api_client)
                 print(api.system_metrics_get())
@@ -70,7 +47,7 @@ class DefaultApiHelper(API):
 
     def prometheus_metrics(self):
         with system_api.ApiClient(self.system_config) as api_client:
-            api_client = set_basic_auth(api_client, "metrics", "metrics")
+            api_client = self.set_basic_auth(api_client, "metrics", "metrics")
             try:
                 api = default_api.DefaultApi(api_client)
                 print(api.prometheus_metrics_get())
@@ -88,3 +65,10 @@ class DefaultApiHelper(API):
             proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
             if not Helpers.check_Yes(proceed):
                 sys.exit()
+
+    @staticmethod
+    def set_basic_auth(api_client: ApiClient, usertype: str, username: str):
+        user = Helpers.get_nginx_user(usertype=usertype, default_username=username)
+        headers = Helpers.get_basic_auth_header(user)
+        api_client.set_default_header("Authorization", headers["Authorization"])
+        return api_client
