@@ -8,8 +8,9 @@ from pathlib import Path
 
 import requests
 import urllib3
-
+import system_client as system_api
 from api.Account import Account
+from api.Api import API
 from api.RestApi import RestApi
 from api.System import System
 from api.Validation import Validation
@@ -23,6 +24,7 @@ from version import __version__
 from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, NODE_END_POINT, \
     DISABLE_VERSION_CHECK
 from setup import Base, Docker, SystemD
+
 
 urllib3.disable_warnings()
 
@@ -403,7 +405,17 @@ def update_validator_config(args):
         },
         "id": 1
     }
-    RestApi.check_health()
+    node_host = API.get_host_info()
+    system_config = system_api.Configuration(node_host, verify_ssl=False)
+
+    with system_api.ApiClient(system_config) as api_client:
+        user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
+        headers = Helpers.get_basic_auth_header(user)
+        api_client.set_default_header("Authorization", headers["Authorization"])
+        RestApi.check_health(api_client)
+
+
+
 
     validator_info = Validation.get_validator_info_json()
 
@@ -436,9 +448,18 @@ def get_info(args):
 
 
 @systemapicommand()
+def metrics(args):
+    node_host = API.get_host_info()
+    system_config = system_api.Configuration(node_host, verify_ssl=False)
+    with system_api.ApiClient(system_config) as api_client:
+        user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
+        headers = Helpers.get_basic_auth_header(user)
+        api_client.set_default_header("Authorization", headers["Authorization"])
+        RestApi.metrics(api_client)
+
+@systemapicommand()
 def api_get_configuration(args):
     System.api_get_configuration()
-
 
 @systemapicommand()
 def api_get_data(args):
@@ -654,13 +675,9 @@ if __name__ == "__main__":
             elif apicli_args.apicommand == "account":
                 handle_account()
             elif apicli_args.apicommand == "health":
-                RestApi.get_health()
+                RestApi.health()
             elif apicli_args.apicommand == "version":
                 RestApi.get_version()
-            elif apicli_args.apicommand == "universe":
-                RestApi.get_universe()
-            elif apicli_args.apicommand == "metrics":
-                RestApi.get_metrics()
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
             else:

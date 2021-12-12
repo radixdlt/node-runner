@@ -1,5 +1,8 @@
 import json
 import sys
+import system_client as system_api
+from system_client import ApiException, Configuration, ApiClient
+from system_client.api import default_api
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -10,8 +13,12 @@ from utils.utils import Helpers, bcolors
 
 class RestApi(API):
     @staticmethod
-    def get_health():
-        return RestApi.get_request("admin", "admin", "health")
+    def health(api_client: ApiClient):
+        try:
+            api = default_api.DefaultApi(api_client)
+            return api.system_health_get()
+        except ApiException as e:
+            Helpers.handleApiException(e)
 
     @staticmethod
     def get_request(usertype, username, api_path):
@@ -31,29 +38,26 @@ class RestApi(API):
         RestApi.get_request("admin", "admin", "version")
 
     @staticmethod
-    def get_universe():
-        RestApi.get_request("admin", "admin", "universe.json")
+    def metrics(apl_Client: ApiClient):
+        try:
+            api = default_api.DefaultApi(apl_Client)
+            print(api.system_metrics_get())
+        except ApiException as e:
+            Helpers.handleApiException(e)
 
     @staticmethod
     def get_metrics():
         RestApi.get_request("metrics", "metrics", "metrics")
 
     @staticmethod
-    def check_health():
-        error = False
+    def check_health(api_client: ApiClient):
         Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
-        health = RestApi.get_health()
+        health = RestApi.health(api_client)
 
-        if not health.ok:
-            Helpers.print_coloured_line("Error retrieving health\n", bcolors.FAIL)
-            sys.exit()
-
-        if Helpers.is_json(health.content):
-            resp_content = json.loads(health.content)
-            if resp_content["status"] != "UP":
-                Helpers.print_coloured_line(
-                    "Node is not in sync. Rerun the command once node is completely synced",
-                    bcolors.WARNING)
-                proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
-                if not Helpers.check_Yes(proceed):
-                    sys.exit()
+        if health["status"] != "UP":
+            Helpers.print_coloured_line(
+                f"Node status is {health['status']} Rerun the command once node is completely synced",
+                bcolors.WARNING)
+            proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
+            if not Helpers.check_Yes(proceed):
+                sys.exit()

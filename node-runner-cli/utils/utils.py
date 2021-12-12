@@ -5,6 +5,8 @@ import requests
 import sys, os
 from pathlib import Path
 
+from system_client import OpenApiException, ApiException
+
 from env_vars import PRINT_REQUEST
 
 
@@ -192,6 +194,13 @@ class Helpers:
         headers = {
             'Authorization': f'Basic {encodedStr}'}
         return headers
+
+    @staticmethod
+    def handleApiException( e: ApiException):
+        print(f"Exception-reason:{e.reason},status:{e.status}.body:{e.body}")
+        sys.exit()
+
+
 
 class bcolors:
     HEADER = '\033[95m'
