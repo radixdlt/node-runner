@@ -131,6 +131,23 @@ def key_list(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.key_list(True)
 
+
+@corecommand()
+def mempool(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.mempool(True)
+
+
+@corecommand([
+    argument("-t", "--transactionId", required=True,
+             help="transaction Id to be searched on mempool",
+             action="store")
+])
+def mempool_transaction(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.mempool(True)
+
+
 systemapicli = ArgumentParser(
     description='systemapi commands')
 systemapi_parser = systemapicli.add_subparsers(dest="systemapicommand")

@@ -1,15 +1,19 @@
 from core_client import Configuration, ApiException
-from core_client.api import network_api, entity_api, key_api
+from core_client.api import network_api, entity_api, key_api, mempool_api
 from core_client.model.data import Data
 from core_client.model.entity_request import EntityRequest
 from core_client.model.entity_response import EntityResponse
 from core_client.model.key_list_request import KeyListRequest
 from core_client.model.key_list_response import KeyListResponse
+from core_client.model.mempool_request import MempoolRequest
+from core_client.model.mempool_response import MempoolResponse
+from core_client.model.mempool_transaction_request import MempoolTransactionRequest
 from core_client.model.network_configuration_response import NetworkConfigurationResponse
 from core_client.model.network_status_request import NetworkStatusRequest
 from core_client.model.operation import Operation
 from core_client.model.operation_group import OperationGroup
 from core_client.model.prepared_validator_registered import PreparedValidatorRegistered
+from core_client.model.transaction_identifier import TransactionIdentifier
 from core_client.model.validator_metadata import ValidatorMetadata
 import core_client as core_api
 from api.Api import API
@@ -55,8 +59,32 @@ class CoreApiHelper(API):
                 api = key_api.KeyApi(api_client)
                 response: KeyListResponse = api.key_list_post(
                     KeyListRequest(network_identifier=self.network_configuration().network_identifier))
-                if print_response:
-                    print(response)
+                return self.handle_response(response, print_response)
+            except ApiException as e:
+                Helpers.handleApiException(e)
+
+    def mempool(self, print_response=False):
+        with core_api.ApiClient(self.system_config) as api_client:
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = mempool_api.MempoolApi(api_client)
+                response: MempoolResponse = api.mempool_post(
+                    MempoolRequest(network_identifier=self.network_configuration().network_identifier))
+                return self.handle_response(response, print_response)
+            except ApiException as e:
+                Helpers.handleApiException(e)
+
+    def mempool_transaction(self, transactionId: str, print_response=False):
+        with core_api.ApiClient(self.system_config) as api_client:
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = mempool_api.MempoolApi(api_client)
+                response: MempoolResponse = api.mempool_transaction_post(
+                    MempoolTransactionRequest(
+                        network_identifier=self.network_configuration().network_identifier,
+                        transaction_identifier=TransactionIdentifier(transactionId)
+                    )
+                )
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)
