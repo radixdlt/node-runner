@@ -450,13 +450,8 @@ def get_info(args):
 
 @systemapicommand()
 def metrics(args):
-    node_host = API.get_host_info()
-    system_config = system_api.Configuration(node_host, verify_ssl=False)
-    with system_api.ApiClient(system_config) as api_client:
-        user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
-        headers = Helpers.get_basic_auth_header(user)
-        api_client.set_default_header("Authorization", headers["Authorization"])
-        DefaultApi.metrics(api_client)
+    defaultApi = DefaultApiHelper(verify_ssl=False)
+    defaultApi.metrics()
 
 @systemapicommand()
 def api_get_configuration(args):

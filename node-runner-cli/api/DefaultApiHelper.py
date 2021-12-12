@@ -54,13 +54,14 @@ class DefaultApiHelper(API):
     def get_version():
         DefaultApiHelper.get_request("admin", "admin", "version")
 
-    @staticmethod
-    def metrics(apl_Client: ApiClient):
-        try:
-            api = default_api.DefaultApi(apl_Client)
-            print(api.system_metrics_get())
-        except ApiException as e:
-            Helpers.handleApiException(e)
+    def metrics(self):
+        with system_api.ApiClient(self.system_config) as api_client:
+            api_client = set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = default_api.DefaultApi(api_client)
+                print(api.system_metrics_get())
+            except ApiException as e:
+                Helpers.handleApiException(e)
 
     def prometheus_metrics(self):
         with system_api.ApiClient(self.system_config) as api_client:
