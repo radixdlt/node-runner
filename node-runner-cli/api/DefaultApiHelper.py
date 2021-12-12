@@ -50,9 +50,14 @@ class DefaultApiHelper(API):
         prepared.headers['Content-Type'] = 'application/json'
         return Helpers.send_request(prepared)
 
-    @staticmethod
-    def get_version():
-        DefaultApiHelper.get_request("admin", "admin", "version")
+    def get_version(self):
+        with system_api.ApiClient(self.system_config) as api_client:
+            api_client = set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = default_api.DefaultApi(api_client)
+                print(api.system_version_get())
+            except ApiException as e:
+                Helpers.handleApiException(e)
 
     def metrics(self):
         with system_api.ApiClient(self.system_config) as api_client:

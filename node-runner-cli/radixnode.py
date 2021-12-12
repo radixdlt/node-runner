@@ -450,8 +450,8 @@ def get_info(args):
 
 @systemapicommand()
 def metrics(args):
-    defaultApi = DefaultApiHelper(verify_ssl=False)
-    defaultApi.metrics()
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.metrics()
 
 @systemapicommand()
 def api_get_configuration(args):
@@ -674,7 +674,8 @@ if __name__ == "__main__":
                 defaultApi = DefaultApiHelper(verify_ssl=False)
                 defaultApi.health(print_response=True)
             elif apicli_args.apicommand == "version":
-                DefaultApi.get_version()
+                defaultApi = DefaultApiHelper(verify_ssl=False)
+                defaultApi.get_version()
             elif apicli_args.apicommand == "metrics":
                 defaultApi = DefaultApiHelper(verify_ssl=False)
                 defaultApi.prometheus_metrics()
