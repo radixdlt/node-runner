@@ -11,7 +11,8 @@ import urllib3
 import system_client as system_api
 from api.Account import Account
 from api.Api import API
-from api.RestApi import RestApi
+
+from api.DefaultApiHelper import DefaultApiHelper
 from api.System import System
 from api.Validation import Validation
 from github.github import latest_release
@@ -412,7 +413,7 @@ def update_validator_config(args):
         user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
         headers = Helpers.get_basic_auth_header(user)
         api_client.set_default_header("Authorization", headers["Authorization"])
-        RestApi.check_health(api_client)
+        DefaultApi.check_health(api_client)
 
 
 
@@ -455,7 +456,7 @@ def metrics(args):
         user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
         headers = Helpers.get_basic_auth_header(user)
         api_client.set_default_header("Authorization", headers["Authorization"])
-        RestApi.metrics(api_client)
+        DefaultApi.metrics(api_client)
 
 @systemapicommand()
 def api_get_configuration(args):
@@ -675,11 +676,13 @@ if __name__ == "__main__":
             elif apicli_args.apicommand == "account":
                 handle_account()
             elif apicli_args.apicommand == "health":
-                RestApi.health()
+                defaultApi = DefaultApiHelper(verify_ssl=False)
+                defaultApi.health(print_response=True)
             elif apicli_args.apicommand == "version":
-                RestApi.get_version()
+                DefaultApi.get_version()
             elif apicli_args.apicommand == "metrics":
-                RestApi.prometheus_metrics()
+                defaultApi = DefaultApiHelper(verify_ssl=False)
+                defaultApi.prometheus_metrics()
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
             else:

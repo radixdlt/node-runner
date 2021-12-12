@@ -11,14 +11,31 @@ from api.Api import API
 from utils.utils import Helpers, bcolors
 
 
-class RestApi(API):
-    @staticmethod
-    def health(api_client: ApiClient):
-        try:
-            api = default_api.DefaultApi(api_client)
-            return api.system_health_get()
-        except ApiException as e:
-            Helpers.handleApiException(e)
+def set_basic_auth(api_client: ApiClient, usertype: str, username: str):
+    user = Helpers.get_nginx_user(usertype=usertype, default_username=username)
+    headers = Helpers.get_basic_auth_header(user)
+    api_client.set_default_header("Authorization", headers["Authorization"])
+    return api_client
+
+
+class DefaultApiHelper(API):
+    system_config: Configuration = None
+
+    def __init__(self, verify_ssl):
+        node_host = API.get_host_info()
+        self.system_config = system_api.Configuration(node_host, verify_ssl=verify_ssl)
+
+    def health(self,print_response=False):
+        with system_api.ApiClient(self.system_config) as api_client:
+            api_client = set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = default_api.DefaultApi(api_client)
+                health_response = api.system_health_get()
+                if print_response:
+                    print(health_response)
+                return health_response
+            except ApiException as e:
+                Helpers.handleApiException(e)
 
     @staticmethod
     def get_request(usertype, username, api_path):
@@ -35,7 +52,7 @@ class RestApi(API):
 
     @staticmethod
     def get_version():
-        RestApi.get_request("admin", "admin", "version")
+        DefaultApiHelper.get_request("admin", "admin", "version")
 
     @staticmethod
     def metrics(apl_Client: ApiClient):
@@ -45,24 +62,18 @@ class RestApi(API):
         except ApiException as e:
             Helpers.handleApiException(e)
 
-    @staticmethod
-    def prometheus_metrics():
-        node_host = API.get_host_info()
-        system_config = system_api.Configuration(node_host, verify_ssl=False)
-        with system_api.ApiClient(system_config) as api_client:
-            user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
-            headers = Helpers.get_basic_auth_header(user)
-            api_client.set_default_header("Authorization", headers["Authorization"])
+    def prometheus_metrics(self):
+        with system_api.ApiClient(self.system_config) as api_client:
+            api_client = set_basic_auth(api_client, "metrics", "metrics")
             try:
                 api = default_api.DefaultApi(api_client)
                 print(api.prometheus_metrics_get())
             except ApiException as e:
                 Helpers.handleApiException(e)
 
-    @staticmethod
-    def check_health(api_client: ApiClient):
+    def check_health(self):
         Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
-        health = RestApi.health(api_client)
+        health = self.health()
 
         if health["status"] != "UP":
             Helpers.print_coloured_line(
