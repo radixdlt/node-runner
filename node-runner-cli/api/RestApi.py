@@ -46,8 +46,18 @@ class RestApi(API):
             Helpers.handleApiException(e)
 
     @staticmethod
-    def get_metrics():
-        RestApi.get_request("metrics", "metrics", "metrics")
+    def prometheus_metrics():
+        node_host = API.get_host_info()
+        system_config = system_api.Configuration(node_host, verify_ssl=False)
+        with system_api.ApiClient(system_config) as api_client:
+            user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
+            headers = Helpers.get_basic_auth_header(user)
+            api_client.set_default_header("Authorization", headers["Authorization"])
+            try:
+                api = default_api.DefaultApi(api_client)
+                print(api.prometheus_metrics_get())
+            except ApiException as e:
+                Helpers.handleApiException(e)
 
     @staticmethod
     def check_health(api_client: ApiClient):

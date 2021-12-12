@@ -678,6 +678,8 @@ if __name__ == "__main__":
                 RestApi.health()
             elif apicli_args.apicommand == "version":
                 RestApi.get_version()
+            elif apicli_args.apicommand == "metrics":
+                RestApi.prometheus_metrics()
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
             else:
