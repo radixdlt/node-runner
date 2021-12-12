@@ -50,7 +50,7 @@ class DefaultApiHelper(API):
         prepared.headers['Content-Type'] = 'application/json'
         return Helpers.send_request(prepared)
 
-    def get_version(self):
+    def version(self):
         with system_api.ApiClient(self.system_config) as api_client:
             api_client = set_basic_auth(api_client, "admin", "admin")
             try:

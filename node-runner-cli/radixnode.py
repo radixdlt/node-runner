@@ -26,7 +26,6 @@ from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVE
     DISABLE_VERSION_CHECK
 from setup import Base, Docker, SystemD
 
-
 urllib3.disable_warnings()
 
 cli = ArgumentParser()
@@ -180,7 +179,7 @@ def setup(args):
     argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
-    argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ",action="store"),
+    argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
@@ -234,7 +233,7 @@ def setup(args):
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
-    
+
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
                                  node_type=args.nodetype)
 
@@ -415,9 +414,6 @@ def update_validator_config(args):
         api_client.set_default_header("Authorization", headers["Authorization"])
         DefaultApi.check_health(api_client)
 
-
-
-
     validator_info = Validation.get_validator_info_json()
 
     user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
@@ -453,9 +449,23 @@ def metrics(args):
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.metrics()
 
+
+@systemapicommand()
+def version(args):
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.version()
+
+
+@systemapicommand()
+def health(args):
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.health(print_response=True)
+
+
 @systemapicommand()
 def api_get_configuration(args):
     System.api_get_configuration()
+
 
 @systemapicommand()
 def api_get_data(args):
@@ -670,12 +680,6 @@ if __name__ == "__main__":
                 handle_validation()
             elif apicli_args.apicommand == "account":
                 handle_account()
-            elif apicli_args.apicommand == "health":
-                defaultApi = DefaultApiHelper(verify_ssl=False)
-                defaultApi.health(print_response=True)
-            elif apicli_args.apicommand == "version":
-                defaultApi = DefaultApiHelper(verify_ssl=False)
-                defaultApi.get_version()
             elif apicli_args.apicommand == "metrics":
                 defaultApi = DefaultApiHelper(verify_ssl=False)
                 defaultApi.prometheus_metrics()
