@@ -17,3 +17,9 @@ class API:
         headers = Helpers.get_basic_auth_header(user)
         api_client.set_default_header("Authorization", headers["Authorization"])
         return api_client
+
+    @staticmethod
+    def handle_response(response, print_response=False):
+        if print_response:
+            print(response)
+        return response

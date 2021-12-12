@@ -120,6 +120,16 @@ def network_status(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.network_status(True)
 
+@corecommand()
+def entity(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.entity(True)
+
+
+@corecommand()
+def key_list(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.key_list(True)
 
 systemapicli = ArgumentParser(
     description='systemapi commands')
