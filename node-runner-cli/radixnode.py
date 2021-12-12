@@ -11,6 +11,7 @@ import urllib3
 import system_client as system_api
 from api.Account import Account
 from api.Api import API
+from api.CoreApiHelper import CoreApiHelper
 
 from api.DefaultApiHelper import DefaultApiHelper
 from api.System import System
@@ -36,7 +37,7 @@ apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
                                  choices=["validation", "account", "health", "version", "universe", "metrics",
-                                          "system"])
+                                          "system", "core"])
 
 cwd = os.getcwd()
 
@@ -89,6 +90,35 @@ account_parser = accountcli.add_subparsers(dest="accountcommand")
 
 def accountcommand(args=[], parent=account_parser):
     return get_decorator(args, parent)
+
+
+# Setup core parser
+corecli = ArgumentParser(
+    description='Core Api comands')
+core_parser = corecli.add_subparsers(dest="corecommand")
+
+
+def corecommand(args=[], parent=core_parser):
+    return get_decorator(args, parent)
+
+
+def handle_core():
+    args = corecli.parse_args(sys.argv[3:])
+    if args.corecommand is None:
+        corecli.print_help()
+    else:
+        args.func(args)
+
+
+@corecommand()
+def network_configuration(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.network_configuration(True)
+
+@corecommand()
+def network_status(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.network_status(True)
 
 
 systemapicli = ArgumentParser(
@@ -653,9 +683,9 @@ if __name__ == "__main__":
 
     if args.subcommand is None:
         cli.print_help()
-    else:
-        if args.subcommand != "version":
-            check_latest_cli()
+    # else:
+    #     if args.subcommand != "version":
+    #         check_latest_cli()
 
     if args.subcommand == "docker":
         dockercli_args = dockercli.parse_args(sys.argv[2:])
@@ -685,6 +715,8 @@ if __name__ == "__main__":
                 defaultApi.prometheus_metrics()
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
+            elif apicli_args.apicommand == "core":
+                handle_core()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 
