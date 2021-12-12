@@ -14,7 +14,6 @@ from api.Api import API
 from api.CoreApiHelper import CoreApiHelper
 
 from api.DefaultApiHelper import DefaultApiHelper
-from api.System import System
 from api.Validation import Validation
 from github.github import latest_release
 from monitoring import Monitoring
@@ -442,15 +441,6 @@ def set_auth(args, usertype):
 """
 
 
-@validationcommand()
-def get_node_info(args):
-    Validation.get_node_info()
-
-
-@validationcommand()
-def get_current_epoch_data(args):
-    Validation.get_current_epoch_data()
-
 
 @accountcommand()
 def update_validator_config(args):
@@ -490,17 +480,6 @@ def update_validator_config(args):
         print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
 
 
-# @accountcommand()
-# def unregister_validator(args):
-#     RestApi.check_health()
-#     Account.un_register_validator()
-
-
-@accountcommand()
-def get_info(args):
-    Account.get_info()
-
-
 @systemapicommand()
 def metrics(args):
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
@@ -517,87 +496,6 @@ def version(args):
 def health(args):
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.health(print_response=True)
-
-
-@systemapicommand()
-def api_get_configuration(args):
-    System.api_get_configuration()
-
-
-@systemapicommand()
-def api_get_data(args):
-    System.api_get_data()
-
-
-@systemapicommand()
-def bft_get_configuration(args):
-    System.bft_get_configuration()
-
-
-@systemapicommand()
-def bft_get_data(args):
-    System.bft_get_data()
-
-
-@systemapicommand()
-def mempool_get_configuration(args):
-    System.mempool_get_configuration()
-
-
-@systemapicommand()
-def mempool_get_data(args):
-    System.mempool_get_data()
-
-
-@systemapicommand()
-def ledger_get_latest_proof(args):
-    System.ledger_get_latest_proof()
-
-
-@systemapicommand()
-def ledger_get_latest_epoch_proof(args):
-    System.ledger_get_latest_epoch_proof()
-
-
-@systemapicommand()
-def radix_engine_get_configuration(args):
-    System.radix_engine_get_configuration()
-
-
-@systemapicommand()
-def radix_engine_get_data(args):
-    System.radix_engine_get_data()
-
-
-@systemapicommand()
-def sync_get_configuration(args):
-    System.sync_get_configuration()
-
-
-@systemapicommand()
-def sync_get_data(args):
-    System.sync_get_data()
-
-
-@systemapicommand()
-def networking_get_configuration(args):
-    System.networking_get_configuration()
-
-
-@systemapicommand()
-def networking_get_peers(args):
-    System.networking_get_peers()
-
-
-@systemapicommand()
-def networking_get_data(args):
-    System.networking_get_data()
-
-
-@systemapicommand()
-def checkpoints_get_checkpoints(args):
-    System.checkpoints_get_checkpoints()
-
 
 @monitoringcommand(
     [argument("-m", "--setupmode", default="QUICK_SETUP_MODE",

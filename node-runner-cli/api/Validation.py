@@ -23,17 +23,6 @@ class Validation(API):
         """
         return Validation.post_on_validation(data)
 
-    @staticmethod
-    def get_current_epoch_data():
-        data = f"""
-            {{
-                "jsonrpc": "2.0",
-                "method": "validation.get_current_epoch_data",
-                "params": [],
-                "id": 1
-            }}
-        """
-        return Validation.post_on_validation(data)
 
     @staticmethod
     def post_on_validation(data):
