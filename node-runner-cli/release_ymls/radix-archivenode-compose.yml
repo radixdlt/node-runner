@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   core:
-    image: radixdlt/radixdlt-core:1.0.0
+    image: radixdlt/radixdlt-core:1.0.4
     init: true
     restart: unless-stopped
     mem_limit: 12000m
@@ -35,7 +35,7 @@ services:
        -  "./node-keystore.ks:/home/radixdlt/node-keystore.ks"
 
   nginx:
-     image: radixdlt/radixdlt-nginx:1.0.0
+    image: radixdlt/radixdlt-nginx:1.0.6
      restart: unless-stopped
      ports:
        - "443:443"
