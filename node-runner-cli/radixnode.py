@@ -9,7 +9,11 @@ from pathlib import Path
 import requests
 import urllib3
 import system_client as system_api
+from core_client.model.construction_build_response import ConstructionBuildResponse
+from core_client.model.construction_submit_response import ConstructionSubmitResponse
+from core_client.model.entity_response import EntityResponse
 from core_client.model.key_list_response import KeyListResponse
+from core_client.model.key_sign_response import KeySignResponse
 
 from api.Account import Account
 from api.Api import API
@@ -477,23 +481,22 @@ def update_validator_config(args):
 
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.check_health()
-    actions = []
-    actions = ValidatorConfig.registeration(actions)
-    # actions = ValidatorConfig.
-    request_data = Account.register_steps(request_data, validator_info)
-    request_data = Account.update_steps(request_data, validator_info)
-    request_data = Account.add_validation_fee(request_data, validator_info)
-    request_data = Account.setup_update_delegation(request_data, validator_info)
-    request_data = Account.add_change_ownerid(request_data, validator_info)
 
-    print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
-    print(f"")
-    print(f"{bcolors.BOLD}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")
-    submit_changes = input(f"{bcolors.BOLD}\nDo you want to continue [Y/n]{bcolors.ENDC}")
-    if Helpers.check_Yes(submit_changes) and len(request_data["params"]["actions"]) != 0:
-        Account.post_on_account(json.dumps(request_data))
-    else:
-        print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
+    core_api_helper = CoreApiHelper(verify_ssl=False)
+    key_list_response: KeyListResponse = core_api_helper.key_list()
+    validator_info: EntityResponse = core_api_helper.entity(
+        key_list_response.public_keys[0].identifiers.validator_entity_identifier)
+
+    actions = []
+    actions = ValidatorConfig.registeration(actions, validator_info)
+    actions = ValidatorConfig.validator_metadata(actions, validator_info)
+    actions = ValidatorConfig.add_validation_fee(actions, validator_info)
+    actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
+    actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
+    unsigned_transaction: ConstructionBuildResponse = core_api_helper.construction_build(actions)
+    signed_transaction: KeySignResponse = core_api_helper.key_sign(unsigned_transaction)
+    submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
+        signed_transaction.signed_transaction, print_response=True)
 
 
 @systemapicommand()

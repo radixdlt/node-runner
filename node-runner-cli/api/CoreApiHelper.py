@@ -1,10 +1,16 @@
+import sys, json
+
 from core_client import Configuration, ApiException
-from core_client.api import network_api, entity_api, key_api, mempool_api
+from core_client.api import network_api, entity_api, key_api, mempool_api, construction_api
+from core_client.model.construction_build_request import ConstructionBuildRequest
+from core_client.model.construction_build_response import ConstructionBuildResponse
+from core_client.model.construction_submit_request import ConstructionSubmitRequest
 from core_client.model.data import Data
 from core_client.model.entity_request import EntityRequest
 from core_client.model.entity_response import EntityResponse
 from core_client.model.key_list_request import KeyListRequest
 from core_client.model.key_list_response import KeyListResponse
+from core_client.model.key_sign_request import KeySignRequest
 from core_client.model.mempool_request import MempoolRequest
 from core_client.model.mempool_response import MempoolResponse
 from core_client.model.mempool_transaction_request import MempoolTransactionRequest
@@ -17,7 +23,8 @@ from core_client.model.transaction_identifier import TransactionIdentifier
 from core_client.model.validator_metadata import ValidatorMetadata
 import core_client as core_api
 from api.Api import API
-from utils.utils import Helpers
+from api.ValidatorConfig import ValidatorConfig
+from utils.utils import bcolors, Helpers
 
 
 class CoreApiHelper(API):
@@ -99,6 +106,55 @@ class CoreApiHelper(API):
                     entity_identifier=entity_identifier
                 )
                 response: EntityResponse = api.entity_post(entityRequest)
+                return self.handle_response(response, print_response)
+            except ApiException as e:
+                Helpers.handleApiException(e)
+
+    def construction_build(self, actions, print_response=False):
+        with core_api.ApiClient(self.system_config) as api_client:
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
+            try:
+                network_configuration: NetworkConfigurationResponse = self.network_configuration()
+                key_list: KeyListResponse = self.key_list()
+                operation_groups = ValidatorConfig.build_operations(actions, key_list)
+
+                api = construction_api.ConstructionApi(api_client)
+                build: ConstructionBuildResponse = api.construction_build_post(ConstructionBuildRequest(
+                    network_identifier=network_configuration.network_identifier,
+                    fee_payer=key_list.public_keys[0].identifiers.account_entity_identifier,
+                    operation_groups=operation_groups
+                ))
+                return self.handle_response(build, print_response)
+
+            except ApiException as e:
+                Helpers.handleApiException(e)
+
+    def key_sign(self, unsigned_transaction, print_response=False):
+        with core_api.ApiClient(self.system_config) as api_client:
+            api_client = self.set_basic_auth(api_client, "superadmin", "superadmin")
+            try:
+                network_configuration: NetworkConfigurationResponse = self.network_configuration()
+                key_list: KeyListResponse = self.key_list()
+                api = key_api.KeyApi(api_client)
+                response = api.key_sign_post(KeySignRequest(
+                    network_identifier=network_configuration.network_identifier,
+                    public_key=key_list.public_keys[0].public_key,
+                    unsigned_transaction=unsigned_transaction
+                ))
+                return self.handle_response(response, print_response)
+            except ApiException as e:
+                Helpers.handleApiException(e)
+
+    def construction_submit(self, signed_transaction, print_response=False):
+        with core_api.ApiClient(self.system_config) as api_client:
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = construction_api.ConstructionApi(api_client)
+                network_configuration: NetworkConfigurationResponse = self.network_configuration()
+                response = api.construction_submit_post(ConstructionSubmitRequest(
+                    network_identifier=network_configuration.network_identifier,
+                    signed_transaction=signed_transaction
+                ))
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)

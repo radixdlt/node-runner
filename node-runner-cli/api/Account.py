@@ -1,4 +1,5 @@
 import requests
+from core_client.model.entity_response import EntityResponse
 from requests.auth import HTTPBasicAuth
 
 from api.Api import API
