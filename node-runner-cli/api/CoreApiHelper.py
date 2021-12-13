@@ -89,14 +89,14 @@ class CoreApiHelper(API):
             except ApiException as e:
                 Helpers.handleApiException(e)
 
-    def entity(self, print_response=False):
+    def entity(self, entity_identifier, print_response=False):
         with core_api.ApiClient(self.system_config) as api_client:
             api_client = self.set_basic_auth(api_client, "admin", "admin")
             try:
                 api = entity_api.EntityApi(api_client)
                 entityRequest = EntityRequest(
                     network_identifier=self.network_configuration().network_identifier,
-                    entity_identifier=self.key_list().public_keys[0].identifiers.account_entity_identifier
+                    entity_identifier=entity_identifier
                 )
                 response: EntityResponse = api.entity_post(entityRequest)
                 return self.handle_response(response, print_response)

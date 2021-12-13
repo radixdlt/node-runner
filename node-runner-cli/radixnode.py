@@ -9,6 +9,8 @@ from pathlib import Path
 import requests
 import urllib3
 import system_client as system_api
+from core_client.model.key_list_response import KeyListResponse
+
 from api.Account import Account
 from api.Api import API
 from api.CoreApiHelper import CoreApiHelper
@@ -122,10 +124,26 @@ def network_status(args):
     core_api_helper.network_status(True)
 
 
-@corecommand()
+@corecommand([
+    argument("-v", "--validator",
+             help="Display entity details of validator address",
+             action="store_true"),
+    argument("-a", "--address",
+             help="Display entity details of validator account address",
+             action="store_true"),
+    argument("-p", "--p2p",
+             help="Display entity details of validator peer to peer address",
+             action="store_true"),
+])
 def entity(args):
     core_api_helper = CoreApiHelper(False)
-    core_api_helper.entity(True)
+    key_list_response: KeyListResponse = core_api_helper.key_list(True)
+    if args.validator:
+        core_api_helper.entity(key_list_response.public_keys[0].identifiers.validator_entity_identifier, True)
+    if args.address:
+        core_api_helper.entity(key_list_response.public_keys[0].identifiers.account_entity_identifier, True)
+    if args.p2p:
+        core_api_helper.entity(key_list_response.public_keys[0].identifiers.p2p_node, True)
 
 
 @corecommand()
@@ -461,7 +479,7 @@ def update_validator_config(args):
     defaultApiHelper.check_health()
     actions = []
     actions = ValidatorConfig.registeration(actions)
-    actions = ValidatorConfig.
+    # actions = ValidatorConfig.
     request_data = Account.register_steps(request_data, validator_info)
     request_data = Account.update_steps(request_data, validator_info)
     request_data = Account.add_validation_fee(request_data, validator_info)
