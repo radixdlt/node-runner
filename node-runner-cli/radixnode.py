@@ -15,6 +15,7 @@ from api.CoreApiHelper import CoreApiHelper
 
 from api.DefaultApiHelper import DefaultApiHelper
 from api.Validation import Validation
+from api.ValidatorConfig import ValidatorConfig
 from github.github import latest_release
 from monitoring import Monitoring
 from utils.utils import run_shell_command
@@ -114,10 +115,12 @@ def network_configuration(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.network_configuration(True)
 
+
 @corecommand()
 def network_status(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.network_status(True)
+
 
 @corecommand()
 def entity(args):
@@ -441,7 +444,6 @@ def set_auth(args, usertype):
 """
 
 
-
 @accountcommand()
 def update_validator_config(args):
     request_data = {
@@ -455,15 +457,11 @@ def update_validator_config(args):
     node_host = API.get_host_info()
     system_config = system_api.Configuration(node_host, verify_ssl=False)
 
-    with system_api.ApiClient(system_config) as api_client:
-        user = Helpers.get_nginx_user(usertype="admin", default_username="admin")
-        headers = Helpers.get_basic_auth_header(user)
-        api_client.set_default_header("Authorization", headers["Authorization"])
-        DefaultApi.check_health(api_client)
-
-    validator_info = Validation.get_validator_info_json()
-
-    user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.check_health()
+    actions = []
+    actions = ValidatorConfig.registeration(actions)
+    actions = ValidatorConfig.
     request_data = Account.register_steps(request_data, validator_info)
     request_data = Account.update_steps(request_data, validator_info)
     request_data = Account.add_validation_fee(request_data, validator_info)
@@ -496,6 +494,7 @@ def version(args):
 def health(args):
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.health(print_response=True)
+
 
 @monitoringcommand(
     [argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
