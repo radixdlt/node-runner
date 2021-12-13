@@ -36,15 +36,15 @@ services:
 
   nginx:
     image: radixdlt/radixdlt-nginx:1.0.6
-     restart: unless-stopped
-     ports:
-       - "443:443"
-       - "30000:30000"
-     volumes:
-       - "nginx_secrets:/etc/nginx/secrets"
-     environment:
-       RADIXDLT_ARCHIVE_API_ENABLE: "true"
-       RADIXDLT_CONSTRUCTION_API_ENABLE: "true"
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "30000:30000"
+    volumes:
+      - "nginx_secrets:/etc/nginx/secrets"
+    environment:
+      RADIXDLT_ARCHIVE_API_ENABLE: "true"
+      RADIXDLT_CONSTRUCTION_API_ENABLE: "true"
 
 volumes:
     nginx_secrets:
