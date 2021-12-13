@@ -1,7 +1,7 @@
+import json
+import sys
 from typing import List
-
 from core_client.model.entity_response import EntityResponse
-
 from api.Action import Action
 from utils.utils import bcolors, Helpers
 
@@ -20,7 +20,8 @@ class ValidatorConfig:
                 bcolors.BOLD, return_string=True))
         if ask_registration.lower() == "true" or ask_registration.lower() == "false":
             value_to_set = bool(ask_registration)
-            return actions.append(Action().set_validator_registeration(value_to_set))
+            actions.append(Action().set_validator_registeration(value_to_set))
+            return actions
         else:
             Helpers.print_coloured_line("There are no changes to apply or user input is wrong", bcolors.WARNING)
         return actions
@@ -39,7 +40,8 @@ class ValidatorConfig:
             validator_url = input(
                 Helpers.print_coloured_line(f"Enter Info URL of your validator to be updated:", bcolors.OKBLUE,
                                             return_string=True))
-            return actions.append(Action().set_validator_metadata(validator_name, validator_url))
+            actions.append(Action().set_validator_metadata(validator_name, validator_url))
+            return actions
         return actions
 
     @staticmethod
@@ -55,7 +57,8 @@ class ValidatorConfig:
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
             validatorFee = Helpers.check_validatorFee_input()
-            return actions.append(Action().set_validator_fee(validatorFee))
+            actions.append(Action().set_validator_fee(validatorFee))
+            return actions
         return actions
 
     @staticmethod
@@ -75,14 +78,16 @@ class ValidatorConfig:
                 bcolors.BOLD, return_string=True))
         if allow_delegation.lower() == "true":
             if not bool(current_value):
-                return actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                return actions
             else:
                 Helpers.print_coloured_line(
                     f"\nThere is no change in the delegation status from the current one {current_value}"
                     f". So not updating this action", bcolors.WARNING)
         elif allow_delegation.lower() == "false":
             if bool(current_value):
-                return actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                return actions
             else:
                 Helpers.print_coloured_line(
                     f"\nThere is no change in the delegation status from the current one {validator_info['allowDelegation']}"
@@ -103,7 +108,8 @@ class ValidatorConfig:
         owner_id = input("\nEnter the new owner id or press Enter not to change:").strip()
         if owner_id != "":
             if owner_id != current_value:
-                return actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                return actions
             Helpers.print_coloured_line("Owner entered is same . So action will not be applied", bcolors.WARNING)
 
         return actions
@@ -115,9 +121,9 @@ class ValidatorConfig:
             for operation_group in action(key_list.public_keys[0].identifiers):
                 operation_groups.append(operation_group)
 
-        print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
+        print(f"{bcolors.WARNING}\nAbout to update node with following operations{bcolors.ENDC}")
         print(f"")
-        print(f"{bcolors.BOLD}{json.dumps(operation_groups, indent=4, sort_keys=True)}{bcolors.ENDC}")
+        print(f"{bcolors.BOLD}{print(operation_groups)}{bcolors.ENDC}")
         submit_changes = input(f"{bcolors.BOLD}\nDo you want to continue [Y/n]{bcolors.ENDC}")
         if Helpers.check_Yes(submit_changes) and len(operation_groups) != 0:
             return operation_groups

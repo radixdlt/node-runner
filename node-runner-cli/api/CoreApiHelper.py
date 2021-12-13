@@ -119,11 +119,12 @@ class CoreApiHelper(API):
                 operation_groups = ValidatorConfig.build_operations(actions, key_list)
 
                 api = construction_api.ConstructionApi(api_client)
-                build: ConstructionBuildResponse = api.construction_build_post(ConstructionBuildRequest(
+                build_request = ConstructionBuildRequest(
                     network_identifier=network_configuration.network_identifier,
                     fee_payer=key_list.public_keys[0].identifiers.account_entity_identifier,
-                    operation_groups=operation_groups
-                ))
+                    operation_groups=operation_groups)
+                print(build_request)
+                build: ConstructionBuildResponse = api.construction_build_post(build_request)
                 return self.handle_response(build, print_response)
 
             except ApiException as e:

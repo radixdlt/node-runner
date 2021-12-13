@@ -1,4 +1,5 @@
 from core_client.model.big_integer import BigInteger
+from core_client.model.data import Data
 from core_client.model.entity_identifier import EntityIdentifier
 from core_client.model.operation import Operation
 from core_client.model.operation_group import OperationGroup

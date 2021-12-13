@@ -466,7 +466,7 @@ def set_auth(args, usertype):
 """
 
 
-@accountcommand()
+@corecommand()
 def update_validator_config(args):
     request_data = {
         "jsonrpc": "2.0",
@@ -490,11 +490,11 @@ def update_validator_config(args):
     actions = []
     actions = ValidatorConfig.registeration(actions, validator_info)
     actions = ValidatorConfig.validator_metadata(actions, validator_info)
-    actions = ValidatorConfig.add_validation_fee(actions, validator_info)
+    # actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
-    unsigned_transaction: ConstructionBuildResponse = core_api_helper.construction_build(actions)
-    signed_transaction: KeySignResponse = core_api_helper.key_sign(unsigned_transaction)
+    build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions)
+    signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
     submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
         signed_transaction.signed_transaction, print_response=True)
 
