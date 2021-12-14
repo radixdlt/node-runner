@@ -56,7 +56,7 @@ class ValidatorConfig:
                                     bcolors.OKBLUE)
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
-            validatorFee = Helpers.check_validatorFee_input()
+            validatorFee = int(Helpers.check_validatorFee_input() * 100)
             actions.append(Action().set_validator_fee(validatorFee))
             return actions
         return actions

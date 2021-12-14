@@ -490,7 +490,7 @@ def update_validator_config(args):
     actions = []
     actions = ValidatorConfig.registeration(actions, validator_info)
     actions = ValidatorConfig.validator_metadata(actions, validator_info)
-    # actions = ValidatorConfig.add_validation_fee(actions, validator_info)
+    actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
     build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
