@@ -110,13 +110,13 @@ class CoreApiHelper(API):
             except ApiException as e:
                 Helpers.handleApiException(e)
 
-    def construction_build(self, actions, print_response=False):
+    def construction_build(self, actions, print_response=False, ask_user=False):
         with core_api.ApiClient(self.system_config) as api_client:
             api_client = self.set_basic_auth(api_client, "admin", "admin")
             try:
                 network_configuration: NetworkConfigurationResponse = self.network_configuration()
                 key_list: KeyListResponse = self.key_list()
-                operation_groups = ValidatorConfig.build_operations(actions, key_list)
+                operation_groups = ValidatorConfig.build_operations(actions, key_list, ask_user=ask_user)
 
                 api = construction_api.ConstructionApi(api_client)
                 build_request = ConstructionBuildRequest(

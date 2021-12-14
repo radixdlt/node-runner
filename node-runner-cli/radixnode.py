@@ -169,7 +169,7 @@ def mempool(args):
 ])
 def mempool_transaction(args):
     core_api_helper = CoreApiHelper(False)
-    core_api_helper.mempool(True)
+    core_api_helper.mempool_transaction(args.transactionId, True)
 
 
 systemapicli = ArgumentParser(
@@ -493,7 +493,7 @@ def update_validator_config(args):
     # actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
-    build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions)
+    build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
     signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
     submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
         signed_transaction.signed_transaction, print_response=True)

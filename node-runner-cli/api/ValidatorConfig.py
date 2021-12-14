@@ -115,12 +115,18 @@ class ValidatorConfig:
         return actions
 
     @staticmethod
-    def build_operations(actions, key_list):
+    def build_operations(actions, key_list, ask_user=False):
         operation_groups = []
         for action in actions:
             for operation_group in action(key_list.public_keys[0].identifiers):
                 operation_groups.append(operation_group)
+        if ask_user:
+            return ValidatorConfig.ask_permission_build(operation_groups)
+        else:
+            return operation_groups
 
+    @staticmethod
+    def ask_permission_build(operation_groups):
         print(f"{bcolors.WARNING}\nAbout to update node with following operations{bcolors.ENDC}")
         print(f"")
         print(f"{bcolors.BOLD}{print(operation_groups)}{bcolors.ENDC}")
