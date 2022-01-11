@@ -203,7 +203,7 @@ def cli_version():
     return __version__
 
 
-def version():
+def print_cli_version():
     print(f"Cli - Version : {cli_version()}")
 
 
@@ -678,7 +678,7 @@ if __name__ == "__main__":
         else:
             authcli_args.func(authcli_args)
     elif args.subcommand == "version":
-        version()
+        print_cli_version()
     elif args.subcommand == "optimise-node":
         optimise_node()
     else:
