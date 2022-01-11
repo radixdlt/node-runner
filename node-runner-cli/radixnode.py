@@ -42,8 +42,7 @@ cli.add_argument('subcommand', help='Subcommand to run',
 apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["validation", "account", "health", "version", "universe", "metrics",
-                                          "system", "core"])
+                                 choices=["version", "system", "core"])
 
 cwd = os.getcwd()
 
@@ -77,24 +76,6 @@ systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
 
 
 def systemdcommand(args=[], parent=systemd_parser):
-    return get_decorator(args, parent)
-
-
-validationcli = ArgumentParser(
-    description='validation commands')
-validation_parser = validationcli.add_subparsers(dest="validationcommand")
-
-
-def validationcommand(args=[], parent=validation_parser):
-    return get_decorator(args, parent)
-
-
-accountcli = ArgumentParser(
-    description='account commands')
-account_parser = accountcli.add_subparsers(dest="accountcommand")
-
-
-def accountcommand(args=[], parent=account_parser):
     return get_decorator(args, parent)
 
 
