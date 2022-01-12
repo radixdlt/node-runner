@@ -196,10 +196,15 @@ class Helpers:
         return headers
 
     @staticmethod
-    def handleApiException( e: ApiException):
+    def handleApiException(e: ApiException):
         print(f"Exception-reason:{e.reason},status:{e.status}.body:{e.body}")
         sys.exit()
 
+    @staticmethod
+    def archivenode_deprecate_message():
+        print(
+            f"Archive node is no more supoorted for core release 1.1.0 onwards. Use cli version older than 1.0.11 to run or maintain archive nodes")
+        sys.exit()
 
 
 class bcolors:

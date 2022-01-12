@@ -190,6 +190,10 @@ def print_cli_version():
 ])
 def setup(args):
     release = latest_release()
+
+    if args.nodetype == "archivenode":
+        Helpers.archivenode_deprecate_message()
+
     composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
                                f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
     print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
@@ -252,13 +256,9 @@ def setup(args):
         nginx_release = args.nginxrelease
 
     if args.nodetype == "archivenode":
-        node_type_name = 'archive'
-    elif args.nodetype == "fullnode":
-        node_type_name = 'fullnode'
-    else:
-        print(f"Node type - {args.nodetype} specificed should be either archivenode or fullnode")
-        sys.exit()
+        Helpers.archivenode_deprecate_message()
 
+    node_type_name = 'fullnode'
     node_dir = '/etc/radixdlt/node'
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
