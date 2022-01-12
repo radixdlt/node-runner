@@ -1,37 +1,28 @@
 #!/usr/bin/env python
-import json
 import os
 import os.path
 import sys
 from argparse import ArgumentParser
-from pathlib import Path
 
-import requests
-import urllib3
 import system_client as system_api
+import urllib3
 from core_client.model.construction_build_response import ConstructionBuildResponse
 from core_client.model.construction_submit_response import ConstructionSubmitResponse
 from core_client.model.entity_response import EntityResponse
 from core_client.model.key_list_response import KeyListResponse
 from core_client.model.key_sign_response import KeySignResponse
 
-from api.Account import Account
 from api.Api import API
 from api.CoreApiHelper import CoreApiHelper
-
 from api.DefaultApiHelper import DefaultApiHelper
-from api.Validation import Validation
 from api.ValidatorConfig import ValidatorConfig
+from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, DISABLE_VERSION_CHECK
 from github.github import latest_release
 from monitoring import Monitoring
-from utils.utils import run_shell_command
-from utils.utils import Helpers
-from utils.utils import bcolors
-
-from version import __version__
-from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, NODE_END_POINT, \
-    DISABLE_VERSION_CHECK
 from setup import Base, Docker, SystemD
+from utils.utils import Helpers
+from utils.utils import run_shell_command
+from version import __version__
 
 urllib3.disable_warnings()
 
@@ -42,7 +33,7 @@ cli.add_argument('subcommand', help='Subcommand to run',
 apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["version", "system", "core"])
+                                 choices=["system", "core"])
 
 cwd = os.getcwd()
 
@@ -579,22 +570,6 @@ def check_latest_cli():
                 sys.exit()
 
 
-def handle_validation():
-    args = validationcli.parse_args(sys.argv[3:])
-    if args.validationcommand is None:
-        validationcli.print_help()
-    else:
-        args.func(args)
-
-
-def handle_account():
-    args = accountcli.parse_args(sys.argv[3:])
-    if args.accountcommand is None:
-        accountcli.print_help()
-    else:
-        args.func(args)
-
-
 def handle_systemapi():
     args = systemapicli.parse_args(sys.argv[3:])
     if args.systemapicommand is None:
@@ -609,9 +584,9 @@ if __name__ == "__main__":
 
     if args.subcommand is None:
         cli.print_help()
-    # else:
-    #     if args.subcommand != "version":
-    #         check_latest_cli()
+    else:
+        if args.subcommand != "version":
+            check_latest_cli()
 
     if args.subcommand == "docker":
         dockercli_args = dockercli.parse_args(sys.argv[2:])
@@ -632,11 +607,7 @@ if __name__ == "__main__":
         if apicli_args.apicommand is None:
             apicli.print_help()
         else:
-            if apicli_args.apicommand == "validation":
-                handle_validation()
-            elif apicli_args.apicommand == "account":
-                handle_account()
-            elif apicli_args.apicommand == "metrics":
+            if apicli_args.apicommand == "metrics":
                 defaultApi = DefaultApiHelper(verify_ssl=False)
                 defaultApi.prometheus_metrics()
             elif apicli_args.apicommand == "system":

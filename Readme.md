@@ -27,16 +27,22 @@ To list the endpoints supported by cli
 $ radixnode api
 
 
-usage: radixnode [-h]
-                 {validation,account,health,version,universe,metrics,system}
+usage: radixnode [-h] {version,system,core}
 radixnode: error: the following arguments are required: apicommand
 ```
 
-To list the methods supported by the endpoints say for example account endpoint
+To list the methods supported by the endpoints say for example core endpoint
 
 ```shell script
-$radixnode api account
-usage: radixnode [-h] {register-validator,unregister-validator,get-info} ...
+$radixnode api core
+usage: radixnode [-h]
+                 {network-configuration,network-status,entity,key-list,mempool,mempool-transaction,update-validator-config}
+                 ...
+
+Core Api comands
+
+positional arguments:
+  {network-configuration,network-status,entity,key-list,mempool,mempool-transaction,update-validator-config}
 
 account commands
 
@@ -44,33 +50,18 @@ positional arguments:
   {register-validator,unregister-validator,get-info}
 ```
 
-
 | **Sub Commands** | **Options** | **Prompts** | **Comments** |
 | --- | --- | --- | --- |
-| api account get-info | - | - | Returns the response from POST request using get_info method on /account |
-| api account register-validator | - |<ul><li>1. Name of your validator:</li><li>2. Info URL of your validator:</li></ul>| Returns the response on POST using register_validator method on /account  |
-| api account unregister-validator | - |-| Returns the response on POST using unregister_validator method on /account  |
-| api validation get-node-info | - | - | Returns the response of POST request using get_validator_info method on /validation  |
-| api validation get-current-epoch-data | - | - | Returns the response of POST request using get_current_epoch_data method on /validation  |
-| api health | - | - | Returns the response of GET request on /health endpoint  |
-| api version | - | - | Returns the response of GET request on /version endpoint  |
-| api universe | - | - | Returns the response of GET request on /universe endpoint  |
-| api metrics | - | - | Returns the response of GET request on /metrics endpoint  |
-| api system api-get-configuration | - | - | Returns the response of POST request using api_get_configuration on /system endpoint  |
-| api system api-get-data | - | - | Returns the response of POST request using api_get_data on /system endpoint  |
-| api system bft-get-configuration | - | - | Returns the response of POST request using bft_get_configuration on /system endpoint  |
-| api system bft-get-data | - | - | Returns the response of POST request using bft_get_data on /system endpoint  |
-| api system mempool-get-configuration | - | - | Returns the response of POST request using mempool_get_configuration on /system endpoint  |
-| api system mempool-get-data | - | - | Returns the response of POST request using mempool_get_data on /system endpoint  |
-| api system ledger-get-latest-proof | - | - | Returns the response of POST request using ledger_get_latest_proof on /system endpoint  |
-| api system ledger-get-latest-epoch-proof | - | - | Returns the response of POST request using ledger_get_latest_epoch_proof on /system endpoint  |
-| api system radix-engine-get-configuration | - | - | Returns the response of POST request using radix_engine_get_configuration on /system endpoint  |
-| api system radix-engine-get-data | - | - | Returns the response of POST request using radix_engine_get_data on /system endpoint  |
-| api system sync-get-configuration | - | - | Returns the response of POST request using sync_get_configuration on /system endpoint  |
-| api system sync-get-data | - | - | Returns the response of POST request using sync_get_data on /system endpoint  |
-| api system networking-get-configuration | - | - | Returns the response of POST request using networking_get_configuration on /system endpoint  |
-| api system networking-get-data | - | - | Returns the response of POST request using networking_get_data on /system endpoint  |
-| api system checkpoints-get-checkpoints | - | - | Returns the response of POST request using checkpoints_get_checkpoints on /system endpoint  |
+| api system health | - | - | Returns the response of POST request on /system/health endpoint  |
+| api system version | - | - | Returns the response of POST request on /system/version endpoint  |
+| api system metrics | - | - | Returns the response of POST request on /system/metrics endpoint  |
+| api core network-configuration | - | - | Returns the response of POST request on /network/configuration endpoint  |
+| api core network-status | - | - | Returns the response of POST request on /network/status endpoint  |
+| api core key-list | - | - | Returns the response of POST request on /key/list endpoint  |
+| api core entity | - | - | Returns the response of POST request on /entity endpoint  |
+| api core mempool | - | - | Returns the response of POST request on /mempool endpoinnt  |
+| api core mempool-transaction | - | - | Returns the response of POST request on /mempool endpoinnt  |
+| api core update-validator-config | - | - | Utility command that helps a node runner to <ul><li>- register </li><li>- unregister </li><li>- set validator metadata such as name/url </li><li>- Add or change validator fee</li><li>- Setup delegation or change owner id</li></ul>  |
 
 
 
@@ -132,7 +123,7 @@ optional arguments:
   -h, --help            show this help message and exit
 ```
 
-To list options/arguements for the subcommand
+To list options/arguments for the subcommand
 ```shell script
 # Check the options for a subcommand such as start-docker
 radixnode docker -h
