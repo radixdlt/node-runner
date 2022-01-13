@@ -59,7 +59,11 @@ positional arguments:
 | api core network-status | - | - | Returns the response of POST request on /network/status endpoint  |
 | api core key-list | - | - | Returns the response of POST request on /key/list endpoint  |
 | api core entity -a | - | - | Returns the response of POST request on /entity endpoint using node's wallet address  |
+| api core entity -a -ss | - | - | Returns the response of POST request on /entity endpoint using node's wallet address and subentity prepared_stake |
+| api core entity -a -su | - | - | Returns the response of POST request on /entity endpoint using node's wallet address and subentity prepared_unstake |
+| api core entity -a -se | - | - | Returns the response of POST request on /entity endpoint using node's wallet address and subentity exiting_stake |
 | api core entity -v  | - | - | Returns the response of POST request on /entity endpoint using node's validator address |
+| api core entity -v -sy | - | - | Returns the response of POST request on /entity endpoint using node's validator address and subentity system |
 | api core mempool | - | - | Returns the response of POST request on /mempool endpoinnt  |
 | api core mempool-transaction | - | - | Returns the response of POST request on /mempool endpoinnt  |
 | api core update-validator-config | - | - | Utility command that helps a node runner to <ul><li>- register </li><li>- unregister </li><li>- set validator metadata such as name/url </li><li>- Add or change validator fee</li><li>- Setup delegation or change owner id</li></ul>  |
