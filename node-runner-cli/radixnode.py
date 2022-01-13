@@ -8,9 +8,12 @@ import system_client as system_api
 import urllib3
 from core_client.model.construction_build_response import ConstructionBuildResponse
 from core_client.model.construction_submit_response import ConstructionSubmitResponse
+from core_client.model.entity_identifier import EntityIdentifier
 from core_client.model.entity_response import EntityResponse
 from core_client.model.key_list_response import KeyListResponse
 from core_client.model.key_sign_response import KeySignResponse
+from core_client.model.sub_entity import SubEntity
+from core_client.model.sub_entity_metadata import SubEntityMetadata
 
 from api.Api import API
 from api.CoreApiHelper import CoreApiHelper
@@ -110,16 +113,69 @@ def network_status(args):
     argument("-p", "--p2p",
              help="Display entity details of validator peer to peer address",
              action="store_true"),
+    argument("-sy", "--subEntitySystem",
+             help="Display entity details of validator address along with sub entity system",
+             action="store_true"),
+    argument("-ss", "--subPreparedStake",
+             help="Display entity details of validator account address along with sub entity  prepared_stake",
+             action="store_true"),
+    argument("-su", "--subPreparedUnStake",
+             help="Display entity details of validator account address along with sub entity  prepared_unstake",
+             action="store_true"),
+    argument("-se", "--subExitingStake",
+             help="Display entity details of validator account address along with sub entity exiting_stake",
+             action="store_true")
 ])
 def entity(args):
     core_api_helper = CoreApiHelper(False)
     key_list_response: KeyListResponse = core_api_helper.key_list(False)
+    validator_address = key_list_response.public_keys[0].identifiers.validator_entity_identifier.address
+    account_address = key_list_response.public_keys[0].identifiers.account_entity_identifier.address
     if args.validator:
-        core_api_helper.entity(key_list_response.public_keys[0].identifiers.validator_entity_identifier, True)
+        if args.subEntitySystem:
+            subEntity = SubEntity(address=str("system"))
+            entityIdentifier = EntityIdentifier(
+                address=validator_address,
+                sub_entity=subEntity
+            )
+        else:
+            entityIdentifier = EntityIdentifier(
+                address=validator_address,
+            )
+
+        core_api_helper.entity(entityIdentifier, True)
+        sys.exit()
     if args.address:
-        core_api_helper.entity(key_list_response.public_keys[0].identifiers.account_entity_identifier, True)
+        if args.subPreparedStake:
+            metadata = SubEntityMetadata(validator=validator_address)
+            subEntity = SubEntity(address=str("prepared_stake"), metadata=metadata)
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+                sub_entity=subEntity
+            )
+        if args.subPreparedUnStake:
+            metadata = SubEntityMetadata(validator=validator_address)
+            subEntity = SubEntity(address=str("prepared_unstake"), metadata=metadata)
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+                sub_entity=subEntity
+            )
+        if args.subExitingStake:
+            metadata = SubEntityMetadata(validator=validator_address)
+            subEntity = SubEntity(address=str("exiting_stake"), metadata=metadata)
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+                sub_entity=subEntity
+            )
+        else:
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+            )
+        core_api_helper.entity(entityIdentifier, True)
+        sys.exit()
     if args.p2p:
         core_api_helper.entity(key_list_response.public_keys[0].identifiers.p2p_node, True)
+        sys.exit()
 
 
 @corecommand()
