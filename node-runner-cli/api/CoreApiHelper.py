@@ -64,8 +64,10 @@ class CoreApiHelper(API):
             api_client = self.set_basic_auth(api_client, "superadmin", "superadmin")
             try:
                 api = key_api.KeyApi(api_client)
+                request = KeyListRequest(network_identifier=self.network_configuration().network_identifier)
+                Helpers.print_request_body(request, "/key/list")
                 response: KeyListResponse = api.key_list_post(
-                    KeyListRequest(network_identifier=self.network_configuration().network_identifier))
+                    request)
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)
@@ -123,7 +125,7 @@ class CoreApiHelper(API):
                     network_identifier=network_configuration.network_identifier,
                     fee_payer=key_list.public_keys[0].identifiers.account_entity_identifier,
                     operation_groups=operation_groups)
-                print(build_request)
+                Helpers.print_request_body(build_request, "/construction/build")
                 build: ConstructionBuildResponse = api.construction_build_post(build_request)
                 return self.handle_response(build, print_response)
 
@@ -137,11 +139,11 @@ class CoreApiHelper(API):
                 network_configuration: NetworkConfigurationResponse = self.network_configuration()
                 key_list: KeyListResponse = self.key_list()
                 api = key_api.KeyApi(api_client)
-                response = api.key_sign_post(KeySignRequest(
-                    network_identifier=network_configuration.network_identifier,
-                    public_key=key_list.public_keys[0].public_key,
-                    unsigned_transaction=unsigned_transaction
-                ))
+                request = KeySignRequest(network_identifier=network_configuration.network_identifier,
+                                         public_key=key_list.public_keys[0].public_key,
+                                         unsigned_transaction=unsigned_transaction)
+                Helpers.print_request_body(request, "/key/sign")
+                response = api.key_sign_post(request)
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)
@@ -152,10 +154,10 @@ class CoreApiHelper(API):
             try:
                 api = construction_api.ConstructionApi(api_client)
                 network_configuration: NetworkConfigurationResponse = self.network_configuration()
-                response = api.construction_submit_post(ConstructionSubmitRequest(
-                    network_identifier=network_configuration.network_identifier,
-                    signed_transaction=signed_transaction
-                ))
+                request = ConstructionSubmitRequest(network_identifier=network_configuration.network_identifier,
+                                                    signed_transaction=signed_transaction)
+                Helpers.print_request_body(request, "/construction/submit")
+                response = api.construction_submit_post(request)
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)

@@ -206,6 +206,12 @@ class Helpers:
             f"Archive node is no more supported for core release 1.1.0 onwards. Use cli version older than 1.0.11 to run or maintain archive nodes")
         sys.exit()
 
+    @staticmethod
+    def print_request_body(item, name):
+        if os.getenv(PRINT_REQUEST):
+            print(f"----Body for {name}---")
+            print(item)
+
 
 class bcolors:
     HEADER = '\033[95m'

@@ -1,5 +1,6 @@
 import os
 
+from env_vars import PRINT_RESPONSE
 from utils.utils import Helpers
 
 
@@ -20,6 +21,7 @@ class API:
 
     @staticmethod
     def handle_response(response, print_response=False):
-        if print_response:
+        if print_response or os.getenv(PRINT_RESPONSE):
+            print("----response----")
             print(response)
         return response
