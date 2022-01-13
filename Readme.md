@@ -21,7 +21,7 @@ The main purpose of this cli is to enable node runners
 
 ## Interaction with node on api endpoints
 
-N
+
 To list the endpoints supported by cli 
 ```shell script
 $ radixnode api

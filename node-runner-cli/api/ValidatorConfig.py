@@ -108,7 +108,7 @@ class ValidatorConfig:
         owner_id = input("\nEnter the new owner id or press Enter not to change:").strip()
         if owner_id != "":
             if owner_id != current_value:
-                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                actions.append(Action().set_validator_owner(owner_id))
                 return actions
             Helpers.print_coloured_line("Owner entered is same . So action will not be applied", bcolors.WARNING)
 

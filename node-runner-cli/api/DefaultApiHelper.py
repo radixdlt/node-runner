@@ -62,7 +62,7 @@ class DefaultApiHelper(API):
             Helpers.print_coloured_line(
                 f"Node status is {health['status']} Rerun the command once node is completely synced",
                 bcolors.WARNING)
-            proceed = Helpers.print_coloured_line("Do you want to continue [Y/n]?")
+            proceed = input(print("Do you want to continue [Y/n]?"))
             if not Helpers.check_Yes(proceed):
                 sys.exit()
 

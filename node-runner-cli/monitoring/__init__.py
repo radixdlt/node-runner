@@ -43,6 +43,7 @@ class Monitoring:
         scrape_config = yaml.safe_load(f"""
             scrape_configs:
               - job_name: mynode
+                metrics_path: /prometheus/metrics
                 scheme: https
                 basic_auth:
                   username: {user["name"]}

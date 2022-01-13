@@ -113,7 +113,7 @@ def network_status(args):
 ])
 def entity(args):
     core_api_helper = CoreApiHelper(False)
-    key_list_response: KeyListResponse = core_api_helper.key_list(True)
+    key_list_response: KeyListResponse = core_api_helper.key_list(False)
     if args.validator:
         core_api_helper.entity(key_list_response.public_keys[0].identifiers.validator_entity_identifier, True)
     if args.address:
