@@ -52,7 +52,7 @@ class ValidatorConfig:
             f"{bcolors.WARNING}\nValidator fee may be decreased at any time, but increasing it incurs a delay of "
             f"approx. 2 weeks. Please set it carefully{bcolors.ENDC}")
         validator_fee = [x for x in validator_info.data_objects if x.type == 'PreparedValidatorFee']
-        Helpers.print_coloured_line(f"Current validator fees are {validator_fee[0]['fee']}",
+        Helpers.print_coloured_line(f"Current validator fees are {int(validator_fee[0]['fee']) / 100}",
                                     bcolors.OKBLUE)
         ask_validator_fee_setup = input("Do you want to setup or update validator fees [Y/n]?:")
         if Helpers.check_Yes(ask_validator_fee_setup):
