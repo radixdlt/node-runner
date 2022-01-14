@@ -203,7 +203,7 @@ class Helpers:
     @staticmethod
     def archivenode_deprecate_message():
         print(
-            f"Archive node is no more supported for core release 1.1.0 onwards. Use cli version older than 1.0.11 to run or maintain archive nodes")
+            f"Archive node is no more supported for core releases from 1.1.0 onwards. Use cli versions older than 1.0.11 to run or maintain archive nodes")
         sys.exit()
 
     @staticmethod

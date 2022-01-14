@@ -110,21 +110,12 @@ class SystemD(Base):
             network.p2p.seed_nodes={trustednode}
             network.host_ip={hostip}
             db.location={data_folder}
-            api.node.port=3334
-            api.archive.port=8081
+            api.port=3334
             log.level=debug
-            api.archive.enable={enable_client_api}
-            api.construction.enable={enable_client_api}
-            api.account.enable=true
-            api.health.enable=true
-            api.metrics.enable=true
-            api.system.enable=true
-            api.validation.enable=true
-            api.version.enable=true
-            api.universe.enable=true
-            
-            api.node.bind.address=0.0.0.0
-            api.archive.bind.address=0.0.0.0  
+            api.transactions.enable=false
+            api.sign.enable=true 
+            api.bind.address=0.0.0.0 
+            network.p2p.use_proxy_protocol=true
 
         """
         run_shell_command(command, shell=True)
