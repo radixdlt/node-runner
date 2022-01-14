@@ -1,28 +1,31 @@
 #!/usr/bin/env python
-import json
 import os
 import os.path
 import sys
 from argparse import ArgumentParser
-from pathlib import Path
 
-import requests
+import system_client as system_api
 import urllib3
+from core_client.model.construction_build_response import ConstructionBuildResponse
+from core_client.model.construction_submit_response import ConstructionSubmitResponse
+from core_client.model.entity_identifier import EntityIdentifier
+from core_client.model.entity_response import EntityResponse
+from core_client.model.key_list_response import KeyListResponse
+from core_client.model.key_sign_response import KeySignResponse
+from core_client.model.sub_entity import SubEntity
+from core_client.model.sub_entity_metadata import SubEntityMetadata
 
-from api.Account import Account
-from api.RestApi import RestApi
-from api.System import System
-from api.Validation import Validation
+from api.Api import API
+from api.CoreApiHelper import CoreApiHelper
+from api.DefaultApiHelper import DefaultApiHelper
+from api.ValidatorConfig import ValidatorConfig
+from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, DISABLE_VERSION_CHECK
 from github.github import latest_release
 from monitoring import Monitoring
-from utils.utils import run_shell_command
-from utils.utils import Helpers
-from utils.utils import bcolors
-
-from version import __version__
-from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, NODE_END_POINT, \
-    DISABLE_VERSION_CHECK
 from setup import Base, Docker, SystemD
+from utils.utils import Helpers
+from utils.utils import run_shell_command
+from version import __version__
 
 urllib3.disable_warnings()
 
@@ -33,8 +36,7 @@ cli.add_argument('subcommand', help='Subcommand to run',
 apicli = ArgumentParser(
     description='API commands')
 api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["validation", "account", "health", "version", "universe", "metrics",
-                                          "system"])
+                                 choices=["system", "core"])
 
 cwd = os.getcwd()
 
@@ -71,22 +73,131 @@ def systemdcommand(args=[], parent=systemd_parser):
     return get_decorator(args, parent)
 
 
-validationcli = ArgumentParser(
-    description='validation commands')
-validation_parser = validationcli.add_subparsers(dest="validationcommand")
+# Setup core parser
+corecli = ArgumentParser(
+    description='Core Api comands')
+core_parser = corecli.add_subparsers(dest="corecommand")
 
 
-def validationcommand(args=[], parent=validation_parser):
+def corecommand(args=[], parent=core_parser):
     return get_decorator(args, parent)
 
 
-accountcli = ArgumentParser(
-    description='account commands')
-account_parser = accountcli.add_subparsers(dest="accountcommand")
+def handle_core():
+    args = corecli.parse_args(sys.argv[3:])
+    if args.corecommand is None:
+        corecli.print_help()
+    else:
+        args.func(args)
 
 
-def accountcommand(args=[], parent=account_parser):
-    return get_decorator(args, parent)
+@corecommand()
+def network_configuration(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.network_configuration(True)
+
+
+@corecommand()
+def network_status(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.network_status(True)
+
+
+@corecommand([
+    argument("-v", "--validator",
+             help="Display entity details of validator address",
+             action="store_true"),
+    argument("-a", "--address",
+             help="Display entity details of validator account address",
+             action="store_true"),
+    argument("-p", "--p2p",
+             help="Display entity details of validator peer to peer address",
+             action="store_true"),
+    argument("-sy", "--subEntitySystem",
+             help="Display entity details of validator address along with sub entity system",
+             action="store_true"),
+    argument("-ss", "--subPreparedStake",
+             help="Display entity details of validator account address along with sub entity  prepared_stake",
+             action="store_true"),
+    argument("-su", "--subPreparedUnStake",
+             help="Display entity details of validator account address along with sub entity  prepared_unstake",
+             action="store_true"),
+    argument("-se", "--subExitingStake",
+             help="Display entity details of validator account address along with sub entity exiting_stake",
+             action="store_true")
+])
+def entity(args):
+    core_api_helper = CoreApiHelper(False)
+    key_list_response: KeyListResponse = core_api_helper.key_list(False)
+    validator_address = key_list_response.public_keys[0].identifiers.validator_entity_identifier.address
+    account_address = key_list_response.public_keys[0].identifiers.account_entity_identifier.address
+    if args.validator:
+        if args.subEntitySystem:
+            subEntity = SubEntity(address=str("system"))
+            entityIdentifier = EntityIdentifier(
+                address=validator_address,
+                sub_entity=subEntity
+            )
+        else:
+            entityIdentifier = EntityIdentifier(
+                address=validator_address,
+            )
+
+        core_api_helper.entity(entityIdentifier, True)
+        sys.exit()
+    if args.address:
+        if args.subPreparedStake:
+            metadata = SubEntityMetadata(validator=validator_address)
+            subEntity = SubEntity(address=str("prepared_stake"), metadata=metadata)
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+                sub_entity=subEntity
+            )
+        if args.subPreparedUnStake:
+            metadata = SubEntityMetadata(validator=validator_address)
+            subEntity = SubEntity(address=str("prepared_unstake"), metadata=metadata)
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+                sub_entity=subEntity
+            )
+        if args.subExitingStake:
+            metadata = SubEntityMetadata(validator=validator_address)
+            subEntity = SubEntity(address=str("exiting_stake"), metadata=metadata)
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+                sub_entity=subEntity
+            )
+        else:
+            entityIdentifier = EntityIdentifier(
+                address=account_address,
+            )
+        core_api_helper.entity(entityIdentifier, True)
+        sys.exit()
+    if args.p2p:
+        core_api_helper.entity(key_list_response.public_keys[0].identifiers.p2p_node, True)
+        sys.exit()
+
+
+@corecommand()
+def key_list(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.key_list(True)
+
+
+@corecommand()
+def mempool(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.mempool(True)
+
+
+@corecommand([
+    argument("-t", "--transactionId", required=True,
+             help="transaction Id to be searched on mempool",
+             action="store")
+])
+def mempool_transaction(args):
+    core_api_helper = CoreApiHelper(False)
+    core_api_helper.mempool_transaction(args.transactionId, True)
 
 
 systemapicli = ArgumentParser(
@@ -120,7 +231,7 @@ def cli_version():
     return __version__
 
 
-def version():
+def print_cli_version():
     print(f"Cli - Version : {cli_version()}")
 
 
@@ -135,6 +246,10 @@ def version():
 ])
 def setup(args):
     release = latest_release()
+
+    if args.nodetype == "archivenode":
+        Helpers.archivenode_deprecate_message()
+
     composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
                                f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
     print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
@@ -177,7 +292,7 @@ def setup(args):
     argument("-r", "--release",
              help="Version of node software to install",
              action="store"),
-    argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ",action="store"),
+    argument("-x", "--nginxrelease", help="Version of radixdlt nginx release ", action="store"),
     argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store"),
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
@@ -197,13 +312,9 @@ def setup(args):
         nginx_release = args.nginxrelease
 
     if args.nodetype == "archivenode":
-        node_type_name = 'archive'
-    elif args.nodetype == "fullnode":
-        node_type_name = 'fullnode'
-    else:
-        print(f"Node type - {args.nodetype} specificed should be either archivenode or fullnode")
-        sys.exit()
+        Helpers.archivenode_deprecate_message()
 
+    node_type_name = 'fullnode'
     node_dir = '/etc/radixdlt/node'
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
@@ -231,7 +342,7 @@ def setup(args):
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
-    
+
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
                                  node_type=args.nodetype)
 
@@ -383,17 +494,7 @@ def set_auth(args, usertype):
 """
 
 
-@validationcommand()
-def get_node_info(args):
-    Validation.get_node_info()
-
-
-@validationcommand()
-def get_current_epoch_data(args):
-    Validation.get_current_epoch_data()
-
-
-@accountcommand()
+@corecommand()
 def update_validator_config(args):
     request_data = {
         "jsonrpc": "2.0",
@@ -403,116 +504,45 @@ def update_validator_config(args):
         },
         "id": 1
     }
-    RestApi.check_health()
+    node_host = API.get_host_info()
+    system_config = system_api.Configuration(node_host, verify_ssl=False)
 
-    validator_info = Validation.get_validator_info_json()
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.check_health()
 
-    user = Helpers.get_nginx_user(usertype="superadmin", default_username="superadmin")
-    request_data = Account.register_steps(request_data, validator_info)
-    request_data = Account.update_steps(request_data, validator_info)
-    request_data = Account.add_validation_fee(request_data, validator_info)
-    request_data = Account.setup_update_delegation(request_data, validator_info)
-    request_data = Account.add_change_ownerid(request_data, validator_info)
+    core_api_helper = CoreApiHelper(verify_ssl=False)
+    key_list_response: KeyListResponse = core_api_helper.key_list()
+    validator_info: EntityResponse = core_api_helper.entity(
+        key_list_response.public_keys[0].identifiers.validator_entity_identifier)
 
-    print(f"{bcolors.WARNING}\nAbout to update node account with following{bcolors.ENDC}")
-    print(f"")
-    print(f"{bcolors.BOLD}{json.dumps(request_data, indent=4, sort_keys=True)}{bcolors.ENDC}")
-    submit_changes = input(f"{bcolors.BOLD}\nDo you want to continue [Y/n]{bcolors.ENDC}")
-    if Helpers.check_Yes(submit_changes) and len(request_data["params"]["actions"]) != 0:
-        Account.post_on_account(json.dumps(request_data))
-    else:
-        print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
-
-
-# @accountcommand()
-# def unregister_validator(args):
-#     RestApi.check_health()
-#     Account.un_register_validator()
-
-
-@accountcommand()
-def get_info(args):
-    Account.get_info()
+    actions = []
+    actions = ValidatorConfig.registeration(actions, validator_info)
+    actions = ValidatorConfig.validator_metadata(actions, validator_info)
+    actions = ValidatorConfig.add_validation_fee(actions, validator_info)
+    actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
+    actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
+    build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
+    signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
+    submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
+        signed_transaction.signed_transaction, print_response=True)
 
 
 @systemapicommand()
-def api_get_configuration(args):
-    System.api_get_configuration()
+def metrics(args):
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.metrics()
 
 
 @systemapicommand()
-def api_get_data(args):
-    System.api_get_data()
+def version(args):
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.version()
 
 
 @systemapicommand()
-def bft_get_configuration(args):
-    System.bft_get_configuration()
-
-
-@systemapicommand()
-def bft_get_data(args):
-    System.bft_get_data()
-
-
-@systemapicommand()
-def mempool_get_configuration(args):
-    System.mempool_get_configuration()
-
-
-@systemapicommand()
-def mempool_get_data(args):
-    System.mempool_get_data()
-
-
-@systemapicommand()
-def ledger_get_latest_proof(args):
-    System.ledger_get_latest_proof()
-
-
-@systemapicommand()
-def ledger_get_latest_epoch_proof(args):
-    System.ledger_get_latest_epoch_proof()
-
-
-@systemapicommand()
-def radix_engine_get_configuration(args):
-    System.radix_engine_get_configuration()
-
-
-@systemapicommand()
-def radix_engine_get_data(args):
-    System.radix_engine_get_data()
-
-
-@systemapicommand()
-def sync_get_configuration(args):
-    System.sync_get_configuration()
-
-
-@systemapicommand()
-def sync_get_data(args):
-    System.sync_get_data()
-
-
-@systemapicommand()
-def networking_get_configuration(args):
-    System.networking_get_configuration()
-
-
-@systemapicommand()
-def networking_get_peers(args):
-    System.networking_get_peers()
-
-
-@systemapicommand()
-def networking_get_data(args):
-    System.networking_get_data()
-
-
-@systemapicommand()
-def checkpoints_get_checkpoints(args):
-    System.checkpoints_get_checkpoints()
+def health(args):
+    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
+    defaultApiHelper.health(print_response=True)
 
 
 @monitoringcommand(
@@ -596,22 +626,6 @@ def check_latest_cli():
                 sys.exit()
 
 
-def handle_validation():
-    args = validationcli.parse_args(sys.argv[3:])
-    if args.validationcommand is None:
-        validationcli.print_help()
-    else:
-        args.func(args)
-
-
-def handle_account():
-    args = accountcli.parse_args(sys.argv[3:])
-    if args.accountcommand is None:
-        accountcli.print_help()
-    else:
-        args.func(args)
-
-
 def handle_systemapi():
     args = systemapicli.parse_args(sys.argv[3:])
     if args.systemapicommand is None:
@@ -649,20 +663,13 @@ if __name__ == "__main__":
         if apicli_args.apicommand is None:
             apicli.print_help()
         else:
-            if apicli_args.apicommand == "validation":
-                handle_validation()
-            elif apicli_args.apicommand == "account":
-                handle_account()
-            elif apicli_args.apicommand == "health":
-                RestApi.get_health()
-            elif apicli_args.apicommand == "version":
-                RestApi.get_version()
-            elif apicli_args.apicommand == "universe":
-                RestApi.get_universe()
-            elif apicli_args.apicommand == "metrics":
-                RestApi.get_metrics()
+            if apicli_args.apicommand == "metrics":
+                defaultApi = DefaultApiHelper(verify_ssl=False)
+                defaultApi.prometheus_metrics()
             elif apicli_args.apicommand == "system":
                 handle_systemapi()
+            elif apicli_args.apicommand == "core":
+                handle_core()
             else:
                 print(f"Invalid api command {apicli_args.apicommand}")
 
@@ -679,7 +686,7 @@ if __name__ == "__main__":
         else:
             authcli_args.func(authcli_args)
     elif args.subcommand == "version":
-        version()
+        print_cli_version()
     elif args.subcommand == "optimise-node":
         optimise_node()
     else:

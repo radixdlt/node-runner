@@ -5,6 +5,8 @@ import requests
 import sys, os
 from pathlib import Path
 
+from system_client import OpenApiException, ApiException
+
 from env_vars import PRINT_REQUEST
 
 
@@ -192,6 +194,24 @@ class Helpers:
         headers = {
             'Authorization': f'Basic {encodedStr}'}
         return headers
+
+    @staticmethod
+    def handleApiException(e: ApiException):
+        print(f"Exception-reason:{e.reason},status:{e.status}.body:{e.body}")
+        sys.exit()
+
+    @staticmethod
+    def archivenode_deprecate_message():
+        print(
+            f"Archive node is no more supported for core release 1.1.0 onwards. Use cli version older than 1.0.11 to run or maintain archive nodes")
+        sys.exit()
+
+    @staticmethod
+    def print_request_body(item, name):
+        if os.getenv(PRINT_REQUEST):
+            print(f"----Body for {name}---")
+            print(item)
+
 
 class bcolors:
     HEADER = '\033[95m'
