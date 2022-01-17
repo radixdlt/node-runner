@@ -240,7 +240,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "1 - (info_counters_sync_target_current_diff / info_counters_sync_target_state_version)",
+          "expr": "(1 - ((info_counters_sync_target_state_version-info_counters_sync_current_state_version) / info_counters_sync_target_state_version)) * 100",
           "hide": false,
           "instant": false,
           "interval": "",
@@ -359,7 +359,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "(1 - (info_counters_sync_target_current_diff / info_counters_sync_target_state_version)) * 100",
+          "expr": "(1 - ((info_counters_sync_target_state_version-info_counters_sync_current_state_version) / info_counters_sync_target_state_version)) * 100",
           "hide": false,
           "interval": "",
           "legendFormat": "",
@@ -939,119 +939,6 @@
                 "mode": "thresholds"
               },
               "mappings": [],
-              "noValue": "?",
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "dark-blue",
-                    "value": null
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 9,
-            "x": 0,
-            "y": 16
-          },
-          "id": 26,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "last"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "text": {},
-            "textMode": "auto"
-          },
-          "pluginVersion": "7.5.4",
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "balance_xrd",
-              "instant": true,
-              "interval": "",
-              "legendFormat": "",
-              "refId": "A"
-            }
-          ],
-          "title": "XRD Balance",
-          "type": "stat"
-        },
-        {
-          "datasource": "${prometheus}",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
-              "noValue": "?",
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "dark-blue",
-                    "value": null
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 3,
-            "w": 9,
-            "x": 9,
-            "y": 16
-          },
-          "id": 30,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "last"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "text": {},
-            "textMode": "auto"
-          },
-          "pluginVersion": "7.5.4",
-          "targets": [
-            {
-              "exemplar": true,
-              "expr": "validator_total_stake",
-              "interval": "",
-              "legendFormat": "",
-              "refId": "A"
-            }
-          ],
-          "title": "XRD Staked",
-          "type": "stat"
-        },
-        {
-          "datasource": "${prometheus}",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
               "max": 1000,
               "min": 0,
               "noValue": "?",
@@ -1095,7 +982,7 @@
           "targets": [
             {
               "exemplar": true,
-              "expr": "info_counters_mempool_count",
+              "expr": "info_counters_mempool_current_size",
               "instant": true,
               "interval": "",
               "legendFormat": "",
