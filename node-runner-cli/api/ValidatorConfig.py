@@ -19,7 +19,7 @@ class ValidatorConfig:
                 "\nEnter the new registration setting [true/false].Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
         if ask_registration.lower() == "true" or ask_registration.lower() == "false":
-            value_to_set = bool(ask_registration)
+            value_to_set = json.loads(ask_registration.lower())
             actions.append(Action().set_validator_registeration(value_to_set))
             return actions
         else:
