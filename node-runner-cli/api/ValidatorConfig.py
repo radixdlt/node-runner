@@ -77,16 +77,16 @@ class ValidatorConfig:
                 "\nEnter the new allow delegation setting [true/false].Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
         if allow_delegation.lower() == "true":
-            if not bool(current_value):
-                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+            if not json.loads(current_value.lower()):
+                actions.append(Action().set_validator_allow_delegation(json.loads(allow_delegation.lower())))
                 return actions
             else:
                 Helpers.print_coloured_line(
                     f"\nThere is no change in the delegation status from the current one {current_value}"
                     f". So not updating this action", bcolors.WARNING)
         elif allow_delegation.lower() == "false":
-            if bool(current_value):
-                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+            if json.loads(current_value.lower()):
+                actions.append(Action().set_validator_allow_delegation(json.loads(allow_delegation.lower())))
                 return actions
             else:
                 Helpers.print_coloured_line(
