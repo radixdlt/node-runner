@@ -68,7 +68,7 @@ class ValidatorConfig:
             f"{bcolors.WARNING}\nEnabling allowDelegation means anyone can delegate stake to your node. Disabling it "
             f"later will not remove this stake.{bcolors.ENDC}")
         allow_delegation = [x for x in validator_info.data_objects if x.type == 'ValidatorAllowDelegation']
-        current_value = allow_delegation[0]['allow_delegation']
+        current_value: bool = allow_delegation[0]['allow_delegation']
         Helpers.print_coloured_line(
             f"\nCurrent setting for allowing delegation : {current_value}",
             bcolors.BOLD)
@@ -77,7 +77,7 @@ class ValidatorConfig:
                 "\nEnter the new allow delegation setting [true/false].Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
         if allow_delegation.lower() == "true":
-            if not json.loads(current_value.lower()):
+            if not bool(current_value):
                 actions.append(Action().set_validator_allow_delegation(json.loads(allow_delegation.lower())))
                 return actions
             else:
@@ -85,7 +85,7 @@ class ValidatorConfig:
                     f"\nThere is no change in the delegation status from the current one {current_value}"
                     f". So not updating this action", bcolors.WARNING)
         elif allow_delegation.lower() == "false":
-            if json.loads(current_value.lower()):
+            if bool(current_value):
                 actions.append(Action().set_validator_allow_delegation(json.loads(allow_delegation.lower())))
                 return actions
             else:
