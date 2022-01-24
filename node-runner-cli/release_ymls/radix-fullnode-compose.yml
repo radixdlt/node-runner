@@ -20,7 +20,7 @@ services:
       RADIXDLT_SIGN_ENABLE: "true"
       RADIXDLT_API_PORT: 3333
       RADIXDLT_NETWORK_ID: 1
-      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: "true"
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: "false"
       RADIX_NODE_KEYSTORE_PASSWORD: "${RADIXDLT_NODE_KEY_PASSWORD}"
 #     If you want use same user from your host, you can pass LOCAL_USER_ID enviroment variable, else it will default to 999.
 #     Command `id` will show your uid of the user from terminal. Replace it with <uid of local user> and uncomment the below line
@@ -41,7 +41,7 @@ services:
       - "443:443"
       - "30000:30000"
     environment:
-      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: "true"
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: "false"
     volumes:
       - "nginx_secrets:/etc/nginx/secrets"
 volumes:
