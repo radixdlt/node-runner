@@ -107,6 +107,7 @@ class CoreApiHelper(API):
                     network_identifier=self.network_configuration().network_identifier,
                     entity_identifier=entity_identifier
                 )
+                Helpers.print_request_body(entityRequest, "/entity")
                 response: EntityResponse = api.entity_post(entityRequest)
                 return self.handle_response(response, print_response)
             except ApiException as e:

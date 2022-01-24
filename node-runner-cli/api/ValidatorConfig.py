@@ -19,7 +19,7 @@ class ValidatorConfig:
                 "\nEnter the new registration setting [true/false].Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
         if ask_registration.lower() == "true" or ask_registration.lower() == "false":
-            value_to_set = bool(ask_registration)
+            value_to_set = json.loads(ask_registration.lower())
             actions.append(Action().set_validator_registeration(value_to_set))
             return actions
         else:
@@ -68,7 +68,7 @@ class ValidatorConfig:
             f"{bcolors.WARNING}\nEnabling allowDelegation means anyone can delegate stake to your node. Disabling it "
             f"later will not remove this stake.{bcolors.ENDC}")
         allow_delegation = [x for x in validator_info.data_objects if x.type == 'ValidatorAllowDelegation']
-        current_value = allow_delegation[0]['allow_delegation']
+        current_value: bool = allow_delegation[0]['allow_delegation']
         Helpers.print_coloured_line(
             f"\nCurrent setting for allowing delegation : {current_value}",
             bcolors.BOLD)
@@ -78,7 +78,7 @@ class ValidatorConfig:
                 bcolors.BOLD, return_string=True))
         if allow_delegation.lower() == "true":
             if not bool(current_value):
-                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                actions.append(Action().set_validator_allow_delegation(json.loads(allow_delegation.lower())))
                 return actions
             else:
                 Helpers.print_coloured_line(
@@ -86,7 +86,7 @@ class ValidatorConfig:
                     f". So not updating this action", bcolors.WARNING)
         elif allow_delegation.lower() == "false":
             if bool(current_value):
-                actions.append(Action().set_validator_allow_delegation(bool(allow_delegation)))
+                actions.append(Action().set_validator_allow_delegation(json.loads(allow_delegation.lower())))
                 return actions
             else:
                 Helpers.print_coloured_line(

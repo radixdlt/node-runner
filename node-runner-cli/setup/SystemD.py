@@ -115,7 +115,7 @@ class SystemD(Base):
             api.transactions.enable=false
             api.sign.enable=true 
             api.bind.address=0.0.0.0 
-            network.p2p.use_proxy_protocol=true
+            network.p2p.use_proxy_protocol=false
 
         """
         run_shell_command(command, shell=True)
