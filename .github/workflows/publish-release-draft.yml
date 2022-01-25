@@ -53,7 +53,7 @@ jobs:
             -X PATCH \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/radixdlt/node-runner/releases/${{ steps.last_release.outputs.id }} \
-            -d '{"tag_name":"${{ github.event.client_payload.release_tag }}", "name": "${{ github.event.client_payload.release_tag }}", "draft": "false"}'
+            -d '{"tag_name":"${{ github.event.client_payload.release_tag }}", "name": "${{ github.event.client_payload.release_tag }}", "draft": "false", "prerelease": "${{ github.event.client_payload.is_prerelease }}"}'
       - uses: ncipollo/release-action@v1
         if: "${{ env.RELEASE_DRAFT_EXISTS == 'false' }}"
         with:
@@ -61,3 +61,4 @@ jobs:
           tag: ${{ github.event.client_payload.release_tag }}
           omitBody: true
           name: ${{ github.event.client_payload.release_tag }}
+          prerelease: ${{ github.event.client_payload.is_prerelease }}
