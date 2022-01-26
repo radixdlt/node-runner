@@ -62,7 +62,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         if: ${{ github.event_name == 'release' }}
 
-      - name: Upload radixcli ubunutu binary
+      - name: Upload radixcli ubuntu binary
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,4 +72,3 @@ jobs:
           asset_name: radixnode-ubuntu-20.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
-
