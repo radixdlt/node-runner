@@ -8,6 +8,9 @@ radixdlt_core_client = {git = "https://github.com/radixdlt/python-core-client", 
 requests = "==2.26.0"
 PyYAML = "==5.4.1"
 deepmerge = "==0.3.0"
+bech32 = "==1.2.0"
+ecdsa = "==0.17.0"
+cryptography="==36.0.1"
 
 [requires]
 python_version = "3.7.6"
