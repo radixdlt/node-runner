@@ -11,7 +11,7 @@ All the below commands can be executed on Ubuntu 20.04 ( supported OS) as below
 radixnode <sub command>
 ```
 
-To download the cli, following instructions from [here](https://docs.radixdlt.com/main/node/cli-install.html)
+To download the cli, following instructions from [here](https://docs.radixdlt.com/main/node-and-gateway/cli-install.html)
 
 The main purpose of this cli is to enable node runners
 
