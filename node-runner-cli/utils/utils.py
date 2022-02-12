@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 import sys, os
 from pathlib import Path
+from version import __version__
 
 from system_client import OpenApiException, ApiException
 
@@ -32,6 +33,10 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         """)
         sys.exit()
     return result
+
+
+def cli_version():
+    return __version__
 
 
 class Helpers:

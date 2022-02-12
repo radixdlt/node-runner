@@ -19,14 +19,15 @@ from api.Api import API
 from api.CoreApiHelper import CoreApiHelper
 from api.DefaultApiHelper import DefaultApiHelper
 from api.ValidatorConfig import ValidatorConfig
+from commands.monitoring import monitoringcli
 from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, DISABLE_VERSION_CHECK
 from github.github import latest_release
 from key_interaction.KeyInteraction import KeyInteraction
 from monitoring import Monitoring
 from setup import Base, Docker, SystemD
-from utils.utils import Helpers
+from utils.utils import Helpers, cli_version
 from utils.utils import run_shell_command
-from version import __version__
+from commands.key import keycli
 
 urllib3.disable_warnings()
 
@@ -61,8 +62,8 @@ dockercli = ArgumentParser(
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
 
 
-def dockercommand(args=[], parent=docker_parser):
-    return get_decorator(args, parent)
+def dockercommand(dockercommand_args=[], parent=docker_parser):
+    return get_decorator(dockercommand_args, parent)
 
 
 systemdcli = ArgumentParser(
@@ -70,18 +71,8 @@ systemdcli = ArgumentParser(
 systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
 
 
-def systemdcommand(args=[], parent=systemd_parser):
-    return get_decorator(args, parent)
-
-
-# Setup key subcommand parser
-keycli = ArgumentParser(
-    description='Key interaction commands')
-key_parser = keycli.add_subparsers(dest="keycommand")
-
-
-def keycommand(args=[], parent=key_parser):
-    return get_decorator(args, parent)
+def systemdcommand(systemdcommand_args=[], parent=systemd_parser):
+    return get_decorator(systemdcommand_args, parent)
 
 
 # Setup core parser
@@ -100,36 +91,6 @@ def handle_core():
         corecli.print_help()
     else:
         args.func(args)
-
-
-@keycommand([
-    argument("-p", "--password", required=True,
-             help="Password of the keystore",
-             action="store"),
-    argument("-f", "--filelocation", required=True,
-             help="Location of keystore on the disk",
-             action="store"),
-])
-def info(args):
-    key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
-    print(f"Validator Address {key.get_validator_address()}")
-    print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
-
-
-@keycommand([
-    argument("-p", "--password", required=True,
-             help="Password of the keystore",
-             action="store"),
-    argument("-f", "--filelocation", required=True,
-             help="Location of keystore on the disk",
-             action="store"),
-    argument("-ps", "--payloadtosign", required=True,
-             help="payload to sign",
-             action="store")
-])
-def sign_payload(args):
-    key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
-    print(f"Signed DER from payload {key.sign_payload(args.payloadtosign)}")
 
 
 @corecommand()
@@ -250,15 +211,6 @@ def systemapicommand(args=[], parent=systemapi_parser):
     return get_decorator(args, parent)
 
 
-monitoringcli = ArgumentParser(
-    description='API command')
-monitoring_parser = monitoringcli.add_subparsers(dest="monitoringcommand")
-
-
-def monitoringcommand(args=[], parent=monitoring_parser):
-    return get_decorator(args, parent)
-
-
 authcli = ArgumentParser(
     description='API command')
 auth_parser = authcli.add_subparsers(dest="authcommand")
@@ -266,10 +218,6 @@ auth_parser = authcli.add_subparsers(dest="authcommand")
 
 def authcommand(args=[], parent=auth_parser):
     return get_decorator(args, parent)
-
-
-def cli_version():
-    return __version__
 
 
 def print_cli_version():
@@ -586,63 +534,6 @@ def health(args):
     defaultApiHelper.health(print_response=True)
 
 
-@monitoringcommand(
-    [argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
-              help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
-              action="store")])
-def setup(args):
-    if args.setupmode == "QUICK_SETUP_MODE":
-        monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/monitoring'
-        print(f"Downloading artifacts from {monitor_url_dir}\n")
-        Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
-        Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
-        Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/",
-                                   ["dashboard.yml", "sample-node-dashboard.json"])
-        Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml")
-        Monitoring.setup_external_volumes()
-        monitoring_file_location = "monitoring/node-monitoring.yml"
-        Monitoring.start_monitoring(f"{monitoring_file_location}")
-
-    elif args.setupmode == "PRODUCTION_MODE":
-        print(" PRODUCTION_MODE not supported yet ")
-        sys.exit()
-    else:
-        print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
-
-
-@monitoringcommand(
-    [
-        argument("-f", "--composefile", default="monitoring/node-monitoring.yml", action="store"),
-        argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
-                 help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
-                 action="store")
-    ]
-)
-def start(args):
-    if args.setupmode == "QUICK_SETUP_MODE":
-        Monitoring.start_monitoring(f"monitoring/node-monitoring.yml")
-    elif args.setupmode == "PRODUCTION_MODE":
-        print(" PRODUCTION_MODE not supported yet ")
-        sys.exit()
-    else:
-        print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
-
-
-@monitoringcommand([
-    argument("-m", "--setupmode", default="QUICK_SETUP_MODE",
-             help="Setup type whether it is QUICK_SETUP_MODE or PRODUCTION_MODE",
-             action="store"),
-    argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
-def stop(args):
-    if args.setupmode == "QUICK_SETUP_MODE":
-        Monitoring.stop_monitoring(f"monitoring/node-monitoring.yml", args.removevolumes)
-    elif args.setupmode == "PRODUCTION_MODE":
-        print(" PRODUCTION_MODE not supported yet ")
-        sys.exit()
-    else:
-        print("Invalid setup mode . It should be either QUICK_SETUP_MODE or PRODUCTION_MODE")
-
-
 def optimise_node():
     Base.setup_node_optimisation_config(cli_version())
 
@@ -668,11 +559,11 @@ def check_latest_cli():
 
 
 def handle_systemapi():
-    args = systemapicli.parse_args(sys.argv[3:])
-    if args.systemapicommand is None:
+    systemcli_args = systemapicli.parse_args(sys.argv[3:])
+    if systemcli_args.systemapicommand is None:
         systemapicli.print_help()
     else:
-        args.func(args)
+        systemcli_args.func(systemcli_args)
 
 
 if __name__ == "__main__":
