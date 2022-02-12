@@ -12,10 +12,10 @@ from ecdsa.util import sigencode_der
 class KeyInteraction:
     private_signing_key: SigningKey = None
 
-    def __init__(self, keystore_password, keystore_path):
+    def __init__(self, keystore_password: bytes, keystore_path):
         self.set_private_signing_key(keystore_path, keystore_password)
 
-    def set_private_signing_key(self, keystore_path, keystore_password):
+    def set_private_signing_key(self, keystore_path: bytes, keystore_password):
         with open(keystore_path, "rb") as f:
             private_key, certificate, additional_certificates = pkcs12.load_key_and_certificates(f.read(),
                                                                                                  keystore_password,
@@ -43,5 +43,5 @@ class KeyInteraction:
         return validator_wallet_address
 
     def sign_payload(self, payload_to_sign):
-        signature_der = self.private_signing_key.sign_digest(bytearray.fromhex(payload_to_sign),
-                                                             sigencode=sigencode_der).hex()
+        return self.private_signing_key.sign_digest(bytearray.fromhex(payload_to_sign),
+                                                    sigencode=sigencode_der).hex()

@@ -21,6 +21,7 @@ from api.DefaultApiHelper import DefaultApiHelper
 from api.ValidatorConfig import ValidatorConfig
 from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVERIDE, DISABLE_VERSION_CHECK
 from github.github import latest_release
+from key_interaction.KeyInteraction import KeyInteraction
 from monitoring import Monitoring
 from setup import Base, Docker, SystemD
 from utils.utils import Helpers
@@ -28,17 +29,6 @@ from utils.utils import run_shell_command
 from version import __version__
 
 urllib3.disable_warnings()
-
-cli = ArgumentParser()
-cli.add_argument('subcommand', help='Subcommand to run',
-                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth"])
-
-apicli = ArgumentParser(
-    description='API commands')
-api_parser = apicli.add_argument(dest="apicommand",
-                                 choices=["system", "core"])
-
-cwd = os.getcwd()
 
 
 def get_decorator(args, parent):
@@ -54,6 +44,17 @@ def get_decorator(args, parent):
 def argument(*name_or_flags, **kwargs):
     return list(name_or_flags), kwargs
 
+
+cli = ArgumentParser()
+cli.add_argument('subcommand', help='Subcommand to run',
+                 choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key"])
+
+apicli = ArgumentParser(
+    description='API commands')
+api_parser = apicli.add_argument(dest="apicommand",
+                                 choices=["system", "core"])
+
+cwd = os.getcwd()
 
 dockercli = ArgumentParser(
     description='Docker commands')
@@ -73,6 +74,16 @@ def systemdcommand(args=[], parent=systemd_parser):
     return get_decorator(args, parent)
 
 
+# Setup key subcommand parser
+keycli = ArgumentParser(
+    description='Key interaction commands')
+key_parser = keycli.add_subparsers(dest="keycommand")
+
+
+def keycommand(args=[], parent=key_parser):
+    return get_decorator(args, parent)
+
+
 # Setup core parser
 corecli = ArgumentParser(
     description='Core Api comands')
@@ -89,6 +100,36 @@ def handle_core():
         corecli.print_help()
     else:
         args.func(args)
+
+
+@keycommand([
+    argument("-p", "--password", required=True,
+             help="Password of the keystore",
+             action="store"),
+    argument("-f", "--filelocation", required=True,
+             help="Location of keystore on the disk",
+             action="store"),
+])
+def info(args):
+    key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
+    print(f"Validator Address {key.get_validator_address()}")
+    print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
+
+
+@keycommand([
+    argument("-p", "--password", required=True,
+             help="Password of the keystore",
+             action="store"),
+    argument("-f", "--filelocation", required=True,
+             help="Location of keystore on the disk",
+             action="store"),
+    argument("-ps", "--payloadtosign", required=True,
+             help="payload to sign",
+             action="store")
+])
+def sign_payload(args):
+    key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
+    print(f"Signed DER from payload {key.sign_payload(args.payloadtosign)}")
 
 
 @corecommand()
@@ -685,6 +726,12 @@ if __name__ == "__main__":
             authcli.print_help()
         else:
             authcli_args.func(authcli_args)
+    elif args.subcommand == "key":
+        keycli_args = keycli.parse_args(sys.argv[2:])
+        if keycli_args.keycommand is None:
+            keycli.print_help()
+        else:
+            keycli_args.func(keycli_args)
     elif args.subcommand == "version":
         print_cli_version()
     elif args.subcommand == "optimise-node":
