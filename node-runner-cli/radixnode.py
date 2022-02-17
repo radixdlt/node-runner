@@ -21,21 +21,6 @@ from utils.utils import Helpers, cli_version
 
 urllib3.disable_warnings()
 
-
-def get_decorator(args, parent):
-    def decorator(func):
-        parser = parent.add_parser(func.__name__.replace("_", "-"), description=func.__doc__)
-        for arg in args:
-            parser.add_argument(*arg[0], **arg[1])
-        parser.set_defaults(func=func)
-
-    return decorator
-
-
-def argument(*name_or_flags, **kwargs):
-    return list(name_or_flags), kwargs
-
-
 cli = ArgumentParser()
 cli.add_argument('subcommand', help='Subcommand to run',
                  choices=["docker", "systemd", "api", "monitoring", "version", "optimise-node", "auth", "key"])
