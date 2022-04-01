@@ -58,11 +58,12 @@ class DefaultApiHelper(API):
         Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
         health = self.health()
 
-        if health["status"] != "UP":
+        if health["network_status"] != "UP":
             Helpers.print_coloured_line(
                 f"Node status is {health['status']} Rerun the command once node is completely synced",
                 bcolors.WARNING)
             proceed = input(print("Do you want to continue [Y/n]?"))
             if not Helpers.check_Yes(proceed):
                 sys.exit()
+        return health    
 

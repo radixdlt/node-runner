@@ -1,7 +1,7 @@
 import sys, json
 
 from core_client import Configuration, ApiException
-from core_client.api import network_api, entity_api, key_api, mempool_api, construction_api
+from core_client.api import network_api, entity_api, key_api, mempool_api, construction_api, engine_api
 from core_client.model.construction_build_request import ConstructionBuildRequest
 from core_client.model.construction_build_response import ConstructionBuildResponse
 from core_client.model.construction_submit_request import ConstructionSubmitRequest
@@ -15,6 +15,8 @@ from core_client.model.mempool_request import MempoolRequest
 from core_client.model.mempool_response import MempoolResponse
 from core_client.model.mempool_transaction_request import MempoolTransactionRequest
 from core_client.model.network_configuration_response import NetworkConfigurationResponse
+from core_client.model.engine_configuration_request import EngineConfigurationRequest
+from core_client.model.engine_configuration_response import EngineConfigurationResponse
 from core_client.model.network_status_request import NetworkStatusRequest
 from core_client.model.operation import Operation
 from core_client.model.operation_group import OperationGroup
@@ -24,7 +26,7 @@ from core_client.model.validator_metadata import ValidatorMetadata
 import core_client as core_api
 from api.Api import API
 from api.ValidatorConfig import ValidatorConfig
-from utils.utils import bcolors, Helpers
+from utils.utils import bcolors, Helpers, AttributeDict
 
 
 class CoreApiHelper(API):
@@ -36,7 +38,6 @@ class CoreApiHelper(API):
         self.system_config = core_api.Configuration(node_host, verify_ssl=verify_ssl)
 
     def network_configuration(self, print_response=False):
-
         with core_api.ApiClient(self.system_config) as api_client:
             api_client = self.set_basic_auth(api_client, "admin", "admin")
             try:
@@ -56,6 +57,17 @@ class CoreApiHelper(API):
                 response = api.network_status_post(
                     NetworkStatusRequest(self.network_configuration().network_identifier))
                 return self.handle_response(response, print_response)
+            except ApiException as e:
+                Helpers.handleApiException(e)
+    
+    def engine_configuration(self):
+        with core_api.ApiClient(self.system_config) as api_client:
+            api_client = self.set_basic_auth(api_client, "admin", "admin")
+            try:
+                api = engine_api.EngineApi(api_client)
+                response: EngineConfigurationResponse = api.engine_configuration_post(
+                    EngineConfigurationRequest(self.network_configuration().network_identifier))
+                return response
             except ApiException as e:
                 Helpers.handleApiException(e)
 
@@ -97,6 +109,16 @@ class CoreApiHelper(API):
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)
+                
+    def validator_info(self, print_response=False):
+        own_entity_identifier = key_list().public_keys[0].identifiers.validator_entity_identifier
+        entity_response = entity(entity_identifier, False)
+        # first, we 'serialize' the response to raw json
+        json_response = str(response).replace("'", "\"").replace("True", "true").replace("False", "false")
+        # we then use this json to create simple model 'ValidatorInfo', which does not contain any validation (or bugs)
+        validator_info = ValidatorInfo.from_entity_response_json_string(dict_response)
+        print(validator_info)
+        return validator_info
 
     def entity(self, entity_identifier, print_response=False):
         with core_api.ApiClient(self.system_config) as api_client:
@@ -107,8 +129,8 @@ class CoreApiHelper(API):
                     network_identifier=self.network_configuration().network_identifier,
                     entity_identifier=entity_identifier
                 )
-                Helpers.print_request_body(entityRequest, "/entity")
-                response: EntityResponse = api.entity_post(entityRequest)
+                Helpers.print_request_body(entityRequest, "/entity")                
+                response: EntityResponse = api.entity_post(entityRequest)                
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)

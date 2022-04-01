@@ -14,7 +14,6 @@ from core_client.model.key_list_response import KeyListResponse
 from core_client.model.key_sign_response import KeySignResponse
 from core_client.model.sub_entity import SubEntity
 from core_client.model.sub_entity_metadata import SubEntityMetadata
-
 from api.Api import API
 from api.CoreApiHelper import CoreApiHelper
 from api.DefaultApiHelper import DefaultApiHelper
@@ -25,7 +24,7 @@ from monitoring import Monitoring
 from setup import Base, Docker, SystemD
 from utils.utils import Helpers
 from utils.utils import run_shell_command
-from version import __version__
+#from version import __version__
 
 urllib3.disable_warnings()
 
@@ -228,7 +227,7 @@ def authcommand(args=[], parent=auth_parser):
 
 
 def cli_version():
-    return __version__
+    return "1.1.1"
 
 
 def print_cli_version():
@@ -508,10 +507,12 @@ def update_validator_config(args):
     system_config = system_api.Configuration(node_host, verify_ssl=False)
 
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
-    defaultApiHelper.check_health()
+    health = defaultApiHelper.check_health()
 
     core_api_helper = CoreApiHelper(verify_ssl=False)
+    engine_configuration = core_api_helper.engine_configuration()
     key_list_response: KeyListResponse = core_api_helper.key_list()
+    
     validator_info: EntityResponse = core_api_helper.entity(
         key_list_response.public_keys[0].identifiers.validator_entity_identifier)
 
@@ -521,6 +522,8 @@ def update_validator_config(args):
     actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
+    actions = ValidatorConfig.vote(actions, validator_info, health, engine_configuration)
+    actions = ValidatorConfig.cancel_vote(actions, validator_info, health, engine_configuration)
     build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
     signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
     submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(

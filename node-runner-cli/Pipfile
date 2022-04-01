@@ -4,10 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-radixdlt_core_client = {git = "https://github.com/radixdlt/python-core-client", editable = true, ref = "1.0-beta.1"}
+core_client = {git = "https://github.com/radixdlt/python-core-client", editable = true, ref = "co-ordinated-forks-david-v3"}
 requests = "==2.26.0"
 PyYAML = "==5.4.1"
 deepmerge = "==0.3.0"
 
 [requires]
-python_version = "3.7.6"
+python_version = "3.10.0"

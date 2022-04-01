@@ -33,6 +33,23 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         sys.exit()
     return result
 
+def print_vote_and_fork_info(health, engine_configuration):
+    vote_status = health['fork_vote_status']
+    print(f"Vote status : {vote_status}")
+    if vote_status != 'VOTE_REQUIRED':
+        print(f"{bcolors.WARNING}No vote is required at the moment{bcolors.ENDC}")    
+    latest_fork = engine_configuration['forks'][-1] 
+    latest_fork_name = latest_fork['name']
+    is_candidate = latest_fork['is_candidate']
+    if health['current_fork_name'] == latest_fork_name:        
+        print(f"\nCurrent fork : {latest_fork_name}, is candidate: {is_candidate}")    
+        print(f"{bcolors.WARNING}The validator is on the latest fork{bcolors.ENDC}")
+    else:
+        print(f"\nLatest fork : {latest_fork_name}, is candidate: {is_candidate}")    
+    
+    if not is_candidate:
+        print(f"{bcolors.WARNING}Fork '{latest_fork_name}' is not a candidate fork, voting will have no effect{bcolors.ENDC}")    
+    return latest_fork_name
 
 class Helpers:
     @staticmethod
@@ -73,14 +90,15 @@ class Helpers:
         nginx_password = f'NGINX_{usertype.upper()}_PASSWORD'
         nginx_username = f'NGINX_{default_username.upper()}_USERNAME'
         if os.environ.get('%s' % nginx_password) is None:
-            print(f"""
-            ------
-            NGINX_{usertype.upper()}_PASSWORD is missing !
-            Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
+            pass
+            # print(f"""
+            # ------
+            # NGINX_{usertype.upper()}_PASSWORD is missing !
+            # Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
-            echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
-            """)
-            sys.exit()
+            # echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            # """)
+            # sys.exit()
         else:
             # if os.getenv(nginx_username) is None:
             #     print (f"Using default name of usertype {usertype} as {default_username}")
@@ -188,11 +206,11 @@ class Helpers:
     @staticmethod
     def get_basic_auth_header(user):
         import base64
-        data = f"{user['name']}:{user['password']}"
-        encodedBytes = base64.b64encode(data.encode("utf-8"))
-        encodedStr = str(encodedBytes, "utf-8")
+        # data = f"{user['name']}:{user['password']}"
+        # encodedBytes = base64.b64encode(data.encode("utf-8"))
+        # encodedStr = str(encodedBytes, "utf-8")
         headers = {
-            'Authorization': f'Basic {encodedStr}'}
+             'Authorization': f'Basic a'}
         return headers
 
     @staticmethod
@@ -223,3 +241,8 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+
+class AttributeDict(dict):
+    __slots__ = () 
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
