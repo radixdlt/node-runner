@@ -26,7 +26,7 @@ from core_client.model.validator_metadata import ValidatorMetadata
 import core_client as core_api
 from api.Api import API
 from api.ValidatorConfig import ValidatorConfig
-from utils.utils import bcolors, Helpers, AttributeDict
+from utils.utils import bcolors, Helpers
 
 
 class CoreApiHelper(API):
@@ -108,17 +108,7 @@ class CoreApiHelper(API):
                 )
                 return self.handle_response(response, print_response)
             except ApiException as e:
-                Helpers.handleApiException(e)
-                
-    def validator_info(self, print_response=False):
-        own_entity_identifier = key_list().public_keys[0].identifiers.validator_entity_identifier
-        entity_response = entity(entity_identifier, False)
-        # first, we 'serialize' the response to raw json
-        json_response = str(response).replace("'", "\"").replace("True", "true").replace("False", "false")
-        # we then use this json to create simple model 'ValidatorInfo', which does not contain any validation (or bugs)
-        validator_info = ValidatorInfo.from_entity_response_json_string(dict_response)
-        print(validator_info)
-        return validator_info
+                Helpers.handleApiException(e)                
 
     def entity(self, entity_identifier, print_response=False):
         with core_api.ApiClient(self.system_config) as api_client:
@@ -129,8 +119,8 @@ class CoreApiHelper(API):
                     network_identifier=self.network_configuration().network_identifier,
                     entity_identifier=entity_identifier
                 )
-                Helpers.print_request_body(entityRequest, "/entity")                
-                response: EntityResponse = api.entity_post(entityRequest)                
+                Helpers.print_request_body(entityRequest, "/entity")
+                response: EntityResponse = api.entity_post(entityRequest)
                 return self.handle_response(response, print_response)
             except ApiException as e:
                 Helpers.handleApiException(e)

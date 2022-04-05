@@ -92,15 +92,14 @@ class Helpers:
         nginx_password = f'NGINX_{usertype.upper()}_PASSWORD'
         nginx_username = f'NGINX_{default_username.upper()}_USERNAME'
         if os.environ.get('%s' % nginx_password) is None:
-            pass
-            # print(f"""
-            # ------
-            # NGINX_{usertype.upper()}_PASSWORD is missing !
-            # Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
+            print(f"""
+            ------
+            NGINX_{usertype.upper()}_PASSWORD is missing !
+            Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
-            # echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
-            # """)
-            # sys.exit()
+            echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            """)
+            sys.exit()
         else:
             # if os.getenv(nginx_username) is None:
             #     print (f"Using default name of usertype {usertype} as {default_username}")
