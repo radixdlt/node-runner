@@ -128,7 +128,7 @@ class ValidatorConfig:
     def cancel_vote(actions: List, validator_info: EntityResponse, health, engine_configuration):
         #latest_fork_name = print_vote_and_fork_info(health, engine_configuration)
         response = input(f"{bcolors.BOLD}\nDo you want to cancel your vote [y/n]? " +
-                         f"Presssing Enter does not cancel your vote. {bcolors.ENDC}").strip()
+                         f"Presssing Enter does not cancel your vote: {bcolors.ENDC}").strip()
         if response.lower().strip() == 'y':
             actions.append(Action.cancel_vote())
         return actions

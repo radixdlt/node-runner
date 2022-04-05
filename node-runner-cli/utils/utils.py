@@ -36,7 +36,9 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
 def print_vote_and_fork_info(health, engine_configuration):
     vote_status = health['fork_vote_status']
     print(f"Vote status : {vote_status}")
-    if vote_status != 'VOTE_REQUIRED':
+    if vote_status == 'VOTE_REQUIRED':
+        print(f"{bcolors.WARNING}Your vote is required{bcolors.ENDC}")    
+    else:
         print(f"{bcolors.WARNING}No vote is required at the moment{bcolors.ENDC}")    
     latest_fork = engine_configuration['forks'][-1] 
     latest_fork_name = latest_fork['name']

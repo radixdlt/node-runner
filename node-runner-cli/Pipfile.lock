@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3c69e2d39e5fcc7c2f3c631f1d1b131b653e7d79333c0fbd2d779305d62b38d9"
+            "sha256": "328f6471db7ef9bbd9cc670354604f81e520cf70d7c71347fb302e3d9044870d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -34,7 +34,7 @@
         "core-client": {
             "editable": true,
             "git": "https://github.com/radixdlt/python-core-client",
-            "ref": "1933bb4284f5682450eb4c6e006d6d8d1f59b839"
+            "ref": "2f8cfea98c3a412a917fe13de0a6fd89e8648fb9"
         },
         "deepmerge": {
             "hashes": [

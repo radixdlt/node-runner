@@ -108,24 +108,8 @@ class Action:
         ]
     
     @staticmethod
-    def vote():
-        return Action.set_validator_metadata("name", "https://www.validator.com")
-        #return Action.set_validator_registeration(True)
-        # return lambda node_identifiers: [
-        #     OperationGroup([
-        #         Operation(
-        #             type="Data",
-        #             entity_identifier=node_identifiers.validator_entity_identifier,
-        #             data=Data(
-        #                 action='CREATE',
-        #                 data_object=ValidatorSystemMetadata(
-        #                     type="ValidatorSystemMetadata",
-        #                     data=""
-        #                 )
-        #             )
-        #         )
-        #     ])
-        # ]
+    def vote():        
+        return Action.set_validator_registeration(True)
     
     @staticmethod
     def cancel_vote():
