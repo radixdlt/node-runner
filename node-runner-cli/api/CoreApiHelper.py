@@ -108,7 +108,7 @@ class CoreApiHelper(API):
                 )
                 return self.handle_response(response, print_response)
             except ApiException as e:
-                Helpers.handleApiException(e)                
+                Helpers.handleApiException(e)
 
     def entity(self, entity_identifier, print_response=False):
         with core_api.ApiClient(self.system_config) as api_client:
