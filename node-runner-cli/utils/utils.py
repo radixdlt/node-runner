@@ -211,7 +211,7 @@ class Helpers:
         encodedBytes = base64.b64encode(data.encode("utf-8"))
         encodedStr = str(encodedBytes, "utf-8")
         headers = {
-             'Authorization': f'Basic {encodedStr}'}
+            'Authorization': f'Basic {encodedStr}'}
         return headers
 
     @staticmethod
@@ -242,3 +242,4 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    
