@@ -115,19 +115,19 @@ class ValidatorConfig:
         return actions
 
     @staticmethod
-    def vote(actions: List, validator_info: EntityResponse, health, engine_configuration):
-        print("-------- Vote -----\n")
+    def vote(actions: List, health, engine_configuration):
+        print("--------Vote--------\n")
         latest_fork_name = print_vote_and_fork_info(health, engine_configuration)        
         response = input(f"{bcolors.BOLD}\nDo you want to cast a vote for fork '{latest_fork_name}' [y/n]? " +
-                         f"Presssing Enter does not cast a vote: {bcolors.ENDC}").strip()
+                         f"Pressing Enter does not cast a vote: {bcolors.ENDC}").strip()
         if response.lower() == 'y':
             actions.append(Action.vote())
         return actions
     
     @staticmethod
-    def cancel_vote(actions: List, validator_info: EntityResponse):
+    def cancel_vote(actions: List):
         response = input(f"{bcolors.BOLD}\nDo you want to cancel your vote [y/n]? " +
-                         f"Presssing Enter does not cancel your vote: {bcolors.ENDC}").strip()
+                         f"Pressing Enter does not cancel your vote: {bcolors.ENDC}").strip()
         if response.lower().strip() == 'y':
             actions.append(Action.cancel_vote())
         return actions

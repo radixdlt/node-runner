@@ -24,7 +24,7 @@ from monitoring import Monitoring
 from setup import Base, Docker, SystemD
 from utils.utils import Helpers
 from utils.utils import run_shell_command
-from version import __version__
+#from version import __version__
 
 urllib3.disable_warnings()
 
@@ -227,7 +227,8 @@ def authcommand(args=[], parent=auth_parser):
 
 
 def cli_version():
-    return __version__
+    #return __version__
+    return "1.1.1"
 
 
 def print_cli_version():
@@ -522,8 +523,8 @@ def update_validator_config(args):
     actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
-    actions = ValidatorConfig.vote(actions, validator_info, health, engine_configuration)
-    actions = ValidatorConfig.cancel_vote(actions, validator_info, health, engine_configuration)
+    actions = ValidatorConfig.vote(actions, health, engine_configuration)
+    actions = ValidatorConfig.cancel_vote(actions)
     build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
     signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
     submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
