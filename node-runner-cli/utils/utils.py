@@ -35,7 +35,7 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
 
 def print_vote_and_fork_info(health, engine_configuration):
     vote_status = health['fork_vote_status']
-    print(f"Vote status : {vote_status}")
+    print(f"Vote status: {vote_status}")
     if vote_status == 'VOTE_REQUIRED':
         print(f"{bcolors.WARNING}Your vote is required{bcolors.ENDC}")    
     else:
@@ -44,10 +44,10 @@ def print_vote_and_fork_info(health, engine_configuration):
     latest_fork_name = latest_fork['name']
     is_candidate = latest_fork['is_candidate']
     if health['current_fork_name'] == latest_fork_name:        
-        print(f"\nCurrent fork : {latest_fork_name}, is candidate: {is_candidate}")    
+        print(f"\nCurrent fork: {latest_fork_name}, is candidate: {is_candidate}")    
         print(f"{bcolors.WARNING}The validator is on the latest fork{bcolors.ENDC}")
     else:
-        print(f"\nLatest fork : {latest_fork_name}, is candidate: {is_candidate}")    
+        print(f"\nLatest fork: {latest_fork_name}, is candidate: {is_candidate}")    
     
     if not is_candidate:
         print(f"{bcolors.WARNING}Fork '{latest_fork_name}' is not a candidate fork, voting will have no effect{bcolors.ENDC}")    
