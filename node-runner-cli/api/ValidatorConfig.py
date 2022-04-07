@@ -117,8 +117,8 @@ class ValidatorConfig:
     @staticmethod
     def vote(actions: List, health, engine_configuration):
         print("--------Vote--------\n")
-        latest_fork_name = print_vote_and_fork_info(health, engine_configuration)        
-        response = input(f"{bcolors.BOLD}\nDo you want to cast a vote for fork '{latest_fork_name}' [y/n]? " +
+        newest_fork_name = print_vote_and_fork_info(health, engine_configuration)        
+        response = input(f"{bcolors.BOLD}\nDo you want to cast a vote for fork '{newest_fork_name}' [y/n]? " +
                          f"Pressing Enter does not cast a vote: {bcolors.ENDC}").strip()
         if response.lower() == 'y':
             actions.append(Action.vote())

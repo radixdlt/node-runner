@@ -40,18 +40,18 @@ def print_vote_and_fork_info(health, engine_configuration):
         print(f"{bcolors.WARNING}Your vote is required{bcolors.ENDC}")    
     else:
         print(f"{bcolors.WARNING}No vote is required at the moment{bcolors.ENDC}")    
-    latest_fork = engine_configuration['forks'][-1] 
-    latest_fork_name = latest_fork['name']
-    is_candidate = latest_fork['is_candidate']
-    if health['current_fork_name'] == latest_fork_name:        
-        print(f"\nCurrent fork: {latest_fork_name}, is candidate: {is_candidate}")    
-        print(f"{bcolors.WARNING}The validator is on the latest fork{bcolors.ENDC}")
+    newest_fork = engine_configuration['forks'][-1] 
+    newest_fork_name = newest_fork['name']
+    is_candidate = newest_fork['is_candidate']
+    if health['current_fork_name'] == newest_fork_name:        
+        print(f"\nCurrent fork: {newest_fork_name}, is candidate: {is_candidate}")    
+        print(f"{bcolors.WARNING}The validator is currently running its newest fork{bcolors.ENDC}")
     else:
-        print(f"\nLatest fork: {latest_fork_name}, is candidate: {is_candidate}")    
+        print(f"\nLatest fork: {newest_fork_name}, is candidate: {is_candidate}")    
     
     if not is_candidate:
-        print(f"{bcolors.WARNING}Fork '{latest_fork_name}' is not a candidate fork, voting will have no effect{bcolors.ENDC}")    
-    return latest_fork_name
+        print(f"{bcolors.WARNING}Fork '{newest_fork_name}' is not a candidate fork, voting will have no effect{bcolors.ENDC}")    
+    return newest_fork_name
 
 class Helpers:
     @staticmethod
