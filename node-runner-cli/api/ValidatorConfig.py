@@ -3,17 +3,18 @@ import sys
 from typing import List
 from core_client.model.entity_response import EntityResponse
 from api.Action import Action
-from utils.utils import bcolors, Helpers, print_vote_and_fork_info
+from utils.utils import bcolors, Helpers, check_for_candidate_forks, print_vote_and_fork_info
 
 
 class ValidatorConfig:
     @staticmethod
-    def registeration(actions: List, validator_info: EntityResponse):
+    def registration(actions: List, validator_info: EntityResponse, health):
         value_to_set = None
         print("\n--------Registration-----\n")
         registration = [x for x in validator_info.data_objects if x.type == 'PreparedValidatorRegistered']
         Helpers.print_coloured_line(f"Current registration status: {registration[0].registered}",
                                     bcolors.OKBLUE)
+        check_for_candidate_forks(health)
         ask_registration = input(
             Helpers.print_coloured_line(
                 "\nEnter the new registration setting [true/false].Press enter if no change required ",
@@ -27,11 +28,12 @@ class ValidatorConfig:
         return actions
 
     @staticmethod
-    def validator_metadata(actions: List, validator_info: EntityResponse):
+    def validator_metadata(actions: List, validator_info: EntityResponse, health):
         print("\n--------Update validator meta info-----\n")
         validatorMetadata = [x for x in validator_info.data_objects if x.type == 'ValidatorMetadata']
         Helpers.print_coloured_line(f"Current name: {validatorMetadata[0]['name']}", bcolors.OKBLUE)
         Helpers.print_coloured_line(f"Current url: {validatorMetadata[0]['url']}", bcolors.OKBLUE)
+        check_for_candidate_forks(health)
         ask_add_or_change_info = input("\nDo you want add/change the validator name and info url [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_info):
             validator_name = input(

@@ -518,8 +518,8 @@ def update_validator_config(args):
         key_list_response.public_keys[0].identifiers.validator_entity_identifier)
 
     actions = []
-    actions = ValidatorConfig.registeration(actions, validator_info)
-    actions = ValidatorConfig.validator_metadata(actions, validator_info)
+    actions = ValidatorConfig.registration(actions, validator_info, health)
+    actions = ValidatorConfig.validator_metadata(actions, validator_info, health)
     actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
