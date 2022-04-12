@@ -33,6 +33,30 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         sys.exit()
     return result
 
+def check_for_candidate_forks(health):
+    if health['fork_vote_status'] == 'VOTE_REQUIRED':
+        print(f"\n{bcolors.WARNING}The newest fork is a candidate one. Submitting this action will also submit a vote for fork " +
+              f"{bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}")
+
+def print_vote_and_fork_info(health, engine_configuration):
+    vote_status = health['fork_vote_status']
+    print(f"Vote status: {vote_status}")
+    if vote_status == 'VOTE_REQUIRED':
+        print(f"{bcolors.WARNING}Your vote is required{bcolors.ENDC}")
+    else:
+        print(f"{bcolors.WARNING}No vote is required at the moment{bcolors.ENDC}")    
+    newest_fork = engine_configuration['forks'][-1] 
+    newest_fork_name = newest_fork['name']
+    is_candidate = newest_fork['is_candidate']
+    print(f"\nThe network is currently running fork {bcolors.BOLD}{newest_fork_name}{bcolors.ENDC}") 
+    if health['current_fork_name'] == newest_fork_name:
+        print(f"{bcolors.WARNING}The validator is currently running its newest fork{bcolors.ENDC}")
+    else:
+        print(f"The validator is running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}")
+    
+    if not is_candidate:
+        print(f"{bcolors.WARNING}Fork '{newest_fork_name}' is not a candidate fork, voting will have no effect{bcolors.ENDC}")    
+    return newest_fork_name
 
 class Helpers:
     @staticmethod
@@ -223,3 +247,4 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    
