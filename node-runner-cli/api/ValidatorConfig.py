@@ -3,22 +3,23 @@ import sys
 from typing import List
 from core_client.model.entity_response import EntityResponse
 from api.Action import Action
-from utils.utils import bcolors, Helpers, check_for_candidate_forks, print_vote_and_fork_info
+from utils.utils import bcolors, Helpers, inform_user_of_automatic_vote_for_candidate_fork, print_vote_and_fork_info
 
 
 class ValidatorConfig:
     @staticmethod
-    def registration(actions: List, validator_info: EntityResponse, health):
+    def registration(actions: List, validator_info: EntityResponse, health, engine_configuration):
         value_to_set = None
         print("\n--------Registration-----\n")
         registration = [x for x in validator_info.data_objects if x.type == 'PreparedValidatorRegistered']
         Helpers.print_coloured_line(f"Current registration status: {registration[0].registered}",
                                     bcolors.OKBLUE)
-        check_for_candidate_forks(health)
         ask_registration = input(
             Helpers.print_coloured_line(
-                "\nEnter the new registration setting [true/false].Press enter if no change required ",
+                "\nEnter the new registration setting [true/false]. Press enter if no change required ",
                 bcolors.BOLD, return_string=True))
+        if ask_registration.lower() == "true":
+            inform_user_of_automatic_vote_for_candidate_fork(health, engine_configuration)
         if ask_registration.lower() == "true" or ask_registration.lower() == "false":
             value_to_set = json.loads(ask_registration.lower())
             actions.append(Action.set_validator_registeration(value_to_set))
@@ -28,14 +29,14 @@ class ValidatorConfig:
         return actions
 
     @staticmethod
-    def validator_metadata(actions: List, validator_info: EntityResponse, health):
+    def validator_metadata(actions: List, validator_info: EntityResponse, health, engine_configuration):
         print("\n--------Update validator meta info-----\n")
         validatorMetadata = [x for x in validator_info.data_objects if x.type == 'ValidatorMetadata']
         Helpers.print_coloured_line(f"Current name: {validatorMetadata[0]['name']}", bcolors.OKBLUE)
         Helpers.print_coloured_line(f"Current url: {validatorMetadata[0]['url']}", bcolors.OKBLUE)
-        check_for_candidate_forks(health)
         ask_add_or_change_info = input("\nDo you want add/change the validator name and info url [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_info):
+            inform_user_of_automatic_vote_for_candidate_fork(health, engine_configuration)
             validator_name = input(
                 Helpers.print_coloured_line(f"Enter the Name of your validator to be updated:", bcolors.OKBLUE,
                                             return_string=True))
@@ -119,19 +120,48 @@ class ValidatorConfig:
     @staticmethod
     def vote(actions: List, health, engine_configuration):
         print("--------Vote--------\n")
-        newest_fork_name = print_vote_and_fork_info(health, engine_configuration)        
+
+        newest_fork = engine_configuration['forks'][-1]
+        newest_fork_name = newest_fork['name']
+        is_candidate = newest_fork['is_candidate']
+
+        if health['current_fork_name'] == newest_fork_name:
+            print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration") 
+            print(f"\n{bcolors.WARNING}No vote is required{bcolors.ENDC}\n")
+            return actions
+
+        if not is_candidate:
+            print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})") 
+            print(f"\n{bcolors.WARNING}This newer fork is not a candidate fork, so no vote is required{bcolors.ENDC}\n")
+            return actions
+
+        node_says_vote_required = health['fork_vote_status'] == 'VOTE_REQUIRED'
+
+        if not node_says_vote_required:
+            print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+            print(f"\n{bcolors.WARNING}The node has already voted for this candidate fork, so no new vote is required{bcolors.ENDC}\n")
+            return actions
+
+        if auto_vote_already_included:
+            print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+            print(f"\n{bcolors.WARNING}The node will already be automatically casting a vote for this fork in this transaction{bcolors.ENDC}\n")
+            return actions
+
+        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+        print(f"\n{bcolors.WARNING}The node has not yet cast a vote for this fork{bcolors.ENDC}\n")
+ 
         response = input(f"{bcolors.BOLD}\nDo you want to cast a vote for fork '{newest_fork_name}' [y/n]? " +
-                         f"Pressing Enter does not cast a vote: {bcolors.ENDC}").strip()
-        if response.lower() == 'y':
+                         f"Typing anything but 'y' or 'Y' does not cast a vote: {bcolors.ENDC}").strip()
+        if response.lower().strip() == 'y':
             actions.append(Action.vote())
         return actions
     
     @staticmethod
-    def cancel_vote(actions: List):
-        response = input(f"{bcolors.BOLD}\nDo you want to cancel your vote [y/n]? " +
-                         f"Pressing Enter does not cancel your vote: {bcolors.ENDC}").strip()
+    def withdraw_vote(actions: List):
+        response = input(f"{bcolors.BOLD}\nDo you want to withdraw your vote [y/n]? " +
+                         f"Typing anything but 'y' or 'Y' does not cast a vote: {bcolors.ENDC}").strip()
         if response.lower().strip() == 'y':
-            actions.append(Action.cancel_vote())
+            actions.append(Action.withdraw_vote())
         return actions
         
     @staticmethod

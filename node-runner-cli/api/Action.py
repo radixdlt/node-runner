@@ -126,7 +126,7 @@ class Action:
         ]
     
     @staticmethod
-    def cancel_vote():
+    def withdraw_vote():
         return lambda node_identifiers: [
             OperationGroup([
                 Operation(

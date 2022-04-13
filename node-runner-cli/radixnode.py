@@ -495,16 +495,7 @@ def set_auth(args, usertype):
 
 @corecommand()
 def update_validator_config(args):
-    request_data = {
-        "jsonrpc": "2.0",
-        "method": "account.submit_transaction_single_step",
-        "params": {
-            "actions": []
-        },
-        "id": 1
-    }
     node_host = API.get_host_info()
-    system_config = system_api.Configuration(node_host, verify_ssl=False)
 
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     health = defaultApiHelper.check_health()
@@ -517,13 +508,13 @@ def update_validator_config(args):
         key_list_response.public_keys[0].identifiers.validator_entity_identifier)
 
     actions = []
-    actions = ValidatorConfig.registration(actions, validator_info, health)
-    actions = ValidatorConfig.validator_metadata(actions, validator_info, health)
+    actions = ValidatorConfig.registration(actions, validator_info, health, engine_configuration)
+    actions = ValidatorConfig.validator_metadata(actions, validator_info, health, engine_configuration)
     actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
     actions = ValidatorConfig.vote(actions, health, engine_configuration)
-    actions = ValidatorConfig.cancel_vote(actions)
+    actions = ValidatorConfig.withdraw_vote(actions)
     build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
     signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
     submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
