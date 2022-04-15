@@ -24,7 +24,7 @@ from monitoring import Monitoring
 from setup import Base, Docker, SystemD
 from utils.utils import Helpers, print_vote_and_fork_info
 from utils.utils import run_shell_command
-#from version import __version__
+from version import __version__
 
 urllib3.disable_warnings()
 
@@ -252,8 +252,7 @@ def authcommand(args=[], parent=auth_parser):
 
 
 def cli_version():
-    return "1.1.1"
-    #return __version__
+    return __version__
 
 
 def print_cli_version():
