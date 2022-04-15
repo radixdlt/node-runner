@@ -22,7 +22,7 @@ from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVE
 from github.github import latest_release
 from monitoring import Monitoring
 from setup import Base, Docker, SystemD
-from utils.utils import Helpers
+from utils.utils import Helpers, print_vote_and_fork_info
 from utils.utils import run_shell_command
 #from version import __version__
 
@@ -105,7 +105,8 @@ def engine_configuration(args):
 @corecommand()
 def fork_information(args):
     engine_configuration = CoreApiHelper(False).engine_configuration()
-    engine_configuration = DefaultApiHelper(False).health()
+    health = DefaultApiHelper(False).health()
+    print_vote_and_fork_info(health, engine_configuration)
     
 
 @corecommand()
@@ -210,15 +211,18 @@ def mempool_transaction(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.mempool_transaction(args.transactionId, True)
 
+
 @corecommand()
 def vote(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.vote(True)
 
+
 @corecommand()
 def withdraw_vote(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.withdraw_vote(True)
+    
     
 systemapicli = ArgumentParser(
     description='systemapi commands')
