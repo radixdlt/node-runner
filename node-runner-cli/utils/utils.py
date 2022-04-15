@@ -4,11 +4,8 @@ from datetime import datetime
 import requests
 import sys, os
 from pathlib import Path
-
-from system_client import OpenApiException, ApiException
-
+from system_client import ApiException
 from env_vars import PRINT_REQUEST
-
 
 def printCommand(cmd):
     print('-----------------------------')
