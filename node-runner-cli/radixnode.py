@@ -22,8 +22,7 @@ from env_vars import COMPOSE_FILE_OVERIDE, NODE_BINARY_OVERIDE, NGINX_BINARY_OVE
 from github.github import latest_release
 from monitoring import Monitoring
 from setup import Base, Docker, SystemD
-from utils.utils import Helpers, print_vote_and_fork_info
-from utils.utils import run_shell_command
+from utils.utils import Helpers, bcolors, print_vote_and_fork_info, run_shell_command
 from version import __version__
 
 urllib3.disable_warnings()
@@ -215,6 +214,14 @@ def mempool_transaction(args):
 @corecommand()
 def vote(args):
     core_api_helper = CoreApiHelper(False)
+    health = DefaultApiHelper(False).health()
+    if health['fork_vote_status'] == 'VOTE_REQUIRED':
+        candidate_fork_name = core_api_helper.engine_configuration()["forks"][-1]['name']
+        print(
+            f"\n{bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{bcolors.WARNING}), " +
+            "by performing this action, the validator will record support for this fork onto the ledger.\n" +
+            f"If you choose to downgrade the software to no longer support this fork, you should manually remove the validator's support for the candidate fork with the withdraw vote action.{bcolors.ENDC}"
+        )
     core_api_helper.vote(True)
 
 
@@ -251,7 +258,7 @@ def authcommand(args=[], parent=auth_parser):
     return get_decorator(args, parent)
 
 
-def cli_version():
+def cli_version():    
     return __version__
 
 

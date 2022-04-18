@@ -29,7 +29,7 @@ from core_client.model.validator_metadata import ValidatorMetadata
 import core_client as core_api
 from api.Api import API
 from api.ValidatorConfig import ValidatorConfig
-from utils.utils import bcolors, Helpers
+from utils.utils import Helpers
 
 
 class CoreApiHelper(API):
