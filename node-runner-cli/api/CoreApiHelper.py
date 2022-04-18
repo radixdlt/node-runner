@@ -159,7 +159,8 @@ class CoreApiHelper(API):
                 network_configuration: NetworkConfigurationResponse = self.network_configuration()
                 key_list: KeyListResponse = self.key_list()
                 operation_groups = ValidatorConfig.build_operations(actions, key_list, ask_user=ask_user)
-                if len(operation_groups) == 0: return
+                if len(operation_groups) == 0: 
+                    return
 
                 api = construction_api.ConstructionApi(api_client)
                 build_request = ConstructionBuildRequest(
