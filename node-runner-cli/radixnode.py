@@ -218,7 +218,7 @@ def vote(args):
     if health['fork_vote_status'] == 'VOTE_REQUIRED':
         candidate_fork_name = core_api_helper.engine_configuration()["forks"][-1]['name']
         print(
-            f"\n{bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{bcolors.WARNING}), " +
+            f"{bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{bcolors.WARNING}), " +
             "by performing this action, the validator will record support for this fork onto the ledger.\n" +
             f"If you choose to downgrade the software to no longer support this fork, you should manually remove the validator's support for the candidate fork with the withdraw vote action.{bcolors.ENDC}"
         )
