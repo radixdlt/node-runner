@@ -222,7 +222,8 @@ def vote(args):
             "by performing this action, the validator will record support for this fork onto the ledger.\n" +
             f"If you choose to downgrade the software to no longer support this fork, you should manually remove the validator's support for the candidate fork with the withdraw vote action.{bcolors.ENDC}"
         )
-    core_api_helper.vote(True)
+        core_api_helper.vote(True)
+    else: print(f"{bcolors.WARNING}No vote is required, therefore no voting action will be performed.{bcolors.ENDC}")
 
 
 @corecommand()
@@ -258,7 +259,7 @@ def authcommand(args=[], parent=auth_parser):
     return get_decorator(args, parent)
 
 
-def cli_version():    
+def cli_version():
     return __version__
 
 
