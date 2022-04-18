@@ -3,7 +3,7 @@ import sys
 from typing import List
 from core_client.model.entity_response import EntityResponse
 from api.Action import Action
-from utils.utils import bcolors, Helpers, check_for_candidate_forks, print_vote_and_fork_info
+from utils.utils import bcolors, Helpers
 
 
 class ValidatorConfig:
@@ -14,7 +14,6 @@ class ValidatorConfig:
         registration = [x for x in validator_info.data_objects if x.type == 'PreparedValidatorRegistered']
         Helpers.print_coloured_line(f"Current registration status: {registration[0].registered}",
                                     bcolors.OKBLUE)
-        check_for_candidate_forks(health)
         ask_registration = input(
             Helpers.print_coloured_line(
                 "\nEnter the new registration setting [true/false].Press enter if no change required ",
@@ -33,7 +32,6 @@ class ValidatorConfig:
         validatorMetadata = [x for x in validator_info.data_objects if x.type == 'ValidatorMetadata']
         Helpers.print_coloured_line(f"Current name: {validatorMetadata[0]['name']}", bcolors.OKBLUE)
         Helpers.print_coloured_line(f"Current url: {validatorMetadata[0]['url']}", bcolors.OKBLUE)
-        check_for_candidate_forks(health)
         ask_add_or_change_info = input("\nDo you want add/change the validator name and info url [Y/n]?")
         if Helpers.check_Yes(ask_add_or_change_info):
             validator_name = input(
@@ -117,24 +115,6 @@ class ValidatorConfig:
         return actions
 
     @staticmethod
-    def vote(actions: List, health, engine_configuration):
-        print("--------Vote--------\n")
-        newest_fork_name = print_vote_and_fork_info(health, engine_configuration)        
-        response = input(f"{bcolors.BOLD}\nDo you want to cast a vote for fork '{newest_fork_name}' [y/n]? " +
-                         f"Pressing Enter does not cast a vote: {bcolors.ENDC}").strip()
-        if response.lower() == 'y':
-            actions.append(Action.vote())
-        return actions
-    
-    @staticmethod
-    def cancel_vote(actions: List):
-        response = input(f"{bcolors.BOLD}\nDo you want to cancel your vote [y/n]? " +
-                         f"Pressing Enter does not cancel your vote: {bcolors.ENDC}").strip()
-        if response.lower().strip() == 'y':
-            actions.append(Action.cancel_vote())
-        return actions
-        
-    @staticmethod
     def build_operations(actions, key_list, ask_user=False):
         operation_groups = []
         for action in actions:
@@ -154,5 +134,5 @@ class ValidatorConfig:
         if Helpers.check_Yes(submit_changes) and len(operation_groups) != 0:
             return operation_groups
         else:
-            print(f"{bcolors.WARNING} Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
-            sys.exit()
+            print(f"{bcolors.WARNING}Changes were not submitted.{bcolors.ENDC} or there are no actions to submit")
+            return operation_groups
