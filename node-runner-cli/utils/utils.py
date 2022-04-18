@@ -29,11 +29,6 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         """)
         sys.exit()
     return result
-
-def check_for_candidate_forks(health):
-    if health['fork_vote_status'] == 'VOTE_REQUIRED':
-        print(f"\n{bcolors.WARNING}The newest fork is a candidate one. Submitting this action will also submit a vote for fork " +
-              f"{bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}")
         
 def print_vote_and_fork_info(health, engine_configuration):    
     newest_fork = engine_configuration['forks'][-1]
