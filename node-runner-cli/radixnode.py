@@ -223,7 +223,8 @@ def vote(args):
             f"If you choose to downgrade the software to no longer support this fork, you should manually remove the validator's support for the candidate fork with the withdraw vote action.{bcolors.ENDC}"
         )
         core_api_helper.vote(True)
-    else: print(f"{bcolors.WARNING}No vote is required, therefore no voting action will be performed.{bcolors.ENDC}")
+    else: 
+        print(f"{bcolors.WARNING}No vote is required, therefore no voting action will be performed.{bcolors.ENDC}")
 
 
 @corecommand()
@@ -531,7 +532,7 @@ def update_validator_config(args):
     health = DefaultApiHelper(verify_ssl=False).check_health()
     core_api_helper = CoreApiHelper(verify_ssl=False)
     
-    key_list_response: KeyListResponse = core_api_helper.key_list()    
+    key_list_response: KeyListResponse = core_api_helper.key_list()
     
     validator_info: EntityResponse = core_api_helper.entity(
         key_list_response.public_keys[0].identifiers.validator_entity_identifier)
