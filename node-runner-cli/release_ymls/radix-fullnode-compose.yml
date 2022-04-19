@@ -14,7 +14,7 @@ services:
       - NET_ADMIN
     environment:
       RADIXDLT_NETWORK_SEEDS_REMOTE: "${RADIXDLT_NETWORK_NODE}"
-      RADIXDLT_LOG_LEVEL: debug
+      RADIXDLT_LOG_LEVEL: info
       JAVA_OPTS: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
       RADIXDLT_VALIDATOR_KEY_LOCATION: "/home/radixdlt/node-keystore.ks"
       RADIXDLT_SIGN_ENABLE: "true"
