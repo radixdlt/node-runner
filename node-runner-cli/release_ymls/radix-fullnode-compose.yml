@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   core:
-    image: radixdlt/radixdlt-core:1.1.0
+    image: radixdlt/radixdlt-core:1.1.1
     init: true
     ulimits:
       nofile:
@@ -15,7 +15,7 @@ services:
     environment:
       RADIXDLT_NETWORK_SEEDS_REMOTE: "${RADIXDLT_NETWORK_NODE}"
       RADIXDLT_LOG_LEVEL: debug
-      JAVA_OPTS: -server -Xms8g -Xmx8g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+      JAVA_OPTS: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
       RADIXDLT_VALIDATOR_KEY_LOCATION: "/home/radixdlt/node-keystore.ks"
       RADIXDLT_SIGN_ENABLE: "true"
       RADIXDLT_API_PORT: 3333
@@ -31,7 +31,7 @@ services:
 #      - "core_ledger:/home/radixdlt/RADIXDB"
       - "./node-keystore.ks:/home/radixdlt/node-keystore.ks"
   nginx:
-    image: radixdlt/radixdlt-nginx:1.1.0
+    image: radixdlt/radixdlt-nginx:1.1.1
     restart: unless-stopped
     ulimits:
       nofile:
