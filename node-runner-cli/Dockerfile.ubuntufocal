@@ -28,7 +28,7 @@ RUN CONFIGURE_OPTS=--enable-shared pyenv install 3.7.6
 
 RUN pyenv virtualenv 3.7.6 nodecli
 RUN pyenv local nodecli
-RUN pip install pyinstaller
+RUN pip install pyinstaller==4.10
 
 WORKDIR /app
 COPY requirements.txt /app/requirements.txt
