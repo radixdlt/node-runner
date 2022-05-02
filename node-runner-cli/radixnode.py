@@ -219,16 +219,16 @@ def vote(args):
         candidate_fork_name = core_api_helper.engine_configuration()["forks"][-1]['name']
         print(
             f"{bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{bcolors.WARNING}), " +
-            "by performing this action, the validator will record support for this fork onto the ledger.\n" +
-            f"If you choose to downgrade the software to no longer support this fork, you should manually remove the validator's support for the candidate fork with the withdraw vote action.{bcolors.ENDC}"
+            "by performing this action, the validator will signal the readiness to run this fork onto the ledger.\n" +
+            f"If you later choose to downgrade the software to a version that no longer includes this fork configuration, you should manually retract your readiness signal by using the retract-candidate-fork-readiness-signal subcommand.{bcolors.ENDC}"
         )
         core_api_helper.vote(True)
     else: 
-        print(f"{bcolors.WARNING}No vote is required, therefore no voting action will be performed.{bcolors.ENDC}")
+        print(f"{bcolors.WARNING}There's no need to signal the readiness for any candidate fork.{bcolors.ENDC}")
 
 
 @corecommand()
-def withdraw_vote(args):
+def retract_candidate_fork_readiness_signal(args):
     core_api_helper = CoreApiHelper(False)
     core_api_helper.withdraw_vote(True)
     
@@ -552,7 +552,7 @@ def update_validator_config(args):
         print("\n------Candidate fork detected------")
         engine_configuration = core_api_helper.engine_configuration()
         print_vote_and_fork_info(health, engine_configuration)        
-        should_vote = input(f"Do you want to cast a vote for {core_api_helper.engine_configuration().forks[-1]['name']}? [Y/n]{bcolors.ENDC}")
+        should_vote = input(f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{bcolors.ENDC}")
         if Helpers.check_Yes(should_vote): core_api_helper.vote(print_response=True)
 
 
