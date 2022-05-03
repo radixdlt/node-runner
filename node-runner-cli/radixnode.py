@@ -212,7 +212,7 @@ def mempool_transaction(args):
 
 
 @corecommand()
-def vote(args):
+def signal_candidate_fork_readiness(args):
     core_api_helper = CoreApiHelper(False)
     health = DefaultApiHelper(False).health()
     if health['fork_vote_status'] == 'VOTE_REQUIRED':
