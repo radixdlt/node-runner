@@ -68,6 +68,9 @@ class Docker(Base):
         prompt_external_db = input("Do you want to configure data directory for the ledger [Y/n]?:")
         if Helpers.check_Yes(prompt_external_db):
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
+        prompt_enable_transactions = input(
+            " Transactions API that can be used stream transactions can be created and exposed by changing api.transactions.enable settings"
+            "Do you want to enable it [true/false]?:")
 
         def represent_none(self, _):
             return self.represent_scalar('tag:yaml.org,2002:null', '')
@@ -79,6 +82,7 @@ class Docker(Base):
 
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
+        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml, prompt_enable_transactions)
 
         if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
             composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
@@ -121,6 +125,16 @@ class Docker(Base):
         """)
         final_conf = always_merger.merge(composefile_yaml, key_yaml)
         return final_conf
+
+    @staticmethod
+    def merge_transactions_env_var(composefile_yaml, transactions_enable="false"):
+        transactions_enable_yml = yaml.safe_load(f"""
+                services:
+                  core:
+                    environment:
+                      RADIXDLT_TRANSACTIONS_API_ENABLE: {transactions_enable}
+                """)
+        return always_merger.merge(transactions_enable_yml, composefile_yaml)
 
     @staticmethod
     def merge_network_info(composefile_yaml, network_id, genesis_json=None):
