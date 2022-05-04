@@ -212,7 +212,7 @@ def mempool_transaction(args):
 
 
 @corecommand()
-def vote(args):
+def signal_candidate_fork_readiness(args):
     core_api_helper = CoreApiHelper(False)
     health = DefaultApiHelper(False).health()
     if health['fork_vote_status'] == 'VOTE_REQUIRED':
@@ -222,7 +222,8 @@ def vote(args):
             "by performing this action, the validator will signal the readiness to run this fork onto the ledger.\n" +
             f"If you later choose to downgrade the software to a version that no longer includes this fork configuration, you should manually retract your readiness signal by using the retract-candidate-fork-readiness-signal subcommand.{bcolors.ENDC}"
         )
-        core_api_helper.vote(True)
+        should_vote = input(f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{bcolors.ENDC}")
+        if Helpers.check_Yes(should_vote): core_api_helper.vote(print_response=True)
     else: 
         print(f"{bcolors.WARNING}There's no need to signal the readiness for any candidate fork.{bcolors.ENDC}")
 
@@ -230,8 +231,8 @@ def vote(args):
 @corecommand()
 def retract_candidate_fork_readiness_signal(args):
     core_api_helper = CoreApiHelper(False)
-    core_api_helper.withdraw_vote(True)
-    
+    should_vote = input(f"This action will retract your candidate fork readiness signal (if there was one), continue? [Y/n]{bcolors.ENDC}")
+    if Helpers.check_Yes(should_vote): core_api_helper.withdraw_vote(print_response=True)    
     
 systemapicli = ArgumentParser(
     description='systemapi commands')
