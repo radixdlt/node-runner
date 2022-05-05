@@ -71,6 +71,8 @@ class Docker(Base):
         prompt_enable_transactions = input(
             " Transactions API that can be used stream transactions can be created and exposed by changing api.transactions.enable settings"
             "Do you want to enable it [true/false]?:")
+        if Helpers.check_Yes(prompt_enable_transactions):
+            composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml, "true")
 
         def represent_none(self, _):
             return self.represent_scalar('tag:yaml.org,2002:null', '')

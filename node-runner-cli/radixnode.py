@@ -297,6 +297,7 @@ def setup(args):
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
+    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_false"),
     argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
@@ -344,7 +345,7 @@ def setup(args):
     SystemD.backup_file(node_dir, f"default.config", backup_time)
 
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
-                                 node_type=args.nodetype)
+                                 node_type=args.nodetype, transactions_enable=args.enabletransactions)
 
     node_version = nodebinaryUrl.rsplit('/', 2)[-2]
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time)
