@@ -297,7 +297,7 @@ def setup(args):
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
-    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_false"),
+    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
     argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
@@ -314,7 +314,6 @@ def setup(args):
 
     if args.nodetype == "archivenode":
         Helpers.archivenode_deprecate_message()
-
     node_type_name = 'fullnode'
     node_dir = '/etc/radixdlt/node'
     nginx_dir = '/etc/nginx'

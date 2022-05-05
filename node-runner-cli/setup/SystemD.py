@@ -113,7 +113,7 @@ class SystemD(Base):
             db.location={data_folder}
             api.port=3334
             log.level=debug
-            api.transactions.enable={transactions_enable}
+            api.transactions.enable={"true" if transactions_enable else "false"}
             api.sign.enable=true 
             api.bind.address=0.0.0.0 
             network.p2p.use_proxy_protocol=false
