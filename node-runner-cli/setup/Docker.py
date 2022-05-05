@@ -129,7 +129,7 @@ class Docker(Base):
                 services:
                   core:
                     environment:
-                      RADIXDLT_TRANSACTIONS_API_ENABLE: {transactions_enable}
+                      RADIXDLT_TRANSACTIONS_API_ENABLE: '{transactions_enable}'
                 """)
         return always_merger.merge(transactions_enable_yml, composefile_yaml)
 
