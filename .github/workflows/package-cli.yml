@@ -20,6 +20,8 @@ jobs:
           access_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1
       - name: Install build essentials
         run: sudo apt-get -y install build-essential
       - name: setup python
@@ -39,7 +41,7 @@ jobs:
   upload-asset-store:
     environment: AWS_ARTIFACT
     runs-on: [ubuntu-latest]
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
     steps:
