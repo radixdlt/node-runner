@@ -90,14 +90,15 @@ class SystemD(Base):
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks"):
+    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks",
+                             transactions_enable="false"):
         network_id = SystemD.get_network_id()
         genesis_json_location = Base.path_to_genesis_json(network_id)
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-        data_folder=Base.get_data_dir()
+        data_folder = Base.get_data_dir()
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -112,7 +113,7 @@ class SystemD(Base):
             db.location={data_folder}
             api.port=3334
             log.level=debug
-            api.transactions.enable=false
+            api.transactions.enable={"true" if transactions_enable else "false"}
             api.sign.enable=true 
             api.bind.address=0.0.0.0 
             network.p2p.use_proxy_protocol=false

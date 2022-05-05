@@ -131,3 +131,5 @@ dmypy.json
 
 #Idea
 .idea
+/node-runner-cli/ansible/artifacts/
+/node-runner-cli/out/ubuntu/focal/

@@ -243,6 +243,7 @@ def print_cli_version():
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
+    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
 ])
 def setup(args):
     release = latest_release()
@@ -262,7 +263,7 @@ def setup(args):
         sys.exit()
 
     keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
-    Docker.setup_compose_file(composefileurl, file_location)
+    Docker.setup_compose_file(composefileurl, file_location, args.enabletransactions)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
 
@@ -297,6 +298,7 @@ def setup(args):
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
+    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
     argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
@@ -313,7 +315,6 @@ def setup(args):
 
     if args.nodetype == "archivenode":
         Helpers.archivenode_deprecate_message()
-
     node_type_name = 'fullnode'
     node_dir = '/etc/radixdlt/node'
     nginx_dir = '/etc/nginx'
@@ -344,7 +345,7 @@ def setup(args):
     SystemD.backup_file(node_dir, f"default.config", backup_time)
 
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
-                                 node_type=args.nodetype)
+                                 node_type=args.nodetype, transactions_enable=args.enabletransactions)
 
     node_version = nodebinaryUrl.rsplit('/', 2)[-2]
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time)
