@@ -97,7 +97,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ./node-runner-cli/out/ubuntu/focal/radixnode
+          asset_path: ./radixnode
           asset_name: radixnode-ubuntu-20.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
