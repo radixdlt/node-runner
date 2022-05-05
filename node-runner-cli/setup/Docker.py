@@ -69,9 +69,6 @@ class Docker(Base):
         if Helpers.check_Yes(prompt_external_db):
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
 
-        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml,
-                                                             "true" if enable_transactions else "false")
-
         def represent_none(self, _):
             return self.represent_scalar('tag:yaml.org,2002:null', '')
 
@@ -82,8 +79,8 @@ class Docker(Base):
 
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
-        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml, prompt_enable_transactions)
-
+        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml,
+                                                             "true" if enable_transactions else "false")
         if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
             composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
 
