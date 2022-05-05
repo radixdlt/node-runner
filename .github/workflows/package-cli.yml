@@ -6,11 +6,9 @@ on:
   push:
     tags:
       - test-artifacts*
+  pull_request:
     branches:
-      - fix-missing-prompt-for-transactions
-  # pull_request:
-  #   branches:
-  #     - main
+      - main
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
