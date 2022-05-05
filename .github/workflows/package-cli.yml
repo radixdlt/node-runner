@@ -38,6 +38,7 @@ jobs:
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
 
   upload-asset-store:
+    runs-on: [ubuntu-latest]
     if: ${{ github.event_name == 'pull_request' }}
     needs:
       - package_ubuntu_cli
@@ -67,6 +68,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
 
   upload-release:
+    runs-on: [ubuntu-latest]
     if: ${{ github.event_name == 'release' }}
     needs:
       - package_ubuntu_cli
