@@ -13,7 +13,6 @@ jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
     runs-on: [ubuntu-latest]
-    environment: AWS_ARTIFACT
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -38,6 +37,7 @@ jobs:
           path: "${{ github.workspace }}/node-runner-cli/out/ubuntu/focal/radixnode"
 
   upload-asset-store:
+    environment: AWS_ARTIFACT
     runs-on: [ubuntu-latest]
     if: ${{ github.event_name == 'pull_request' }}
     needs:
