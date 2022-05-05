@@ -46,7 +46,7 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def setup_compose_file(composefileurl, file_location):
+    def setup_compose_file(composefileurl, file_location, enable_transactions=False):
         compose_file_name = composefileurl.rsplit('/', 1)[-1]
         if os.path.isfile(compose_file_name):
             backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
@@ -68,11 +68,9 @@ class Docker(Base):
         prompt_external_db = input("Do you want to configure data directory for the ledger [Y/n]?:")
         if Helpers.check_Yes(prompt_external_db):
             composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
-        prompt_enable_transactions = input(
-            " Transactions API that can be used stream transactions can be created and exposed by changing api.transactions.enable settings"
-            "Do you want to enable it [true/false]?:")
-        if Helpers.check_Yes(prompt_enable_transactions):
-            composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml, "true")
+
+        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml,
+                                                             "true" if enable_transactions else "false")
 
         def represent_none(self, _):
             return self.represent_scalar('tag:yaml.org,2002:null', '')

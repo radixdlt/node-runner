@@ -243,6 +243,7 @@ def print_cli_version():
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
+    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
 ])
 def setup(args):
     release = latest_release()
@@ -262,7 +263,7 @@ def setup(args):
         sys.exit()
 
     keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
-    Docker.setup_compose_file(composefileurl, file_location)
+    Docker.setup_compose_file(composefileurl, file_location, args.enabletransactions)
 
     trustednode_ip = Helpers.parse_trustednode(args.trustednode)
 
