@@ -49,6 +49,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: set branchname with commit
         run: |
           ls -l
@@ -64,7 +66,7 @@ jobs:
           version: 2
       - name: Upload cli to asset store
         run: |
-          aws s3 cp node-runner-cli/out/ubuntu/focal/radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
+          aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
