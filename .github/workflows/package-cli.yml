@@ -6,9 +6,11 @@ on:
   push:
     tags:
       - test-artifacts*
-  pull_request:
     branches:
-      - main
+      - fix-missing-prompt-for-transactions
+  # pull_request:
+  #   branches:
+  #     - main
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
@@ -45,10 +47,7 @@ jobs:
     needs:
       - package_ubuntu_cli
     steps:
-      - name: Download packaged cli
-        uses: actions/download-artifact@v3
-        with:
-          name: ubuntu 20.04
+
       - name: Checkout
         uses: actions/checkout@v2
       - name: set branchname with commit
@@ -64,8 +63,13 @@ jobs:
         uses: unfor19/install-aws-cli-action@v1
         with:
           version: 2
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
       - name: Upload cli to asset store
         run: |
+          ls */**
           aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
