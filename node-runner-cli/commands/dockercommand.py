@@ -3,10 +3,12 @@ import sys
 from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
+from config.DockerConfig import DockerConfig
 from env_vars import COMPOSE_FILE_OVERIDE
 from github.github import latest_release
 from setup import Docker, Base
 from utils.utils import Helpers, run_shell_command, cli_version
+import yaml
 
 dockercli = ArgumentParser(
     description='Docker commands')
@@ -18,7 +20,6 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 
 
 @dockercommand([
-
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-t", "--trustednode", required=True,
@@ -33,27 +34,29 @@ def setup(args):
     if args.nodetype == "archivenode":
         Helpers.archivenode_deprecate_message()
 
-    composefileurl = os.getenv(COMPOSE_FILE_OVERIDE,
-                               f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/node-runner-cli/release_ymls/radix-{args.nodetype}-compose.yml")
-    print(f"Going to setup node type {args.nodetype} from location {composefileurl}.\n")
-    # TODO autoapprove
-    continue_setup = input(
-        "Do you want to continue [Y/n]?:")
+    config = DockerConfig()
+    config.set_node_type(args.nodetype)
+    config.set_composefile_url()
+    config.set_keydetails()
+    config.set_core_release(release)
+    config.set_data_directory()
+    config.set_network_id()
+    config.set_enable_transaction(args.enabletransactions)
 
-    if not Helpers.check_Yes(continue_setup):
-        print(" Quitting ....")
-        sys.exit()
+    print(f"Yaml of config {yaml.dump(config.core_node_settings)}")
 
-    keystore_password, file_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
-    Docker.setup_compose_file(composefileurl, file_location, args.enabletransactions)
+    keystore_password, file_location = Base.generatekey(
+        keyfile_path=config.core_node_settings.keydetails["keyfile_path"],
+        keyfile_name=config.core_node_settings.keydetails["keyfile_name"],
+        keygen_tag=config.core_node_settings.keydetails["keygen_tag"])
 
-    trustednode_ip = Helpers.parse_trustednode(args.trustednode)
+    Docker.setup_compose_file(config)
 
-    compose_file_name = composefileurl.rsplit('/', 1)[-1]
+    compose_file_name = config.core_node_settings.composefileurl.rsplit('/', 1)[-1]
+
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
-    # TODO AutoApprove
     should_start = input(f"\nOkay to start the node [Y/n]?:")
     if Helpers.check_Yes(should_start):
         if action == "update":

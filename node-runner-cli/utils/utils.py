@@ -214,6 +214,17 @@ class Helpers:
         return str(radixnode_dir)
 
     @staticmethod
+    def get_keyfile_name():
+        default_keyfile_name = "node-keystore.ks"
+        value = input("\nEnter the name of keystore file. Enter to use default value {default_keyfile_name}:").strip()
+        if value != "":
+            keyfile_name = value
+        else:
+            keyfile_name = default_keyfile_name
+
+        return keyfile_name
+
+    @staticmethod
     def get_basic_auth_header(user):
         import base64
         data = f"{user['name']}:{user['password']}"
