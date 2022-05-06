@@ -16,7 +16,6 @@ systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
 def systemdcommand(systemdcommand_args=[], parent=systemd_parser):
     return get_decorator(systemdcommand_args, parent)
 
-
 @systemdcommand([
     argument("-r", "--release",
              help="Version of node software to install",
@@ -26,6 +25,7 @@ def systemdcommand(systemdcommand_args=[], parent=systemd_parser):
     argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
              action="store", choices=["fullnode", "archivenode"]),
     argument("-i", "--hostip", required=True, help="Static Public IP of the node", action="store"),
+    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
     argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
@@ -42,21 +42,20 @@ def setup(args):
 
     if args.nodetype == "archivenode":
         Helpers.archivenode_deprecate_message()
-
     node_type_name = 'fullnode'
     node_dir = '/etc/radixdlt/node'
     nginx_dir = '/etc/nginx'
     nginx_secrets_dir = f"{nginx_dir}/secrets"
     node_secrets_dir = f"{node_dir}/secrets"
-    nodebinaryUrl = os.getenv(NODE_BINARY_OVERIDE,
-                              f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip")
+    node_binary_url = os.getenv(NODE_BINARY_OVERIDE,
+                                f"https://github.com/radixdlt/radixdlt/releases/download/{release}/radixdlt-dist-{release}.zip")
 
     # TODO add method to fetch latest nginx release
-    nginxconfigUrl = os.getenv(NGINX_BINARY_OVERIDE,
-                               f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{nginx_release}/radixdlt-nginx-{node_type_name}-conf.zip")
+    nginx_config_url = os.getenv(NGINX_BINARY_OVERIDE,
+                                 f"https://github.com/radixdlt/radixdlt-nginx/releases/download/{nginx_release}/radixdlt-nginx-{node_type_name}-conf.zip")
     # TODO AutoApprove
     continue_setup = input(
-        f"Going to setup node type {args.nodetype} for version {release} from location {nodebinaryUrl} and {nginxconfigUrl}. \n Do you want to continue Y/n:")
+        f"Going to setup node type {args.nodetype} for version {release} from location {node_binary_url} and {nginx_config_url}. \n Do you want to continue Y/n:")
 
     if not Helpers.check_Yes(continue_setup):
         print(" Quitting ....")
@@ -65,25 +64,24 @@ def setup(args):
     backup_time = Helpers.get_current_date_time()
     SystemD.checkUser()
     keystore_password, keyfile_location = SystemD.generatekey(node_secrets_dir, keygen_tag=release)
-    trustednode_ip = Helpers.parse_trustednode(args.trustednode)
 
-    SystemD.backup_file(node_secrets_dir, f"environment", backup_time)
+    SystemD.backup_file(node_secrets_dir, "environment", backup_time)
     SystemD.set_environment_variables(keystore_password, node_secrets_dir)
 
     SystemD.backup_file(node_dir, f"default.config", backup_time)
 
     SystemD.setup_default_config(trustednode=args.trustednode, hostip=args.hostip, node_dir=node_dir,
-                                 node_type=args.nodetype)
+                                 node_type=args.nodetype, transactions_enable=args.enabletransactions)
 
-    node_version = nodebinaryUrl.rsplit('/', 2)[-2]
+    node_version = node_binary_url.rsplit('/', 2)[-2]
     SystemD.backup_file("/etc/systemd/system", "radixdlt-node.service", backup_time)
     SystemD.setup_service_file(node_version, node_dir=node_dir, node_secrets_path=node_secrets_dir)
 
-    SystemD.download_binaries(nodebinaryUrl, node_dir=node_dir, node_version=node_version)
+    SystemD.download_binaries(node_binary_url, node_dir=node_dir, node_version=node_version)
 
-    SystemD.backup_file("/lib/systemd/system", f"nginx.service", backup_time)
+    SystemD.backup_file("/lib/systemd/system", "nginx.service", backup_time)
 
-    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=nginxconfigUrl,
+    nginx_configured = SystemD.setup_nginx_config(nginx_config_location_Url=nginx_config_url,
                                                   node_type=args.nodetype,
                                                   nginx_etc_dir=nginx_dir, backup_time=backup_time)
     SystemD.create_ssl_certs(nginx_secrets_dir)

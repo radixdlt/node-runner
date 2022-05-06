@@ -16,6 +16,8 @@ from api.CoreApiHelper import CoreApiHelper
 from api.DefaultApiHelper import DefaultApiHelper
 from commands.subcommand import get_decorator, argument
 from api.ValidatorConfig import ValidatorConfig
+from utils.utils import print_vote_and_fork_info
+from utils.utils import Helpers, bcolors
 
 corecli = ArgumentParser(
     description='Core Api comands')
@@ -145,32 +147,55 @@ def mempool_transaction(args):
 
 @corecommand()
 def update_validator_config(args):
-    request_data = {
-        "jsonrpc": "2.0",
-        "method": "account.submit_transaction_single_step",
-        "params": {
-            "actions": []
-        },
-        "id": 1
-    }
-    node_host = API.get_host_info()
-    system_config = system_api.Configuration(node_host, verify_ssl=False)
-
-    defaultApiHelper = DefaultApiHelper(verify_ssl=False)
-    defaultApiHelper.check_health()
-
+    health = DefaultApiHelper(verify_ssl=False).check_health()
     core_api_helper = CoreApiHelper(verify_ssl=False)
+
     key_list_response: KeyListResponse = core_api_helper.key_list()
+
     validator_info: EntityResponse = core_api_helper.entity(
         key_list_response.public_keys[0].identifiers.validator_entity_identifier)
 
     actions = []
-    actions = ValidatorConfig.registeration(actions, validator_info)
-    actions = ValidatorConfig.validator_metadata(actions, validator_info)
+    actions = ValidatorConfig.registration(actions, validator_info, health)
+    actions = ValidatorConfig.validator_metadata(actions, validator_info, health)
     actions = ValidatorConfig.add_validation_fee(actions, validator_info)
     actions = ValidatorConfig.setup_update_delegation(actions, validator_info)
     actions = ValidatorConfig.add_change_ownerid(actions, validator_info)
     build_response: ConstructionBuildResponse = core_api_helper.construction_build(actions, ask_user=True)
-    signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
-    submitted_transaction: ConstructionSubmitResponse = core_api_helper.construction_submit(
-        signed_transaction.signed_transaction, print_response=True)
+    if build_response:
+        signed_transaction: KeySignResponse = core_api_helper.key_sign(build_response.unsigned_transaction)
+        core_api_helper.construction_submit(signed_transaction.signed_transaction, print_response=True)
+
+    if health['fork_vote_status'] == 'VOTE_REQUIRED':
+        print("\n------Candidate fork detected------")
+        engine_configuration = core_api_helper.engine_configuration()
+        print_vote_and_fork_info(health, engine_configuration)
+        should_vote = input(
+            f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{bcolors.ENDC}")
+        if Helpers.check_Yes(should_vote): core_api_helper.vote(print_response=True)
+
+
+@corecommand()
+def signal_candidate_fork_readiness(args):
+    core_api_helper = CoreApiHelper(False)
+    health = DefaultApiHelper(False).health()
+    if health['fork_vote_status'] == 'VOTE_REQUIRED':
+        candidate_fork_name = core_api_helper.engine_configuration()["forks"][-1]['name']
+        print(
+            f"{bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{bcolors.WARNING}), " +
+            "by performing this action, the validator will signal the readiness to run this fork onto the ledger.\n" +
+            f"If you later choose to downgrade the software to a version that no longer includes this fork configuration, you should manually retract your readiness signal by using the retract-candidate-fork-readiness-signal subcommand.{bcolors.ENDC}"
+        )
+        should_vote = input(
+            f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{bcolors.ENDC}")
+        if Helpers.check_Yes(should_vote): core_api_helper.vote(print_response=True)
+    else:
+        print(f"{bcolors.WARNING}There's no need to signal the readiness for any candidate fork.{bcolors.ENDC}")
+
+
+@corecommand()
+def retract_candidate_fork_readiness_signal(args):
+    core_api_helper = CoreApiHelper(False)
+    should_vote = input(
+        f"This action will retract your candidate fork readiness signal (if there was one), continue? [Y/n]{bcolors.ENDC}")
+    if Helpers.check_Yes(should_vote): core_api_helper.withdraw_vote(print_response=True)
