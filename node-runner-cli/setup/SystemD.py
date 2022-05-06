@@ -84,20 +84,21 @@ class SystemD(Base):
     def set_environment_variables(keystore_password, node_secrets_dir):
         command = f"""
         cat > {node_secrets_dir}/environment << EOF
-        JAVA_OPTS="-server -Xms8g -Xmx8g -XX:+HeapDumpOnOutOfMemoryError -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+        JAVA_OPTS="--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
         RADIX_NODE_KEYSTORE_PASSWORD={keystore_password}
         """
         run_shell_command(command, shell=True)
 
     @staticmethod
-    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks"):
+    def setup_default_config(trustednode, hostip, node_dir, node_type, keyfile_name="node-keystore.ks",
+                             transactions_enable="false"):
         network_id = SystemD.get_network_id()
         genesis_json_location = Base.path_to_genesis_json(network_id)
 
         network_genesis_file_for_testnets = f"network.genesis_file={genesis_json_location}" if genesis_json_location else ""
         enable_client_api = "true" if node_type == "archivenode" else "false"
 
-        data_folder=Base.get_data_dir()
+        data_folder = Base.get_data_dir()
         command = f"""
         cat > {node_dir}/default.config << EOF
             ntp=false
@@ -112,7 +113,7 @@ class SystemD(Base):
             db.location={data_folder}
             api.port=3334
             log.level=debug
-            api.transactions.enable=false
+            api.transactions.enable={"true" if transactions_enable else "false"}
             api.sign.enable=true 
             api.bind.address=0.0.0.0 
             network.p2p.use_proxy_protocol=false

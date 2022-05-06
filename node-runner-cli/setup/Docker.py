@@ -46,7 +46,7 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def setup_compose_file(composefileurl, file_location):
+    def setup_compose_file(composefileurl, file_location, enable_transactions=False):
         compose_file_name = composefileurl.rsplit('/', 1)[-1]
         if os.path.isfile(compose_file_name):
             backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
@@ -79,7 +79,8 @@ class Docker(Base):
 
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
-
+        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml,
+                                                             "true" if enable_transactions else "false")
         if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
             composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
 
@@ -121,6 +122,16 @@ class Docker(Base):
         """)
         final_conf = always_merger.merge(composefile_yaml, key_yaml)
         return final_conf
+
+    @staticmethod
+    def merge_transactions_env_var(composefile_yaml, transactions_enable="false"):
+        transactions_enable_yml = yaml.safe_load(f"""
+                services:
+                  core:
+                    environment:
+                      RADIXDLT_TRANSACTIONS_API_ENABLE: '{transactions_enable}'
+                """)
+        return always_merger.merge(transactions_enable_yml, composefile_yaml)
 
     @staticmethod
     def merge_network_info(composefile_yaml, network_id, genesis_json=None):

@@ -10,7 +10,6 @@ from system_client import OpenApiException, ApiException
 
 from env_vars import PRINT_REQUEST
 
-
 def printCommand(cmd):
     print('-----------------------------')
     if type(cmd) is list:
@@ -33,6 +32,30 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         """)
         sys.exit()
     return result
+
+def print_vote_and_fork_info(health, engine_configuration):
+    newest_fork = engine_configuration['forks'][-1]
+    newest_fork_name = newest_fork['name']
+    is_candidate = newest_fork['is_candidate']
+
+    if health['current_fork_name'] == newest_fork_name:
+        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration")
+        print(f"{bcolors.WARNING}No action is needed{bcolors.ENDC}")
+        return
+
+    if not is_candidate:
+        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})")
+        print(f"{bcolors.WARNING}This newer fork is not a candidate fork, so no action is needed{bcolors.ENDC}")
+        return
+
+    node_says_vote_required = health['fork_vote_status'] == 'VOTE_REQUIRED'
+    if not node_says_vote_required:
+        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+        print(f"{bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{bcolors.ENDC}")
+        return
+
+    print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+    print(f"{bcolors.WARNING}The node has not yet signalled the readiness for this fork{bcolors.ENDC}")
 
 
 def cli_version():

@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-radixdlt_core_client = {git = "https://github.com/radixdlt/python-core-client", editable = true, ref = "1.0-beta.1"}
+core_client = {git = "https://github.com/radixdlt/python-core-client", editable = true, ref = "v1.1.1"}
 requests = "==2.26.0"
-PyYAML = "==5.4.1"
+PyYAML = "==6.0.0"
 deepmerge = "==0.3.0"
 bech32 = "==1.2.0"
 ecdsa = "==0.17.0"

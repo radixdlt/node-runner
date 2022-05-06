@@ -65,4 +65,5 @@ class DefaultApiHelper(API):
             proceed = input(print("Do you want to continue [Y/n]?"))
             if not Helpers.check_Yes(proceed):
                 sys.exit()
+        return health    
 

@@ -13,7 +13,7 @@ from core_client.model.sub_entity_metadata import SubEntityMetadata
 from core_client.model.token_resource_identifier import TokenResourceIdentifier
 from core_client.model.validator_allow_delegation import ValidatorAllowDelegation
 from core_client.model.validator_metadata import ValidatorMetadata
-
+from core_client.model.validator_system_metadata import ValidatorSystemMetadata
 
 class Action:
     @staticmethod
@@ -101,6 +101,42 @@ class Action:
                         data_object=PreparedValidatorOwner(
                             type="PreparedValidatorOwner",
                             owner=EntityIdentifier(address=owner)
+                        )
+                    )
+                )
+            ]),
+        ]
+    
+    @staticmethod
+    def vote():        
+        return lambda node_identifiers: [
+            OperationGroup([
+                Operation(
+                    type="Data",
+                    entity_identifier=node_identifiers.validator_entity_identifier,
+                    data=Data(
+                        action='CREATE',
+                        data_object=ValidatorSystemMetadata(
+                            type="ValidatorSystemMetadata",
+                            data=""
+                        )
+                    )
+                )
+            ]),
+        ]
+    
+    @staticmethod
+    def cancel_vote():
+        return lambda node_identifiers: [
+            OperationGroup([
+                Operation(
+                    type="Data",
+                    entity_identifier=node_identifiers.validator_entity_identifier,
+                    data=Data(
+                        action='CREATE',
+                        data_object=ValidatorSystemMetadata(
+                            type="ValidatorSystemMetadata",
+                            data="0" * 32
                         )
                     )
                 )
