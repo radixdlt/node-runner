@@ -34,7 +34,7 @@ cwd = os.getcwd()
 
 
 def print_cli_version():
-    print(f"Cli - Version : {cli_version()}")
+    print(f"Cli - Version : {Helpers.cli_version()}")
 
 
 def optimise_node():

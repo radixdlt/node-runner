@@ -58,9 +58,6 @@ def print_vote_and_fork_info(health, engine_configuration):
     print(f"{bcolors.WARNING}The node has not yet signalled the readiness for this fork{bcolors.ENDC}")
 
 
-def cli_version():
-    return __version__
-
 
 class Helpers:
     @staticmethod
@@ -250,6 +247,10 @@ class Helpers:
         if os.getenv(PRINT_REQUEST):
             print(f"----Body for {name}---")
             print(item)
+
+    @staticmethod
+    def cli_version():
+        return __version__
 
 
 class bcolors:
