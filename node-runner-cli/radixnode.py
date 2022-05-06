@@ -17,7 +17,7 @@ from commands.systemdcommand import systemdcli
 from env_vars import DISABLE_VERSION_CHECK
 from github.github import latest_release
 from setup import Base
-from utils.utils import Helpers, cli_version
+from utils.utils import Helpers
 
 urllib3.disable_warnings()
 
@@ -38,17 +38,17 @@ def print_cli_version():
 
 
 def optimise_node():
-    Base.setup_node_optimisation_config(cli_version())
+    Base.setup_node_optimisation_config(Helpers.cli_version())
 
 
 def check_latest_cli():
     cli_latest_version = latest_release("radixdlt/node-runner")
 
     if os.getenv(DISABLE_VERSION_CHECK, "False").lower() not in ("true", "yes"):
-        if cli_version() != cli_latest_version:
+        if Helpers.cli_version() != cli_latest_version:
             os_name = "ubuntu-20.04"
             print(
-                f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {cli_version()}.\n.")
+                f"Radixnode CLI latest version is {cli_latest_version} and current version of the binary is {Helpers.cli_version()}.\n.")
             print(f"""
                 ---------------------------------------------------------------
                 Update the CLI by running these commands

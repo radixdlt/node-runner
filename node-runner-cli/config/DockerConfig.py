@@ -5,12 +5,23 @@ from setup import Base
 from utils.utils import Helpers
 
 
-class KeyDetails:
+class Subscriptable:
+    def __class_getitem__(cls, item):
+        return cls._get_child_dict()[item]
+
+    @classmethod
+    def _get_child_dict(cls):
+        return {k: v for k, v in cls.__dict__.items() if not k.startswith('_')}
+
+
+class KeyDetails(Subscriptable):
     keyfile_path = None
     keyfile_name = None
+    keygen_tag = None
+    keystore_password = None
 
 
-class DefaultDockerSettings:
+class DefaultDockerSettings(Subscriptable):
     nodetype = "fullnode"
     composefileurl = None
     keydetails = KeyDetails()
@@ -18,6 +29,7 @@ class DefaultDockerSettings:
     data_directory = None
     genesis_json_location = None
     enable_transaction = False
+    network_id = None
 
 
 class DockerConfig:
@@ -38,6 +50,14 @@ class DockerConfig:
             self.core_node_settings.keydetails.keyfile_path = Helpers.get_keyfile_path()
         if not self.core_node_settings.keydetails.keyfile_name:
             self.core_node_settings.keydetails.keyfile_name = Helpers.get_keyfile_name()
+        if not self.core_node_settings.keydetails.keygen_tag:
+            self.core_node_settings.keydetails.keygen_tag = self.core_node_settings.core_release
+
+        keystore_password, file_location = Base.generatekey(
+            keyfile_path=self.core_node_settings.keydetails.keyfile_path,
+            keyfile_name=self.core_node_settings.keydetails.keyfile_name,
+            keygen_tag=self.core_node_settings.keydetails.keygen_tag)
+        self.core_node_settings.keydetails.keystore_password = keystore_password
 
     def set_core_release(self, release):
         self.core_node_settings.core_release = release

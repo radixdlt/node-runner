@@ -1,14 +1,12 @@
-import os
-import sys
 from argparse import ArgumentParser
+
+import yaml
 
 from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
-from env_vars import COMPOSE_FILE_OVERIDE
 from github.github import latest_release
 from setup import Docker, Base
-from utils.utils import Helpers, run_shell_command, cli_version
-import yaml
+from utils.utils import Helpers, run_shell_command
 
 dockercli = ArgumentParser(
     description='Docker commands')
@@ -45,11 +43,6 @@ def setup(args):
 
     print(f"Yaml of config {yaml.dump(config.core_node_settings)}")
 
-    keystore_password, file_location = Base.generatekey(
-        keyfile_path=config.core_node_settings.keydetails["keyfile_path"],
-        keyfile_name=config.core_node_settings.keydetails["keyfile_name"],
-        keygen_tag=config.core_node_settings.keydetails["keygen_tag"])
-
     Docker.setup_compose_file(config)
 
     compose_file_name = config.core_node_settings.composefileurl.rsplit('/', 1)[-1]
@@ -57,12 +50,13 @@ def setup(args):
     action = "update" if args.update else "start"
     print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
     run_shell_command(f"cat {compose_file_name}", shell=True)
-    should_start = input(f"\nOkay to start the node [Y/n]?:")
+    should_start = input("\nOkay to start the node [Y/n]?:")
     if Helpers.check_Yes(should_start):
         if action == "update":
             print(f"For update, bringing down the node using compose file {compose_file_name}")
             Docker.run_docker_compose_down(compose_file_name)
-        Docker.run_docker_compose_up(keystore_password, compose_file_name, args.trustednode)
+        Docker.run_docker_compose_up(config.core_node_settings.keydetails.keystore_password, compose_file_name,
+                                     args.trustednode)
     else:
         print(f"""
             ---------------------------------------------------------------

@@ -1,14 +1,16 @@
 import json
+import os
 import subprocess
+import sys
 from datetime import datetime
-import requests
-import sys, os
 from pathlib import Path
-from version import __version__
 
-from system_client import OpenApiException, ApiException
+import requests
+from system_client import ApiException
 
 from env_vars import PRINT_REQUEST
+from version import __version__
+
 
 def printCommand(cmd):
     print('-----------------------------')
@@ -21,7 +23,8 @@ def printCommand(cmd):
 
 
 def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=False):
-    printCommand(cmd)
+    if not quite:
+        printCommand(cmd)
     if env:
         result = subprocess.run(cmd, env=env, shell=shell)
     else:
@@ -33,30 +36,35 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         sys.exit()
     return result
 
+
 def print_vote_and_fork_info(health, engine_configuration):
     newest_fork = engine_configuration['forks'][-1]
     newest_fork_name = newest_fork['name']
     is_candidate = newest_fork['is_candidate']
 
     if health['current_fork_name'] == newest_fork_name:
-        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration")
+        print(
+            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration")
         print(f"{bcolors.WARNING}No action is needed{bcolors.ENDC}")
         return
 
     if not is_candidate:
-        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})")
+        print(
+            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})")
         print(f"{bcolors.WARNING}This newer fork is not a candidate fork, so no action is needed{bcolors.ENDC}")
         return
 
     node_says_vote_required = health['fork_vote_status'] == 'VOTE_REQUIRED'
     if not node_says_vote_required:
-        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
-        print(f"{bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{bcolors.ENDC}")
+        print(
+            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+        print(
+            f"{bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{bcolors.ENDC}")
         return
 
-    print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+    print(
+        f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
     print(f"{bcolors.WARNING}The node has not yet signalled the readiness for this fork{bcolors.ENDC}")
-
 
 
 class Helpers:
@@ -206,14 +214,15 @@ class Helpers:
     @staticmethod
     def get_keyfile_path():
         radixnode_dir = f"{Path.home()}/node-config"
-        print(f"Path to keyfile is {radixnode_dir}")
-        run_shell_command(f'mkdir -p {radixnode_dir}', shell=True)
+        print(f"Location of keyfile: {radixnode_dir}")
+        run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
         return str(radixnode_dir)
 
     @staticmethod
     def get_keyfile_name():
         default_keyfile_name = "node-keystore.ks"
-        value = input("\nEnter the name of keystore file. Enter to use default value {default_keyfile_name}:").strip()
+        value = input(
+            f"\nEnter the name of keystore file. Press 'Enter' to use default value '{default_keyfile_name}':").strip()
         if value != "":
             keyfile_name = value
         else:
@@ -239,7 +248,7 @@ class Helpers:
     @staticmethod
     def archivenode_deprecate_message():
         print(
-            f"Archive node is no more supported for core releases from 1.1.0 onwards. Use cli versions older than 1.0.11 to run or maintain archive nodes")
+            "Archive node is no more supported for core releases from 1.1.0 onwards. Use cli versions older than 1.0.11 to run or maintain archive nodes")
         sys.exit()
 
     @staticmethod

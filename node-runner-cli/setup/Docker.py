@@ -4,6 +4,7 @@ import sys
 
 import requests
 
+from config.DockerConfig import DockerConfig
 from env_vars import IMAGE_OVERRIDE
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
@@ -46,9 +47,9 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def setup_compose_file(config):
-        composefileurl = config.settings.composefileurl
-        key_file_location = f'{config.settings.keydetails.keyfile_path}/{config.settings.keydetails.keyfile_name}'
+    def setup_compose_file(config: DockerConfig):
+        composefileurl = config.core_node_settings.composefileurl
+        key_file_location = f'{config.core_node_settings.keydetails.keyfile_path}/{config.core_node_settings.keydetails.keyfile_name}'
         compose_file_name = composefileurl.rsplit('/', 1)[-1]
         if os.path.isfile(compose_file_name):
             backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
@@ -66,21 +67,21 @@ class Docker(Base):
 
         composefile_yaml = yaml.safe_load(resp.content)
 
-        if config.settings.data_directory:
-            composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
+        if config.core_node_settings.data_directory:
+            composefile_yaml = Docker.merge_external_db_config(composefile_yaml, config)
 
         def represent_none(self, _):
             return self.represent_scalar('tag:yaml.org,2002:null', '')
 
         yaml.add_representer(type(None), represent_none)
 
-        network_id = config.settings.network_id
-        genesis_json_location = config.settings.genesis_json_location
+        network_id = config.core_node_settings.network_id
+        genesis_json_location = config.core_node_settings.genesis_json_location
 
         composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
         composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, key_file_location)
         composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml,
-                                                             "true" if config.settings.enable_transaction else "false")
+                                                             "true" if config.core_node_settings.enable_transaction else "false")
         if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
             composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
 
@@ -88,8 +89,8 @@ class Docker(Base):
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
-    def merge_external_db_config(composefile_yaml, keyfile_name="node-keystore.ks"):
-        data_dir_path = Base.get_data_dir()
+    def merge_external_db_config(composefile_yaml, config: DockerConfig):
+        data_dir_path = config.core_node_settings.data_directory
 
         # TODO fix the issue where volumes array gets merged correctly
         external_data_yaml = yaml.safe_load(f"""
