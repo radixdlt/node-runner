@@ -84,7 +84,12 @@ class Docker(Base):
                                                              "true" if config.core_node_settings.enable_transaction else "false")
         if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
             composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
+        return composefile_yaml
 
+    @staticmethod
+    def save_compose_file(config, composefile_yaml):
+        composefileurl = config.core_node_settings.composefileurl
+        compose_file_name = composefileurl.rsplit('/', 1)[-1]
         with open(compose_file_name, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 

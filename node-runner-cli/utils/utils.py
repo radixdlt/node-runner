@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 import requests
+import yaml
 from system_client import ApiException
 
 from env_vars import PRINT_REQUEST
@@ -261,6 +262,15 @@ class Helpers:
     def cli_version():
         return __version__
 
+    @staticmethod
+    def yaml_as_dict(my_file):
+        my_dict = {}
+        with open(my_file, 'r') as fp:
+            docs = yaml.safe_load_all(fp)
+            for doc in docs:
+                for key, value in doc.items():
+                    my_dict[key] = value
+        return my_dict
 
 class bcolors:
     HEADER = '\033[95m'

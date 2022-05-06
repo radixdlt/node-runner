@@ -30,6 +30,7 @@ class DefaultDockerSettings(Subscriptable):
     genesis_json_location = None
     enable_transaction = False
     network_id = None
+    existing_docker_compose = "radix-fullnode-compose.yml"
 
 
 class DockerConfig:

@@ -7,6 +7,7 @@ from config.DockerConfig import DockerConfig
 from github.github import latest_release
 from setup import Docker, Base
 from utils.utils import Helpers, run_shell_command
+from deepdiff import DeepDiff
 
 dockercli = ArgumentParser(
     description='Docker commands')
@@ -43,8 +44,13 @@ def setup(args):
 
     print(f"Yaml of config {yaml.dump(config.core_node_settings)}")
 
-    Docker.setup_compose_file(config)
+    composefile_yaml = Docker.setup_compose_file(config)
 
+    print(DeepDiff(composefile_yaml, Helpers.yaml_as_dict(config.core_node_settings.existing_docker_compose),
+                   ignore_order=True))
+    update_compose_file = input("\nOkay to update the file [Y/n]?:")
+    if Helpers.check_Yes(update_compose_file):
+        Docker.save_compose_file(config, composefile_yaml)
     compose_file_name = config.core_node_settings.composefileurl.rsplit('/', 1)[-1]
 
     action = "update" if args.update else "start"

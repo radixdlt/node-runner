@@ -11,6 +11,7 @@ deepmerge = "==0.3.0"
 bech32 = "==1.2.0"
 ecdsa = "==0.17.0"
 cryptography="==36.0.1"
+deepdiff="==5.8.0"
 
 [requires]
 python_version = "3.7.6"
