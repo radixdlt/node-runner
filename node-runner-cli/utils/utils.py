@@ -215,7 +215,7 @@ class Helpers:
     @staticmethod
     def get_keyfile_path():
         radixnode_dir = f"{Path.home()}/node-config"
-        print(f"Location of keyfile: {radixnode_dir}")
+        print(f"Folder Location for keyfile will be: {radixnode_dir}")
         run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
         return str(radixnode_dir)
 
@@ -223,7 +223,7 @@ class Helpers:
     def get_keyfile_name():
         default_keyfile_name = "node-keystore.ks"
         value = input(
-            f"\nEnter the name of keystore file. Press 'Enter' to use default value '{default_keyfile_name}':").strip()
+            f"\nType in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':").strip()
         if value != "":
             keyfile_name = value
         else:

@@ -8,7 +8,7 @@ from github.github import latest_release
 from setup import Docker, Base
 from utils.utils import Helpers, run_shell_command
 from deepdiff import DeepDiff
-
+from pathlib import Path
 dockercli = ArgumentParser(
     description='Docker commands')
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
@@ -27,13 +27,13 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
     argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
     argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
 ])
-def setup(args):
+def config(args):
     release = latest_release()
 
     if args.nodetype == "archivenode":
         Helpers.archivenode_deprecate_message()
 
-    config = DockerConfig()
+    config = DockerConfig(release)
     config.set_node_type(args.nodetype)
     config.set_composefile_url()
     config.set_keydetails()
@@ -41,8 +41,26 @@ def setup(args):
     config.set_data_directory()
     config.set_network_id()
     config.set_enable_transaction(args.enabletransactions)
-
     print(f"Yaml of config {yaml.dump(config.core_node_settings)}")
+    config_file = f"{Path.home()}/config.yaml"
+
+    def represent_none(self, _):
+        return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+    yaml.add_representer(type(None), represent_none)
+    with open(config_file, 'w') as f:
+        yaml.dump(config.core_node_settings, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+
+
+@dockercommand([
+    argument("-f", "--configfile", required=True,
+             help="Path to config file",
+             action="store"),
+])
+def setup(args):
+    release = latest_release()
+    config = DockerConfig(release)
+    config.loadConfig(args.configfile)
 
     composefile_yaml = Docker.setup_compose_file(config)
 

@@ -32,7 +32,7 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks",keygen_tag="1.0.0"):
+    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
         print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
             # TODO AutoApprove
@@ -44,11 +44,11 @@ class Base:
                 (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
             if Helpers.check_Yes(ask_keystore_exists):
                 print(
-                    f"Copy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
+                    f"\nCopy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
                 sys.exit()
             else:
                 print(f"""
-                Generating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
+                \nGenerating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
                 """)
                 keystore_password = getpass.getpass(f"Enter the password of the new file '{keyfile_name}':")
                 # TODO keygen image needs to be updated
@@ -115,10 +115,14 @@ class Base:
             setup_swap = "false"
 
     @staticmethod
-    def get_data_dir():
+    def get_data_dir(create_dir=True):
         # TODO AutoApprove
-        data_dir_path = input("Enter the absolute path to data DB folder:")
-        run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
+        data_dir_path = input(
+            f"\n Press Enter to store ledger on \"{Path.home()}/data\" directory or Enter the absolute path of existing ledger data folder:")
+        if data_dir_path == "":
+            data_dir_path = f"{Path.home()}/data"
+        if create_dir:
+            run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path
 
     @staticmethod
