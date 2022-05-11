@@ -47,7 +47,7 @@ class Docker(Base):
                           })
 
     @staticmethod
-    def setup_compose_file(config: DockerConfig):
+    def setup_new_compose_file(config: DockerConfig):
         composefileurl = config.core_node_settings.composefileurl
         key_file_location = f'{config.core_node_settings.keydetails.keyfile_path}/{config.core_node_settings.keydetails.keyfile_name}'
         compose_file_name = composefileurl.rsplit('/', 1)[-1]

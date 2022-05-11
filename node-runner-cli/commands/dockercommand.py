@@ -8,6 +8,7 @@ from setup import Docker, Base
 from utils.utils import Helpers, run_shell_command
 from deepdiff import DeepDiff
 from pathlib import Path
+
 dockercli = ArgumentParser(
     description='Docker commands')
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
@@ -58,29 +59,39 @@ def config(args):
 @dockercommand([
     argument("-f", "--configfile", required=True,
              help="Path to config file",
-             action="store")
+             action="store"),
+    argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true"),
 ])
 def setup(args):
     release = latest_release()
+    autoapprove = args.autoapprove
+
     docker_config = DockerConfig(release)
     docker_config.loadConfig(args.configfile)
+    core_node_settings = docker_config.core_node_settings
+    new_compose_file = Docker.setup_new_compose_file(docker_config)
 
-    composefile_yaml = Docker.setup_compose_file(docker_config)
-
-    existing_yaml = Helpers.yaml_as_dict(f"{docker_config.core_node_settings.existing_docker_compose}")
-    print(dict(DeepDiff(existing_yaml, composefile_yaml,
-                        ignore_order=True))
+    old_compose_file = Helpers.yaml_as_dict(f"{docker_config.core_node_settings.existing_docker_compose}")
+    print(dict(DeepDiff(old_compose_file, new_compose_file))
           )
-    update_compose_file = input("\nOkay to update the file [Y/n]?:")
-    if Helpers.check_Yes(update_compose_file):
-        Docker.save_compose_file(docker_config, composefile_yaml)
-    compose_file_name = docker_config.core_node_settings.existing_docker_compose.rsplit('/', 1)[-1]
+    to_update = ""
+    if autoapprove:
+        print("In Auto mode - Updating file as suggested in above changes")
+    else:
+        to_update = input("\nOkay to update the file [Y/n]?:")
+    if Helpers.check_Yes(to_update) or autoapprove:
+        Docker.save_compose_file(docker_config, new_compose_file)
 
     run_shell_command(f"cat {docker_config.core_node_settings.existing_docker_compose}", shell=True)
-    should_start = input("\nOkay to start the node [Y/n]?:")
-    if Helpers.check_Yes(should_start):
-        Docker.run_docker_compose_up(docker_config.core_node_settings.keydetails.keystore_password, compose_file_name,
-                                     docker_config.core_node_settings.trusted_node)
+    should_start = ""
+    if autoapprove:
+        print("In Auto mode -  Updating the node as per above contents of docker file")
+    else:
+        should_start = input("\nOkay to start the node [Y/n]?:")
+    if Helpers.check_Yes(should_start) or autoapprove:
+        Docker.run_docker_compose_up(core_node_settings.keydetails.keystore_password,
+                                     core_node_settings.existing_docker_compose,
+                                     core_node_settings.trusted_node)
         # print(f"""
         #     ---------------------------------------------------------------
         #     Bring up node by updating the file {compose_file_name}
