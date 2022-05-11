@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 
 import yaml
-
 from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
 from github.github import latest_release
@@ -41,55 +40,55 @@ def config(args):
     config.set_data_directory()
     config.set_network_id()
     config.set_enable_transaction(args.enabletransactions)
-    print(f"Yaml of config {yaml.dump(config.core_node_settings)}")
+    config.set_trusted_node(args.trustednode)
+    config.set_existing_docker_compose_file()
+    config_to_dump = {"core-node": dict(config.core_node_settings)}
+    print(f"Yaml of config \n{yaml.dump(config_to_dump)}")
     config_file = f"{Path.home()}/config.yaml"
 
     def represent_none(self, _):
         return self.represent_scalar('tag:yaml.org,2002:null', '')
 
     yaml.add_representer(type(None), represent_none)
+
     with open(config_file, 'w') as f:
-        yaml.dump(config.core_node_settings, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+        yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
 
 @dockercommand([
     argument("-f", "--configfile", required=True,
              help="Path to config file",
-             action="store"),
+             action="store")
 ])
 def setup(args):
     release = latest_release()
-    config = DockerConfig(release)
-    config.loadConfig(args.configfile)
+    docker_config = DockerConfig(release)
+    docker_config.loadConfig(args.configfile)
 
-    composefile_yaml = Docker.setup_compose_file(config)
+    composefile_yaml = Docker.setup_compose_file(docker_config)
 
-    print(DeepDiff(composefile_yaml, Helpers.yaml_as_dict(config.core_node_settings.existing_docker_compose),
-                   ignore_order=True))
+    existing_yaml = Helpers.yaml_as_dict(f"{docker_config.core_node_settings.existing_docker_compose}")
+    print(dict(DeepDiff(existing_yaml, composefile_yaml,
+                        ignore_order=True))
+          )
     update_compose_file = input("\nOkay to update the file [Y/n]?:")
     if Helpers.check_Yes(update_compose_file):
-        Docker.save_compose_file(config, composefile_yaml)
-    compose_file_name = config.core_node_settings.composefileurl.rsplit('/', 1)[-1]
+        Docker.save_compose_file(docker_config, composefile_yaml)
+    compose_file_name = docker_config.core_node_settings.existing_docker_compose.rsplit('/', 1)[-1]
 
-    action = "update" if args.update else "start"
-    print(f"About to {action} the node using docker-compose file {compose_file_name}, which is as below")
-    run_shell_command(f"cat {compose_file_name}", shell=True)
+    run_shell_command(f"cat {docker_config.core_node_settings.existing_docker_compose}", shell=True)
     should_start = input("\nOkay to start the node [Y/n]?:")
     if Helpers.check_Yes(should_start):
-        if action == "update":
-            print(f"For update, bringing down the node using compose file {compose_file_name}")
-            Docker.run_docker_compose_down(compose_file_name)
-        Docker.run_docker_compose_up(config.core_node_settings.keydetails.keystore_password, compose_file_name,
-                                     args.trustednode)
-    else:
-        print(f"""
-            ---------------------------------------------------------------
-            Bring up node by updating the file {compose_file_name}
-            You can do it through cli using below command
-                radixnode docker stop  -f {compose_file_name}
-                radixnode docker start -f {compose_file_name} -t {args.trustednode}
-            ----------------------------------------------------------------
-            """)
+        Docker.run_docker_compose_up(docker_config.core_node_settings.keydetails.keystore_password, compose_file_name,
+                                     docker_config.core_node_settings.trusted_node)
+        # print(f"""
+        #     ---------------------------------------------------------------
+        #     Bring up node by updating the file {compose_file_name}
+        #     You can do it through cli using below command
+        #         radixnode docker stop  -f {compose_file_name}
+        #         radixnode docker start -f {compose_file_name} -t {args.trustednode}
+        #     ----------------------------------------------------------------
+        #     """)
 
 
 @dockercommand([
