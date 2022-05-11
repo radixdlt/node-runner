@@ -92,28 +92,27 @@ def setup(args):
         Docker.run_docker_compose_up(core_node_settings.keydetails.keystore_password,
                                      core_node_settings.existing_docker_compose,
                                      core_node_settings.trusted_node)
-        # print(f"""
-        #     ---------------------------------------------------------------
-        #     Bring up node by updating the file {compose_file_name}
-        #     You can do it through cli using below command
-        #         radixnode docker stop  -f {compose_file_name}
-        #         radixnode docker start -f {compose_file_name} -t {args.trustednode}
-        #     ----------------------------------------------------------------
-        #     """)
 
 
 @dockercommand([
-    argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
-    argument("-t", "--trustednode", required=True, help="Trusted node on radix network", action="store")
+    argument("-f", "--configfile", required=True,
+             help="Path to config file",
+             action="store"),
 ])
 def start(args):
     release = latest_release()
-    keystore_password, keyfile_location = Base.generatekey(keyfile_path=Helpers.get_keyfile_path(), keygen_tag=release)
-    Docker.run_docker_compose_up(keystore_password, args.composefile, args.trustednode)
+    docker_config = DockerConfig(release)
+    docker_config.loadConfig(args.configfile)
+    core_node_settings = docker_config.core_node_settings
+    Docker.run_docker_compose_up(core_node_settings.keydetails.keystore_password,
+                                 core_node_settings.existing_docker_compose,
+                                 core_node_settings.trusted_node)
 
 
 @dockercommand([
-    argument("-f", "--composefile", required=True, help="The name of compose file ", action="store"),
+    argument("-f", "--configfile", required=True,
+             help="Path to config file",
+             action="store"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true"),
 ])
 def stop(args):
@@ -122,7 +121,11 @@ def stop(args):
             """ 
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
-    Docker.run_docker_compose_down(args.composefile, args.removevolumes)
+    release = latest_release()
+    docker_config = DockerConfig(release)
+    docker_config.loadConfig(args.configfile)
+    core_node_settings = docker_config.core_node_settings
+    Docker.run_docker_compose_down(core_node_settings.existing_docker_compose, args.removevolumes)
 
 
 @dockercommand([])
