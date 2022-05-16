@@ -5,6 +5,7 @@ from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
 from github.github import latest_release
 from setup import Docker, Base
+from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command
 from deepdiff import DeepDiff
 from pathlib import Path
@@ -33,18 +34,37 @@ def config(args):
     if args.nodetype == "archivenode":
         Helpers.archivenode_deprecate_message()
 
-    config = DockerConfig(release)
-    config.set_node_type(args.nodetype)
-    config.set_composefile_url()
-    config.set_keydetails()
-    config.set_core_release(release)
-    config.set_data_directory()
-    config.set_network_id()
-    config.set_enable_transaction(args.enabletransactions)
-    config.set_trusted_node(args.trustednode)
-    config.set_existing_docker_compose_file()
-    config_to_dump = {"core-node": dict(config.core_node_settings)}
+    configuration = DockerConfig(release)
+    configuration.core_node_settings.set_node_type(args.nodetype)
+    configuration.core_node_settings.set_composefile_url()
+    configuration.core_node_settings.ask_keydetails()
+    configuration.core_node_settings.set_core_release(release)
+    configuration.core_node_settings.ask_data_directory()
+    configuration.common_settings.ask_network_id()
+    configuration.core_node_settings.set_enable_transaction(args.enabletransactions)
+    configuration.core_node_settings.set_trusted_node(args.trustednode)
+    configuration.core_node_settings.ask_existing_docker_compose_file()
+
+    if Prompts.check_for_gateway():
+        configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
+        configuration.gateway_settings.data_aggregator.ask_postgress_settings()
+        configuration.gateway_settings.data_aggregator.ask_gateway_release()
+        configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
+
+        configuration.gateway_settings.gateway_api.set_core_api_node_setings(
+            configuration.gateway_settings.data_aggregator.coreApiNode)
+        configuration.gateway_settings.gateway_api.set_postgress_settings(
+            configuration.gateway_settings.data_aggregator.postgresSettings)
+
+    config_to_dump = {
+        "common-config": dict(configuration.common_settings),
+        "core-node": dict(configuration.core_node_settings),
+        "data-aggregator": dict(configuration.gateway_settings.data_aggregator),
+        "gateway-api": dict(configuration.gateway_settings.gateway_api)
+    }
     print(f"Yaml of config \n{yaml.dump(config_to_dump)}")
+
+    # TODO make this as optional parameter
     config_file = f"{Path.home()}/config.yaml"
 
     def represent_none(self, _):
@@ -72,8 +92,7 @@ def setup(args):
     new_compose_file = Docker.setup_new_compose_file(docker_config)
 
     old_compose_file = Helpers.yaml_as_dict(f"{docker_config.core_node_settings.existing_docker_compose}")
-    print(dict(DeepDiff(old_compose_file, new_compose_file))
-          )
+    print(dict(DeepDiff(old_compose_file, new_compose_file)))
     to_update = ""
     if autoapprove:
         print("In Auto mode - Updating file as suggested in above changes")
