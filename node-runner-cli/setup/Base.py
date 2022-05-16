@@ -5,8 +5,7 @@ from pathlib import Path
 
 import requests
 
-from env_vars import NETWORK_ID
-from utils.utils import run_shell_command, Helpers
+from utils.utils import run_shell_command, Helpers, Bcolors
 
 
 class Base:
@@ -33,10 +32,9 @@ class Base:
 
     @staticmethod
     def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
-        print('-----------------------------')
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
             # TODO AutoApprove
-            print(f"Node key file already exist at location {keyfile_path}")
+            print(f"Node Keystore file already exist at location {keyfile_path}")
             keystore_password = getpass.getpass(f"Enter the password of the existing keystore file '{keyfile_name}':")
         else:
             # TODO AutoApprove
@@ -118,9 +116,13 @@ class Base:
     def get_data_dir(create_dir=True):
         # TODO AutoApprove
         data_dir_path = input(
-            f"\n Press Enter to store ledger on \"{Path.home()}/data\" directory or Enter the absolute path of existing ledger data folder:")
+            f"-----------LEDGER LOCATION------\n"
+            f"Radix node stores all the data on ledger on a folder. "
+            f"This would allow to restart the node without a need to download ledger on every restart"
+            f"\n{Bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
+            f"Type the absolute path of existing ledger data folder:{Bcolors.ENDC}")
         if data_dir_path == "":
-            data_dir_path = f"{Path.home()}/data"
+            data_dir_path = f"{Helpers.get_home_dir()}/data"
         if create_dir:
             run_shell_command(f'sudo mkdir -p {data_dir_path}', shell=True)
         return data_dir_path

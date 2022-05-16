@@ -11,7 +11,7 @@ class Prompts:
             return answer
 
     @staticmethod
-    def get_postgress_password():
+    def ask_postgress_password():
         answer = input("Type in Postgress database password:")
         return answer
 
@@ -19,6 +19,28 @@ class Prompts:
     def get_postgress_user():
         answer = input("Type in Postgress username:")
         return answer
+
+    @staticmethod
+    def ask_postgress_location():
+        answer = input(
+            "Gateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
+            "(although not advised) or use a remote managed POSTGRES."
+            "Press ENTER to use default 'local' setup or type in 'remote': ")
+        local_or_remote = Prompts.check_default(answer, 'local')
+        if local_or_remote == "local":
+            default_postgres_dir = f"{Helpers.get_home_dir()}/postgresdata"
+            postgres_mount = input(f"Press Enter to store POSTGRES data on \"{default_postgres_dir}\" directory"
+                                   f" Or type in the absolute path:")
+            return "local", Prompts.check_default(postgres_mount, default_postgres_dir), "postgres_db:5432"
+
+        else:
+            hostname = input("\nEnter the host name of server hosting postgress:")
+            port = input("\nEnter the port the postgres process is listening on the server:")
+            return "remote", None, f"{hostname}:{port}"
+
+    @staticmethod
+    def ask_postgress_volume_location():
+        answer = input("")
 
     @staticmethod
     def get_postgress_dbname():

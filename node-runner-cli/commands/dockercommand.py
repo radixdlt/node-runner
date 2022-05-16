@@ -1,14 +1,14 @@
 from argparse import ArgumentParser
 
 import yaml
+from deepdiff import DeepDiff
+
 from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
 from github.github import latest_release
 from setup import Docker, Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command
-from deepdiff import DeepDiff
-from pathlib import Path
 
 dockercli = ArgumentParser(
     description='Docker commands')
@@ -62,15 +62,15 @@ def config(args):
         "data-aggregator": dict(configuration.gateway_settings.data_aggregator),
         "gateway-api": dict(configuration.gateway_settings.gateway_api)
     }
-    print(f"Yaml of config \n{yaml.dump(config_to_dump)}")
 
     # TODO make this as optional parameter
-    config_file = f"{Path.home()}/config.yaml"
+    config_file = f"{Helpers.get_home_dir()}/config.yaml"
 
     def represent_none(self, _):
         return self.represent_scalar('tag:yaml.org,2002:null', '')
 
     yaml.add_representer(type(None), represent_none)
+    print(f"Yaml of config \n{yaml.dump(config_to_dump)}")
 
     with open(config_file, 'w') as f:
         yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

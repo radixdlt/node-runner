@@ -45,27 +45,27 @@ def print_vote_and_fork_info(health, engine_configuration):
 
     if health['current_fork_name'] == newest_fork_name:
         print(
-            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration")
-        print(f"{bcolors.WARNING}No action is needed{bcolors.ENDC}")
+            f"The node is currently running fork {Bcolors.BOLD}{health['current_fork_name']}{Bcolors.ENDC}, which is the newest fork in its configuration")
+        print(f"{Bcolors.WARNING}No action is needed{Bcolors.ENDC}")
         return
 
     if not is_candidate:
         print(
-            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})")
-        print(f"{bcolors.WARNING}This newer fork is not a candidate fork, so no action is needed{bcolors.ENDC}")
+            f"The node is currently running fork {Bcolors.BOLD}{health['current_fork_name']}{Bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})")
+        print(f"{Bcolors.WARNING}This newer fork is not a candidate fork, so no action is needed{Bcolors.ENDC}")
         return
 
     node_says_vote_required = health['fork_vote_status'] == 'VOTE_REQUIRED'
     if not node_says_vote_required:
         print(
-            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+            f"The node is currently running fork {Bcolors.BOLD}{health['current_fork_name']}{Bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
         print(
-            f"{bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{bcolors.ENDC}")
+            f"{Bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{Bcolors.ENDC}")
         return
 
     print(
-        f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
-    print(f"{bcolors.WARNING}The node has not yet signalled the readiness for this fork{bcolors.ENDC}")
+        f"The node is currently running fork {Bcolors.BOLD}{health['current_fork_name']}{Bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+    print(f"{Bcolors.WARNING}The node has not yet signalled the readiness for this fork{Bcolors.ENDC}")
 
 
 class Helpers:
@@ -186,36 +186,40 @@ class Helpers:
             json_response = json.loads(resp.content)
             if "error" in json_response:
                 print(
-                    f"{bcolors.FAIL}\n Failed to submit changes Check the response for the error details{bcolors.ENDC}")
+                    f"{Bcolors.FAIL}\n Failed to submit changes Check the response for the error details{Bcolors.ENDC}")
         elif not resp.ok:
-            print(f"{bcolors.FAIL}\n Failed to submit changes")
+            print(f"{Bcolors.FAIL}\n Failed to submit changes")
 
     @staticmethod
     def check_validatorFee_input():
         while True:
             try:
                 str_validatorFee = input(
-                    f'{bcolors.BOLD}Enter the validatorFee value between 0.00 to 100.00 as the validator fees:{bcolors.ENDC}')
+                    f'{Bcolors.BOLD}Enter the validatorFee value between 0.00 to 100.00 as the validator fees:{Bcolors.ENDC}')
                 validatorFee = float(str_validatorFee)
                 if 0 <= validatorFee <= 100:
                     break
             except ValueError:
                 pass
             print(
-                f"{bcolors.FAIL}The validatorFee value should between 0.00 to 100.00 as the validator fees!{bcolors.ENDC}")
+                f"{Bcolors.FAIL}The validatorFee value should between 0.00 to 100.00 as the validator fees!{Bcolors.ENDC}")
         return round(validatorFee, 2)
 
     @staticmethod
     def print_coloured_line(text, color="\033[0m", return_string=False):
         if not return_string:
-            print(f"{color}{text}{bcolors.ENDC}")
+            print(f"{color}{text}{Bcolors.ENDC}")
         else:
-            return f"{color}{text}{bcolors.ENDC}"
+            return f"{color}{text}{Bcolors.ENDC}"
 
     @staticmethod
     def get_keyfile_path():
-        radixnode_dir = f"{Path.home()}/node-config"
-        print(f"Folder Location for keyfile will be: {radixnode_dir}")
+        radixnode_dir = f"{Helpers.get_home_dir()}/node-config"
+        print(f"------ KEYSTORE FILE ----\n"
+              f"\nThis keystore file is very important and it is the identity of the node."
+              f"\nIf you are planning to run a validator, make sure you backup this keystore file"
+              f"\nFolder Location for Keystore file will be: {radixnode_dir}")
+        # TODO this needs to moved out of init
         run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
         return str(radixnode_dir)
 
@@ -272,7 +276,12 @@ class Helpers:
                     my_dict[key] = value
         return my_dict
 
-class bcolors:
+    @staticmethod
+    def get_home_dir():
+        return Path.home()
+
+
+class Bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'

@@ -1,4 +1,5 @@
 import os
+
 import yaml
 
 from config.CommonDockerSettings import CommonDockerSettings
@@ -34,7 +35,6 @@ class CoreDockerSettings():
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
     data_directory: str = None
-    genesis_json_location: str = None
     enable_transaction: str = False
     existing_docker_compose: str = None
     trusted_node: str = None
@@ -45,8 +45,6 @@ class CoreDockerSettings():
         yield 'keydetails', dict(self.keydetails)
         yield 'core_release', self.core_release
         yield 'data_directory', self.data_directory
-        if self.genesis_json_location:
-            yield 'genesis_json_location', self.genesis_json_location
         yield 'enable_transaction', self.enable_transaction
         yield 'existing_docker_compose', self.existing_docker_compose
         yield 'trusted_node', self.trusted_node
@@ -57,7 +55,9 @@ class CoreDockerSettings():
             os.getenv(COMPOSE_FILE_OVERIDE,
                       f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_latest_version}/node-runner-cli/release_ymls/radix-{self.nodetype}-compose.yml")
         print(
-            f"Going to setup node type {self.nodetype} from location {self.composefileurl}.\n")
+            f"--------BASE DOCKER COMPOSE FILE ---------"
+            f"\nDocker version of node is set using a base docker-compose file from the location {self.composefileurl} "
+            f"\nGoing to setup node type {self.nodetype} using this file\n")
 
     def set_node_type(self, nodetype):
         self.nodetype = nodetype

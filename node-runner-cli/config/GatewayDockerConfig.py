@@ -1,7 +1,6 @@
-from config.DockerConfig import CommonDockerSettings
-from utils.Prompts import Prompts
 from urllib.parse import urlparse
 
+from utils.Prompts import Prompts
 from utils.utils import Helpers
 
 
@@ -44,15 +43,18 @@ class CoreApiNode:
 
 
 class DataAggregatorSetting:
-    release = None
-    repo = "radixdlt/ng-data-aggregator"
-    docker_image = None
-    restart = "unless-stopped"
-    PrometheusMetricsPort = "1234"
-    DisableCoreApiHttpsCertificateChecks = None
-    NetworkName = None
+    release: str = None
+    repo: str = "radixdlt/ng-data-aggregator"
+    docker_image: str = None
+    restart: str = "unless-stopped"
+    PrometheusMetricsPort: str = "1234"
+    DisableCoreApiHttpsCertificateChecks: str = None
+    NetworkName: str = None
     postgresSettings: PostGresSettings = PostGresSettings({})
     coreApiNode: CoreApiNode = CoreApiNode({})
+    host: str = None
+    setup: str = None
+    data_mount_path: str = None
 
     def ask_gateway_release(self):
         self.release = Prompts.get_gateway_release()
@@ -60,8 +62,9 @@ class DataAggregatorSetting:
 
     def ask_postgress_settings(self):
         postgresSettings = self.postgresSettings
+        postgresSettings.setup, postgresSettings.data_mount_path, postgresSettings.host = Prompts.ask_postgress_location()
         postgresSettings.postgres_user = Prompts.get_postgress_user()
-        postgresSettings.postgres_password = Prompts.get_postgress_password()
+        postgresSettings.postgres_password = Prompts.ask_postgress_password()
         postgresSettings.postgres_dbname = Prompts.get_postgress_dbname()
         self.postgresSettings = postgresSettings
 
