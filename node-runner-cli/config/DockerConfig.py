@@ -109,12 +109,12 @@ class DockerConfig:
     def loadConfig(self, file):
         with open(file, 'r') as file:
             config_yaml = yaml.safe_load(file)
-            core_node = config_yaml["core-node"]
-            common_settings = config_yaml["common-config"]
+            core_node = config_yaml["core_node"]
+            common_settings = config_yaml["common_config"]
             self.core_node_settings.core_release = core_node.get("core_release", None)
             self.core_node_settings.composefileurl = core_node.get("composefileurl")
             self.core_node_settings.data_directory = core_node.get("data_directory", None)
-            self.core_node_settings.genesis_json_location = config_yaml["core-node"].get("genesis_json_location", None)
+            self.core_node_settings.genesis_json_location = core_node.get("genesis_json_location", None)
             self.core_node_settings.enable_transaction = core_node.get("enable_transaction", False)
             self.common_settings = CommonDockerSettings(
                 {"network_id": common_settings.get("network_id", "1")})

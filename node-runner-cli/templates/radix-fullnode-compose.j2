@@ -1,0 +1,66 @@
+services:
+  core:
+    cap_add:
+    - NET_ADMIN
+    environment:
+      JAVA_OPTS: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
+        -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+        -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+      RADIXDLT_API_PORT: 3333
+      RADIXDLT_LOG_LEVEL: {{core_node.log_level or 'info'}}
+      RADIXDLT_NETWORK_ID: {{common_config.network_id}}
+      RADIXDLT_NETWORK_SEEDS_REMOTE: {{core_node.trusted_node}}
+      {% if core_node.use_proxy_protocol is defined %}
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol}}'
+      {% endif %}
+      RADIXDLT_SIGN_ENABLE: 'true'
+      RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
+      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
+      RADIX_NODE_KEYSTORE_PASSWORD: {{core_node.keydetails.keystore_password}}
+      {% if common_config.genesis_json_location is defined %}
+      RADIXDLT_GENESIS_FILE: "{{common_config.genesis_json_location}}"
+      {% endif %}
+    image: radixdlt/radixdlt-core:{{core_node.core_release}}
+    init: true
+    mem_limit: {{core_node.memory_limit or '12000m'}}
+    restart: unless-stopped
+    ulimits:
+      memlock: '-1'
+      nofile:
+        hard: '65536'
+        soft: '65536'
+    volumes:
+    {% if core_node.data_directory is defined %}
+    - core_ledger:/home/radixdlt/RADIXDB
+    {% endif %}
+    - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
+    {% if common_config.genesis_json_location is defined %}
+    - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis.json"
+    {% endif %}
+  nginx:
+    environment:
+    {% if core_node.use_proxy_protocol is defined %}
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol}}'
+    {% endif %}
+    image: radixdlt/radixdlt-nginx:1.1.1
+    ports:
+    - 443:443
+    - 30000:30000
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        hard: '65536'
+        soft: '65536'
+    volumes:
+    - nginx_secrets:/etc/nginx/secrets
+version: '2.2'
+volumes:
+ {% if core_node.data_directory is defined %}
+  core_ledger:
+    driver: local
+    driver_opts:
+      device: {{ core_node.data_directory }}
+      o: bind
+      type: none
+ {% endif %}
+  nginx_secrets:

@@ -35,4 +35,5 @@ class CommonDockerSettings:
 
     def __iter__(self):
         for attr, value in self.__dict__.items():
-            yield attr, value
+            if value:
+                yield attr, value

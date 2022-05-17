@@ -5,6 +5,7 @@ from deepdiff import DeepDiff
 
 from commands.subcommand import get_decorator, argument
 from config.DockerConfig import DockerConfig
+from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
 from utils.Prompts import Prompts
@@ -57,10 +58,10 @@ def config(args):
             configuration.gateway_settings.data_aggregator.postgresSettings)
 
     config_to_dump = {
-        "common-config": dict(configuration.common_settings),
-        "core-node": dict(configuration.core_node_settings),
-        "data-aggregator": dict(configuration.gateway_settings.data_aggregator),
-        "gateway-api": dict(configuration.gateway_settings.gateway_api)
+        "common_config": dict(configuration.common_settings),
+        "core_node": dict(configuration.core_node_settings),
+        "data_aggregator": dict(configuration.gateway_settings.data_aggregator),
+        "gateway_api": dict(configuration.gateway_settings.gateway_api)
     }
 
     # TODO make this as optional parameter
@@ -88,18 +89,26 @@ def setup(args):
 
     docker_config = DockerConfig(release)
     docker_config.loadConfig(args.configfile)
-    core_node_settings = docker_config.core_node_settings
-    new_compose_file = Docker.setup_new_compose_file(docker_config)
 
-    old_compose_file = Helpers.yaml_as_dict(f"{docker_config.core_node_settings.existing_docker_compose}")
-    print(dict(DeepDiff(old_compose_file, new_compose_file)))
+    def represent_none(self, _):
+        return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+    yaml.add_representer(type(None), represent_none)
+
+    with open(args.configfile, 'r') as file:
+        all_config = yaml.safe_load(file)
+    render_template = Renderer().load_file_based_template("radix-fullnode-compose.j2").render(all_config).to_yaml()
+
+    old_compose_file = Helpers.yaml_as_dict(f"{all_config['core_node']['existing_docker_compose']}")
+    print(dict(DeepDiff(old_compose_file, render_template)))
+
     to_update = ""
     if autoapprove:
         print("In Auto mode - Updating file as suggested in above changes")
     else:
         to_update = input("\nOkay to update the file [Y/n]?:")
     if Helpers.check_Yes(to_update) or autoapprove:
-        Docker.save_compose_file(docker_config, new_compose_file)
+        Docker.save_compose_file(docker_config, render_template)
 
     run_shell_command(f"cat {docker_config.core_node_settings.existing_docker_compose}", shell=True)
     should_start = ""
@@ -108,9 +117,9 @@ def setup(args):
     else:
         should_start = input("\nOkay to start the node [Y/n]?:")
     if Helpers.check_Yes(should_start) or autoapprove:
-        Docker.run_docker_compose_up(core_node_settings.keydetails.keystore_password,
-                                     core_node_settings.existing_docker_compose,
-                                     core_node_settings.trusted_node)
+        Docker.run_docker_compose_up(docker_config.core_node_settings.keydetails.keystore_password,
+                                     docker_config.core_node_settings.existing_docker_compose,
+                                     docker_config.core_node_settings.trusted_node)
 
 
 @dockercommand([
