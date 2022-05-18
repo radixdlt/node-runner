@@ -44,8 +44,9 @@ class CoreDockerSettings():
         for attr, value in self.__dict__.items():
             if value:
                 if attr in ['keydetails']:
-                    yield attr, dict(self.keydetails)
-                yield attr, value
+                    yield attr, dict(value)
+                else:
+                    yield attr, value
 
     def set_composefile_url(self):
         cli_latest_version = latest_release("radixdlt/node-runner")
