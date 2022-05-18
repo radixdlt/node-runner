@@ -34,6 +34,8 @@ def config(args):
     release = latest_release()
     configuration = DockerConfig(release)
     configuration.common_settings.ask_network_id()
+    print("About to create config file using the answers from the questions that would be asked in next steps."
+          f"\nLocation of the config file is {args.configfile}")
     config_file = args.configfile
     if Prompts.check_for_fullnode():
         configuration.core_node_settings.set_node_type()
