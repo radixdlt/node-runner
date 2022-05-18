@@ -31,7 +31,7 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name="node-keystore.ks", keygen_tag="1.0.0"):
+    def generatekey(keyfile_path, keyfile_name, keygen_tag):
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
             # TODO AutoApprove
             print(f"Node Keystore file already exist at location {keyfile_path}")

@@ -1,4 +1,6 @@
 import os
+import sys
+from pathlib import Path
 
 import yaml
 
@@ -7,7 +9,7 @@ from config.GatewayDockerConfig import GatewayDockerSettings
 from env_vars import COMPOSE_FILE_OVERIDE
 from github.github import latest_release
 from setup import Base
-from utils.utils import Helpers
+from utils.Prompts import Prompts
 
 
 class KeyDetails():
@@ -23,10 +25,9 @@ class KeyDetails():
         self.keystore_password = key_details.get("keystore_password", None)
 
     def __iter__(self):
-        yield 'keyfile_path', self.keyfile_path
-        yield 'keyfile_name', self.keyfile_name
-        yield 'keygen_tag', self.keygen_tag
-        yield 'keystore_password', self.keystore_password
+        for attr, value in self.__dict__.items():
+            if value:
+                yield attr, value
 
 
 class CoreDockerSettings():
@@ -40,14 +41,11 @@ class CoreDockerSettings():
     trusted_node: str = None
 
     def __iter__(self):
-        yield 'nodetype', self.nodetype
-        yield 'composefileurl', self.composefileurl
-        yield 'keydetails', dict(self.keydetails)
-        yield 'core_release', self.core_release
-        yield 'data_directory', self.data_directory
-        yield 'enable_transaction', self.enable_transaction
-        yield 'existing_docker_compose', self.existing_docker_compose
-        yield 'trusted_node', self.trusted_node
+        for attr, value in self.__dict__.items():
+            if value:
+                yield attr, value
+            elif attr in ['keydetails']:
+                yield attr, dict(self.keydetails)
 
     def set_composefile_url(self):
         cli_latest_version = latest_release("radixdlt/node-runner")
@@ -59,15 +57,15 @@ class CoreDockerSettings():
             f"\nDocker version of node is set using a base docker-compose file from the location {self.composefileurl} "
             f"\nGoing to setup node type {self.nodetype} using this file\n")
 
-    def set_node_type(self, nodetype):
+    def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
 
     def ask_keydetails(self):
         keydetails = self.keydetails
         if not keydetails.keyfile_path:
-            keydetails.keyfile_path = Helpers.get_keyfile_path()
+            keydetails.keyfile_path = Prompts.ask_keyfile_path()
         if not keydetails.keyfile_name:
-            keydetails.keyfile_name = Helpers.get_keyfile_name()
+            keydetails.keyfile_name = Prompts.ask_keyfile_name()
         if not keydetails.keygen_tag:
             keydetails.keygen_tag = self.core_release
 
@@ -85,13 +83,14 @@ class CoreDockerSettings():
         if not self.data_directory:
             self.data_directory = Base.get_data_dir(create_dir=False)
 
-    def set_enable_transaction(self, enabletransactions):
-        self.enable_transaction = enabletransactions
+    def ask_enable_transaction(self):
+        self.enable_transaction = Prompts.ask_enable_transaction()
 
     def ask_existing_docker_compose_file(self):
         self.existing_docker_compose = Base.get_existing_compose_file()
 
     def set_trusted_node(self, trusted_node):
+        # Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
 
@@ -107,6 +106,10 @@ class DockerConfig:
         yield 'core_node_settings', dict(self.core_node_settings)
 
     def loadConfig(self, file):
+        my_file = Path(file)
+        if not my_file.is_file():
+            sys.exit("Unable to find config file"
+                     "Run `radixnode docker init` to setup one")
         with open(file, 'r') as file:
             config_yaml = yaml.safe_load(file)
             core_node = config_yaml["core_node"]

@@ -1,4 +1,4 @@
-from utils.utils import Helpers
+from utils.utils import Helpers, run_shell_command
 
 
 class Prompts:
@@ -102,7 +102,60 @@ class Prompts:
     @staticmethod
     def check_for_gateway():
         print(
-            "Do you want to setup NETWORK GATEWAY on this node? "
+            "Do you want to setup NETWORK GATEWAY on this machine? "
             "\nFor more info refer https://docs.radixdlt.com/main/node-and-gateway/network-gateway.html")
-        answer = input("Press ENTER for No or type in either Y or N:")
+        answer = input("Default is N, Press ENTER to accept default or type in [Y/N]")
         return Helpers.check_Yes(Prompts.check_default(answer, "N"))
+
+    @staticmethod
+    def check_for_fullnode():
+        print(
+            "Do you want to setup fullnode or a validator?  "
+            "\nFor more information refer "
+            "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
+        answer = input("Default is Y, Press ENTER to accept default or type in [Y/N]:")
+        return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
+
+    @staticmethod
+    def ask_enable_transaction():
+        answer = input(
+            "Transactions API on fullnodes are disabled. To enable this, it requires to be set to true,"
+            "\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
+        return Prompts.check_default(answer, "false")
+
+    @staticmethod
+    def ask_keyfile_path():
+        print(f"------ KEYSTORE FILE ----\n"
+              f"\nThe keystore file is very important and it is the identity of the node."
+              f"\nIf you are planning to run a validator, defintely make sure you backup this keystore file"
+              )
+        y_n = input("\nDo you have a keystore file that you want to use [Y/N]?")
+        if Helpers.check_Yes(Prompts.check_default(y_n, "N")):
+            return input("Enter the absolute path of the folder, just the folder, where the keystore file is located:")
+        else:
+            radixnode_dir = f"{Helpers.get_home_dir()}/node-config"
+            answer = input(
+                f"\nDefault folder location for Keystore file will be: {radixnode_dir}"
+                "\nPress 'ENTER' to accept default. otherwise enter the absolute path of the new folder:")
+            # TODO this needs to moved out of init
+            run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
+            return str(radixnode_dir)
+
+    @staticmethod
+    def ask_keyfile_name():
+        default_keyfile_name = "node-keystore.ks"
+        value = input(
+            f"\nType in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':").strip()
+        if value != "":
+            keyfile_name = value
+        else:
+            keyfile_name = default_keyfile_name
+
+        return keyfile_name
+
+    @staticmethod
+    def ask_trusted_node():
+        input("Fullnode needs details another node to connect to network. "
+              "\nTo connect to MAINNET details on these node can be found here "
+              "- https://docs.radixdlt.com/main/node-and-gateway/cli-install-node-docker.html#_install_the_node"
+              "\nType in the node you want to connect to")

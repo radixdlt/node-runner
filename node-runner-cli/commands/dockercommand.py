@@ -21,37 +21,35 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 
 
 @dockercommand([
-    argument("-n", "--nodetype", required=True, default="fullnode", help="Type of node fullnode or archivenode",
-             action="store", choices=["fullnode", "archivenode"]),
-    argument("-t", "--trustednode", required=True,
+    argument("-t", "--trustednode",
+             required=True,
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
-    argument("-u", "--update", help="Update the node to new version of composefile", action="store_false"),
-    argument("-ts", "--enabletransactions", help="Enable transaction stream api", action="store_true"),
+    argument("-f", "--configfile",
+             help="Path to config file",
+             action="store",
+             default=f"{Helpers.get_home_dir()}/config.yaml"),
 ])
 def config(args):
     release = latest_release()
-
-    if args.nodetype == "archivenode":
-        Helpers.archivenode_deprecate_message()
-
     configuration = DockerConfig(release)
-    configuration.core_node_settings.set_node_type(args.nodetype)
-    configuration.core_node_settings.set_composefile_url()
-    configuration.core_node_settings.ask_keydetails()
-    configuration.core_node_settings.set_core_release(release)
-    configuration.core_node_settings.ask_data_directory()
     configuration.common_settings.ask_network_id()
-    configuration.core_node_settings.set_enable_transaction(args.enabletransactions)
-    configuration.core_node_settings.set_trusted_node(args.trustednode)
-    configuration.core_node_settings.ask_existing_docker_compose_file()
+
+    if Prompts.check_for_fullnode():
+        configuration.core_node_settings.set_node_type()
+        configuration.core_node_settings.set_composefile_url()
+        configuration.core_node_settings.set_core_release(release)
+        configuration.core_node_settings.set_trusted_node(args.trustednode)
+        configuration.core_node_settings.ask_keydetails()
+        configuration.core_node_settings.ask_data_directory()
+        configuration.core_node_settings.ask_enable_transaction()
+        configuration.core_node_settings.ask_existing_docker_compose_file()
 
     if Prompts.check_for_gateway():
         configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
         configuration.gateway_settings.data_aggregator.ask_postgress_settings()
         configuration.gateway_settings.data_aggregator.ask_gateway_release()
         configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
-
         configuration.gateway_settings.gateway_api.set_core_api_node_setings(
             configuration.gateway_settings.data_aggregator.coreApiNode)
         configuration.gateway_settings.gateway_api.set_postgress_settings(

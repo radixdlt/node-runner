@@ -212,28 +212,6 @@ class Helpers:
         else:
             return f"{color}{text}{Bcolors.ENDC}"
 
-    @staticmethod
-    def get_keyfile_path():
-        radixnode_dir = f"{Helpers.get_home_dir()}/node-config"
-        print(f"------ KEYSTORE FILE ----\n"
-              f"\nThis keystore file is very important and it is the identity of the node."
-              f"\nIf you are planning to run a validator, make sure you backup this keystore file"
-              f"\nFolder Location for Keystore file will be: {radixnode_dir}")
-        # TODO this needs to moved out of init
-        run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
-        return str(radixnode_dir)
-
-    @staticmethod
-    def get_keyfile_name():
-        default_keyfile_name = "node-keystore.ks"
-        value = input(
-            f"\nType in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':").strip()
-        if value != "":
-            keyfile_name = value
-        else:
-            keyfile_name = default_keyfile_name
-
-        return keyfile_name
 
     @staticmethod
     def get_basic_auth_header(user):
