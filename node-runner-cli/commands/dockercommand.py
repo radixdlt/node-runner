@@ -26,7 +26,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
     argument("-f", "--configfile",
-             help="Path to config file",
+             help="Path to config file where the config is going to get saved",
              action="store",
              default=f"{Helpers.get_home_dir()}/config.yaml"),
 ])
@@ -34,7 +34,7 @@ def config(args):
     release = latest_release()
     configuration = DockerConfig(release)
     configuration.common_settings.ask_network_id()
-
+    config_file = args.configfile
     if Prompts.check_for_fullnode():
         configuration.core_node_settings.set_node_type()
         configuration.core_node_settings.set_composefile_url()
@@ -61,9 +61,6 @@ def config(args):
         "data_aggregator": dict(configuration.gateway_settings.data_aggregator),
         "gateway_api": dict(configuration.gateway_settings.gateway_api)
     }
-
-    # TODO make this as optional parameter
-    config_file = f"{Helpers.get_home_dir()}/config.yaml"
 
     def represent_none(self, _):
         return self.represent_scalar('tag:yaml.org,2002:null', '')
