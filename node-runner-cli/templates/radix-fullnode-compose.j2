@@ -10,9 +10,7 @@ services:
       RADIXDLT_LOG_LEVEL: {{core_node.log_level or 'info'}}
       RADIXDLT_NETWORK_ID: {{common_config.network_id}}
       RADIXDLT_NETWORK_SEEDS_REMOTE: {{core_node.trusted_node}}
-      {% if core_node.use_proxy_protocol is defined %}
-      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol}}'
-      {% endif %}
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
       RADIXDLT_SIGN_ENABLE: 'true'
       RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
       RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
@@ -39,9 +37,7 @@ services:
     {% endif %}
   nginx:
     environment:
-    {% if core_node.use_proxy_protocol is defined %}
-      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol}}'
-    {% endif %}
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
     image: radixdlt/radixdlt-nginx:1.1.1
     ports:
     - 443:443
