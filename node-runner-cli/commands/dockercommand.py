@@ -33,11 +33,14 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 def config(args):
     release = latest_release()
     configuration = DockerConfig(release)
-    configuration.common_settings.ask_network_id()
+
     print("About to create config file using the answers from the questions that would be asked in next steps."
           f"\nLocation of the config file is {args.configfile}")
     config_file = args.configfile
-    if Prompts.check_for_fullnode():
+
+    configuration.common_settings.ask_network_id()
+    run_fullnode = Prompts.check_for_fullnode()
+    if run_fullnode:
         configuration.core_node_settings.set_node_type()
         configuration.core_node_settings.set_core_release(release)
         configuration.core_node_settings.set_trusted_node(args.trustednode)
@@ -46,21 +49,19 @@ def config(args):
         configuration.core_node_settings.ask_enable_transaction()
         configuration.core_node_settings.ask_existing_docker_compose_file()
 
-    if Prompts.check_for_gateway():
+    run_gateway = Prompts.check_for_gateway()
+    if run_gateway:
         configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
         configuration.gateway_settings.postgres_db.ask_postgress_settings()
         configuration.gateway_settings.data_aggregator.ask_gateway_release()
         configuration.gateway_settings.gateway_api.ask_gateway_release()
         configuration.gateway_settings.gateway_api.set_core_api_node_setings(
             configuration.gateway_settings.data_aggregator.coreApiNode)
-
-    config_to_dump = {
-        "common_config": dict(configuration.common_settings),
-        "core_node": dict(configuration.core_node_settings),
-        "data_aggregator": dict(configuration.gateway_settings.data_aggregator),
-        "gateway_api": dict(configuration.gateway_settings.gateway_api),
-        "postgress_db": dict(configuration.gateway_settings.postgres_db)
-    }
+    config_to_dump = {"common_config": dict(configuration.common_settings)}
+    if run_fullnode:
+        config_to_dump["core_node"] = dict(configuration.core_node_settings)
+    if run_gateway:
+        config_to_dump["gateway"] = dict(configuration.gateway_settings)
 
     def represent_none(self, _):
         return self.represent_scalar('tag:yaml.org,2002:null', '')

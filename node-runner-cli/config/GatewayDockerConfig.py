@@ -1,24 +1,17 @@
 from urllib.parse import urlparse
 
+from config.BaseConfig import BaseConfig
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
 
-class PostGresSettings:
+class PostGresSettings(BaseConfig):
     postgres_user: str = None
     postgres_password: str = None
     postgres_dbname: str = "radixdlt_ledger"
     data_mount_path: str = None
     setup: str = None
     host: str = None
-
-    def __init__(self, settings: dict):
-        for key, value in settings.items():
-            setattr(self, key, value)
-
-    def __iter__(self):
-        for attr, value in self.__dict__.items():
-            yield attr, value
 
     def ask_postgress_settings(self):
         self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location()
@@ -27,7 +20,7 @@ class PostGresSettings:
         self.postgres_dbname = Prompts.get_postgress_dbname()
 
 
-class CoreApiNode:
+class CoreApiNode(BaseConfig):
     Name = None
     CoreApiAddress = None
     TrustWeighting = None
@@ -35,20 +28,21 @@ class CoreApiNode:
     Enabled = None
     basic_auth_user = None
     basic_auth_password = None
-
-    def __init__(self, settings: dict):
-        for key, value in settings.items():
-            setattr(self, key, value)
+    auth_header = None
 
     def __iter__(self):
-        for attr, value in self.__dict__.items():
-            if attr in ['auth_header']:
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+
+        for attr, value in class_variables.items():
+            if attr in ['auth_header'] and (self.basic_auth_user and self.basic_auth_password):
                 yield attr, Helpers.get_basic_auth_header({
                     "name": self.basic_auth_user,
                     "password": self.basic_auth_password
                 })
-            else:
-                yield attr, value
+            elif self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)
 
 
 class DataAggregatorSetting:
@@ -60,6 +54,10 @@ class DataAggregatorSetting:
     DisableCoreApiHttpsCertificateChecks: str = None
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
+
+    def __init__(self, settings: dict):
+        for key, value in settings.items():
+            setattr(self, key, value)
 
     def ask_gateway_release(self):
         self.release = Prompts.get_gateway_release("data_aggregator")
@@ -93,23 +91,28 @@ class DataAggregatorSetting:
         self.DisableCoreApiHttpsCertificateChecks = Prompts.get_disablehttpsVerfiy()
 
     def __iter__(self):
-        for attr, value in self.__dict__.items():
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+        for attr, value in class_variables.items():
             if attr in ['postgresSettings', 'coreApiNode']:
-                yield attr, dict(value)
-            else:
-                yield attr, value
+                yield attr, dict(self.__getattribute__(attr))
+            elif self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)
 
 
-class GatewayAPIDockerSettings:
+class GatewayAPIDockerSettings(BaseConfig):
     release: str = None
     repo: str = "radixdlt/ng-gateway-api"
     docker_image: str = None
-    NetworkName = None
     postgresSettings: PostGresSettings = PostGresSettings({})
     coreApiNode: CoreApiNode = CoreApiNode({})
-    image = "radixdlt/ng-data-aggregator:1.1.2"
     restart = "unless-stopped"
     PrometheusMetricsPort = "1234"
+
+    def __init__(self, settings: dict):
+        for key, value in settings.items():
+            setattr(self, key, value)
 
     def ask_gateway_release(self):
         self.release = Prompts.get_gateway_release("gateway_api")
@@ -119,14 +122,29 @@ class GatewayAPIDockerSettings:
         self.coreApiNode = coreApiNode
 
     def __iter__(self):
-        for attr, value in self.__dict__.items():
-            if attr in ['postgresSettings', 'coreApiNode']:
-                yield attr, dict(value)
-            else:
-                yield attr, value
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+
+        for attr, value in class_variables.items():
+            if attr in ['coreApiNode']:
+                yield attr, dict(self.__getattribute__(attr))
+            elif self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)
 
 
-class GatewayDockerSettings:
-    data_aggregator = DataAggregatorSetting()
-    gateway_api = GatewayAPIDockerSettings()
+class GatewayDockerSettings(BaseConfig):
+    data_aggregator = DataAggregatorSetting({})
+    gateway_api = GatewayAPIDockerSettings({})
     postgres_db = PostGresSettings({})
+
+    def __iter__(self):
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+
+        for attr, value in class_variables.items():
+            if attr in ['data_aggregator', 'gateway_api', 'postgres_db']:
+                yield attr, dict(self.__getattribute__(attr))
+            elif self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)

@@ -1,12 +1,14 @@
+from config.BaseConfig import BaseConfig
 from setup import Base
 
 
-class CommonDockerSettings:
+class CommonDockerSettings(BaseConfig):
     network_id: int = None
     network_name: str = None
     genesis_json_location: str = None
 
     def __init__(self, settings: dict):
+        super().__init__(settings)
         for key, value in settings.items():
             setattr(self, key, value)
 
@@ -32,8 +34,3 @@ class CommonDockerSettings:
         if not self.network_id:
             self.set_network_id(Base.get_network_id())
         self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
-
-    def __iter__(self):
-        for attr, value in self.__dict__.items():
-            if value:
-                yield attr, value

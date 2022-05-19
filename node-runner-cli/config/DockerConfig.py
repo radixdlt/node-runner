@@ -3,31 +3,21 @@ from pathlib import Path
 
 import yaml
 
+from config.BaseConfig import BaseConfig
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from setup import Base
 from utils.Prompts import Prompts
 
 
-class KeyDetails():
+class KeyDetails(BaseConfig):
     keyfile_path: str = None
     keyfile_name: str = None
     keygen_tag: str = None
     keystore_password: str = None
 
-    def __init__(self, key_details):
-        self.keyfile_path = key_details.get("keyfile_path", None)
-        self.keyfile_name = key_details.get("keyfile_name", None)
-        self.keygen_tag = key_details.get("keygen_tag", None)
-        self.keystore_password = key_details.get("keystore_password", None)
 
-    def __iter__(self):
-        for attr, value in self.__dict__.items():
-            if value:
-                yield attr, value
-
-
-class CoreDockerSettings():
+class CoreDockerSettings(BaseConfig):
     nodetype: str = "fullnode"
     composefileurl: str = None
     keydetails: KeyDetails = KeyDetails({})
@@ -38,22 +28,14 @@ class CoreDockerSettings():
     trusted_node: str = None
 
     def __iter__(self):
-        for attr, value in self.__dict__.items():
-            if value:
-                if attr in ['keydetails']:
-                    yield attr, dict(value)
-                else:
-                    yield attr, value
-
-    # def set_composefile_url(self):
-    #     cli_latest_version = latest_release("radixdlt/node-runner")
-    #     self.composefileurl = \
-    #         os.getenv(COMPOSE_FILE_OVERIDE,
-    #                   f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_latest_version}/node-runner-cli/release_ymls/radix-{self.nodetype}-compose.yml")
-    #     print(
-    #         f"--------BASE DOCKER COMPOSE FILE ---------"
-    #         f"\nDocker version of node is set using a base docker-compose file from the location {self.composefileurl} "
-    #         f"\nGoing to setup node type {self.nodetype} using this file\n")
+        class_variables = {key: value
+                           for key, value in self.__class__.__dict__.items()
+                           if not key.startswith('__') and not callable(value)}
+        for attr, value in class_variables.items():
+            if attr in ['keydetails']:
+                yield attr, dict(self.__getattribute__(attr))
+            elif self.__getattribute__(attr):
+                yield attr, self.__getattribute__(attr)
 
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
@@ -93,15 +75,13 @@ class CoreDockerSettings():
 
 
 class DockerConfig:
-    core_node_settings: CoreDockerSettings = CoreDockerSettings()
+    core_node_settings: CoreDockerSettings = CoreDockerSettings({})
     common_settings: CommonDockerSettings = CommonDockerSettings({})
-    gateway_settings: GatewayDockerSettings = GatewayDockerSettings()
+    gateway_settings: GatewayDockerSettings = GatewayDockerSettings({})
 
     def __init__(self, release: str):
         self.core_node_settings.core_release = release
 
-    def __iter__(self):
-        yield 'core_node_settings', dict(self.core_node_settings)
 
     def loadConfig(self, file):
         my_file = Path(file)
