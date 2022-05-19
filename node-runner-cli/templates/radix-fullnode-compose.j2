@@ -51,7 +51,7 @@ services:
     volumes:
     - nginx_secrets:/etc/nginx/secrets
  {% endif %}
- {% if postgress_db.setup is defined and gateway_api.postgresSettings.setup =='local' %}
+ {% if gateway.postgres_db is defined and gateway.postgres_db.setup =='local' %}
   postgres_db:
     image: "postgres:12-alpine"
     ports:
@@ -59,16 +59,15 @@ services:
     stop_grace_period: 90s
     restart: unless-stopped
     volumes:
-      - {{postgress_db.data_mount_path}}:/var/lib/postgresql/data
+      - {{gateway.postgres_db.data_mount_path}}:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: "{{postgress_db.postgres_user}}"
-      POSTGRES_PASSWORD: "{{postgress_db.postgres_password}}"
-      POSTGRES_DB: "{{postgress_db.postgres_dbname}}"
+      POSTGRES_USER: "{{gateway.postgres_db.postgres_user}}"
+      POSTGRES_PASSWORD: "{{gateway.postgres_db.postgres_password}}"
+      POSTGRES_DB: "{{gateway.postgres_db.postgres_dbname}}"
 {% endif %}
 {% if gateway.gateway_api is defined %}
   gateway_api: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.gateway_api.docker_image}}
-    profiles: ["NONE"]
     ports:
       - "127.0.0.1:5308:80" # This allows you to connect to the API at http://localhost:5308
       - "127.0.0.1:1235:1235" # This allows you to connect to the metrics API at http://localhost:1235
@@ -92,7 +91,7 @@ services:
       RADIX_NG_API__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.Enabled or 'true'}}"
 {% endif %}
 {% if gateway.data_aggregator is defined %}
- data_aggregator:
+  data_aggregator:
     image: {{gateway.data_aggregator.docker_image}}
     restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
     ports:
