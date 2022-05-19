@@ -1,3 +1,5 @@
+import os
+
 from utils.utils import Helpers, run_shell_command
 
 
@@ -49,32 +51,37 @@ class Prompts:
 
     @staticmethod
     def get_CoreApiAddress():
-        answer = input("Type in CoreApi address in format of url like http(s)://<host and port>:")
-        return answer
+        answer = input("------ Core API to read Transactions ----"
+                       "\nThis will be node either running locally or remote. Default settings using local node"
+                       "\nDefault value is `http://core:3333`. Press ENTER to accept default Or Type in CoreApi "
+                       "address in format of url like http(s)://<host and port>:")
+        return Prompts.check_default(answer, 'http://core:3333')
 
     @staticmethod
     def get_CopeAPINodeName():
         answer = input(
             "Type in CoreApi node name. This can be any string and logs would refer this name on related info/errors"
-            "Press ENTER to accept default value `core-api`:")
-        return Prompts.check_default(answer, 'core-api')
+            "\nPress ENTER to accept default value as 'core':")
+        return Prompts.check_default(answer, 'core')
 
     @staticmethod
     def get_TrustWeighting():
         answer = input(
-            "Type in TrustWeight settings. Default is 1, press 'ENTER' to accept default:")
+            "Type in TrustWeight settings. This is used by data_aggregator.  "
+            "\nDefault is 1, press 'ENTER' to accept default:")
         return Prompts.check_default(answer, 1)
 
     @staticmethod
     def get_RequestWeighting():
         answer = input(
-            "Type in RequestWeighting settings. Default is 1, press 'ENTER' to accept default:")
+            "Type in RequestWeighting settings.This is used by gateway_api."
+            "\nDefault is 1, press 'ENTER' to accept default:")
         return Prompts.check_default(answer, 1)
 
     @staticmethod
     def get_coreAPINodeEnabled():
         answer = input(
-            "Is this node enabled for gateway. Press Enter accept default as true [true/false]:")
+            "Is this node enabled for gateway. Press Enter to accept default as true [true/false]:")
         return Prompts.check_default(answer, "true")
 
     @staticmethod
@@ -94,9 +101,9 @@ class Prompts:
         return Prompts.check_default(answer, "true")
 
     @staticmethod
-    def get_gateway_release():
+    def get_gateway_release(gateway_or_aggregator):
         # TODO add code to pull latest release
-        answer = input("Type in gateway release tag:")
+        answer = input(f"Type in {gateway_or_aggregator} release tag:")
         return answer
 
     @staticmethod
@@ -159,3 +166,17 @@ class Prompts:
               "\nTo connect to MAINNET details on these node can be found here "
               "- https://docs.radixdlt.com/main/node-and-gateway/cli-install-node-docker.html#_install_the_node"
               "\nType in the node you want to connect to")
+
+    @staticmethod
+    def ask_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
+        y_n = input("Is this first time you running the node on this machine [Y/N]")
+        if Helpers.check_Yes(y_n):
+            return None
+        else:
+            prompt_answer = input(
+                f"Is existing docker compose file stored in location '{os.getcwd()}/{default_compose_file}'?"
+                f"\n If so, press 'ENTER' or type in absolute path to file:")
+            if prompt_answer == "":
+                return f"{os.getcwd()}/{default_compose_file}"
+            else:
+                return prompt_answer

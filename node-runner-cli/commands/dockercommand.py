@@ -39,7 +39,6 @@ def config(args):
     config_file = args.configfile
     if Prompts.check_for_fullnode():
         configuration.core_node_settings.set_node_type()
-        configuration.core_node_settings.set_composefile_url()
         configuration.core_node_settings.set_core_release(release)
         configuration.core_node_settings.set_trusted_node(args.trustednode)
         configuration.core_node_settings.ask_keydetails()
@@ -49,19 +48,18 @@ def config(args):
 
     if Prompts.check_for_gateway():
         configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
-        configuration.gateway_settings.data_aggregator.ask_postgress_settings()
+        configuration.gateway_settings.postgres_db.ask_postgress_settings()
         configuration.gateway_settings.data_aggregator.ask_gateway_release()
-        configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
+        configuration.gateway_settings.gateway_api.ask_gateway_release()
         configuration.gateway_settings.gateway_api.set_core_api_node_setings(
             configuration.gateway_settings.data_aggregator.coreApiNode)
-        configuration.gateway_settings.gateway_api.set_postgress_settings(
-            configuration.gateway_settings.data_aggregator.postgresSettings)
 
     config_to_dump = {
         "common_config": dict(configuration.common_settings),
         "core_node": dict(configuration.core_node_settings),
         "data_aggregator": dict(configuration.gateway_settings.data_aggregator),
-        "gateway_api": dict(configuration.gateway_settings.gateway_api)
+        "gateway_api": dict(configuration.gateway_settings.gateway_api),
+        "postgress_db": dict(configuration.gateway_settings.postgres_db)
     }
 
     def represent_none(self, _):
@@ -105,7 +103,7 @@ def setup(args):
     else:
         to_update = input("\nOkay to update the file [Y/n]?:")
     if Helpers.check_Yes(to_update) or autoapprove:
-        Docker.save_compose_file(docker_config, render_template)
+        Docker.save_compose_file(docker_config.core_node_settings.existing_docker_compose, render_template)
 
     run_shell_command(f"cat {docker_config.core_node_settings.existing_docker_compose}", shell=True)
     should_start = ""

@@ -49,6 +49,21 @@ services:
         soft: '65536'
     volumes:
     - nginx_secrets:/etc/nginx/secrets
+ {% if postgress_db.setup is defined and gateway_api.postgresSettings.setup =='local' %}
+  postgres_db:
+    image: "postgres:12-alpine"
+    ports:
+      - "127.0.0.1:5532:5432"
+    stop_grace_period: 90s
+    restart: unless-stopped
+    volumes:
+      - {{postgress_db.data_mount_path}}:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "{{postgress_db.postgres_user}}"
+      POSTGRES_PASSWORD: "{{postgress_db.postgres_password}}"
+      POSTGRES_DB: "{{postgress_db.postgres_dbname}}"
+ {% endif %}
+
 version: '2.2'
 volumes:
  {% if core_node.data_directory is defined %}

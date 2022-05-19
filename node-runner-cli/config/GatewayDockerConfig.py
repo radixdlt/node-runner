@@ -8,6 +8,9 @@ class PostGresSettings:
     postgres_user: str = None
     postgres_password: str = None
     postgres_dbname: str = "radixdlt_ledger"
+    data_mount_path: str = None
+    setup: str = None
+    host: str = None
 
     def __init__(self, settings: dict):
         for key, value in settings.items():
@@ -16,6 +19,12 @@ class PostGresSettings:
     def __iter__(self):
         for attr, value in self.__dict__.items():
             yield attr, value
+
+    def ask_postgress_settings(self):
+        self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location()
+        self.postgres_user = Prompts.get_postgress_user()
+        self.postgres_password = Prompts.ask_postgress_password()
+        self.postgres_dbname = Prompts.get_postgress_dbname()
 
 
 class CoreApiNode:
@@ -50,23 +59,11 @@ class DataAggregatorSetting:
     PrometheusMetricsPort: str = "1234"
     DisableCoreApiHttpsCertificateChecks: str = None
     NetworkName: str = None
-    postgresSettings: PostGresSettings = PostGresSettings({})
     coreApiNode: CoreApiNode = CoreApiNode({})
-    host: str = None
-    setup: str = None
-    data_mount_path: str = None
 
     def ask_gateway_release(self):
-        self.release = Prompts.get_gateway_release()
+        self.release = Prompts.get_gateway_release("data_aggregator")
         self.docker_image = f"{self.repo}:{self.release}"
-
-    def ask_postgress_settings(self):
-        postgresSettings = self.postgresSettings
-        postgresSettings.setup, postgresSettings.data_mount_path, postgresSettings.host = Prompts.ask_postgress_location()
-        postgresSettings.postgres_user = Prompts.get_postgress_user()
-        postgresSettings.postgres_password = Prompts.ask_postgress_password()
-        postgresSettings.postgres_dbname = Prompts.get_postgress_dbname()
-        self.postgresSettings = postgresSettings
 
     def ask_core_api_node_settings(self):
         coreApiNode = self.coreApiNode
@@ -104,6 +101,9 @@ class DataAggregatorSetting:
 
 
 class GatewayAPIDockerSettings:
+    release: str = None
+    repo: str = "radixdlt/ng-gateway-api"
+    docker_image: str = None
     NetworkName = None
     postgresSettings: PostGresSettings = PostGresSettings({})
     coreApiNode: CoreApiNode = CoreApiNode({})
@@ -111,11 +111,12 @@ class GatewayAPIDockerSettings:
     restart = "unless-stopped"
     PrometheusMetricsPort = "1234"
 
+    def ask_gateway_release(self):
+        self.release = Prompts.get_gateway_release("gateway_api")
+        self.docker_image = f"{self.repo}:{self.release}"
+
     def set_core_api_node_setings(self, coreApiNode: CoreApiNode):
         self.coreApiNode = coreApiNode
-
-    def set_postgress_settings(self, postgresSettings):
-        self.postgresSettings = postgresSettings
 
     def __iter__(self):
         for attr, value in self.__dict__.items():
@@ -128,3 +129,4 @@ class GatewayAPIDockerSettings:
 class GatewayDockerSettings:
     data_aggregator = DataAggregatorSetting()
     gateway_api = GatewayAPIDockerSettings()
+    postgres_db = PostGresSettings({})

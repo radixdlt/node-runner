@@ -151,12 +151,3 @@ class Base:
 
         return genesis_json_location
 
-    @staticmethod
-    def get_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
-        prompt_answer = input(
-            f"Is existing docker compose file stored in location '{os.getcwd()}/{default_compose_file}'?"
-            f"\n If so, press 'ENTER' or type in absolute path to file:")
-        if prompt_answer == "":
-            return f"{os.getcwd()}/{default_compose_file}"
-        else:
-            return prompt_answer

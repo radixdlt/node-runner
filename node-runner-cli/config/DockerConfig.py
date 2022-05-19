@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -6,8 +5,6 @@ import yaml
 
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
-from env_vars import COMPOSE_FILE_OVERIDE
-from github.github import latest_release
 from setup import Base
 from utils.Prompts import Prompts
 
@@ -48,15 +45,15 @@ class CoreDockerSettings():
                 else:
                     yield attr, value
 
-    def set_composefile_url(self):
-        cli_latest_version = latest_release("radixdlt/node-runner")
-        self.composefileurl = \
-            os.getenv(COMPOSE_FILE_OVERIDE,
-                      f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_latest_version}/node-runner-cli/release_ymls/radix-{self.nodetype}-compose.yml")
-        print(
-            f"--------BASE DOCKER COMPOSE FILE ---------"
-            f"\nDocker version of node is set using a base docker-compose file from the location {self.composefileurl} "
-            f"\nGoing to setup node type {self.nodetype} using this file\n")
+    # def set_composefile_url(self):
+    #     cli_latest_version = latest_release("radixdlt/node-runner")
+    #     self.composefileurl = \
+    #         os.getenv(COMPOSE_FILE_OVERIDE,
+    #                   f"https://raw.githubusercontent.com/radixdlt/node-runner/{cli_latest_version}/node-runner-cli/release_ymls/radix-{self.nodetype}-compose.yml")
+    #     print(
+    #         f"--------BASE DOCKER COMPOSE FILE ---------"
+    #         f"\nDocker version of node is set using a base docker-compose file from the location {self.composefileurl} "
+    #         f"\nGoing to setup node type {self.nodetype} using this file\n")
 
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
@@ -88,7 +85,7 @@ class CoreDockerSettings():
         self.enable_transaction = Prompts.ask_enable_transaction()
 
     def ask_existing_docker_compose_file(self):
-        self.existing_docker_compose = Base.get_existing_compose_file()
+        self.existing_docker_compose = Prompts.ask_existing_compose_file()
 
     def set_trusted_node(self, trusted_node):
         # Prompts.ask_trusted_node()
@@ -116,7 +113,6 @@ class DockerConfig:
             core_node = config_yaml["core_node"]
             common_settings = config_yaml["common_config"]
             self.core_node_settings.core_release = core_node.get("core_release", None)
-            self.core_node_settings.composefileurl = core_node.get("composefileurl")
             self.core_node_settings.data_directory = core_node.get("data_directory", None)
             self.core_node_settings.genesis_json_location = core_node.get("genesis_json_location", None)
             self.core_node_settings.enable_transaction = core_node.get("enable_transaction", False)
