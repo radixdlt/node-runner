@@ -116,8 +116,8 @@ class Base:
     def get_data_dir(create_dir=True):
         # TODO AutoApprove
         data_dir_path = input(
-            f"-----------LEDGER LOCATION------\n"
-            f"Radix node stores all the data on ledger on a folder. "
+            f"\n-----------LEDGER LOCATION------\n"
+            f"\nRadix node stores all the data on ledger on a folder. "
             f"This would allow to restart the node without a need to download ledger on every restart"
             f"\n{Bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
             f"Type the absolute path of existing ledger data folder:{Bcolors.ENDC}")
@@ -130,7 +130,7 @@ class Base:
     @staticmethod
     def get_network_id():
         # Network id
-        network_prompt = input("Enter the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
+        network_prompt = input("\nEnter the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
         if network_prompt.lower() in ["s", "stokenet"]:
             network_id = 2
         elif network_prompt.lower() in ["m", "mainnet"]:

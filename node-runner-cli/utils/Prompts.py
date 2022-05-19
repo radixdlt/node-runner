@@ -14,29 +14,33 @@ class Prompts:
 
     @staticmethod
     def ask_postgress_password():
-        answer = input("Type in Postgress database password:")
+        answer = input("\nPOSTGRES USER PASSWORD: Type in Postgress database password:")
         return answer
 
     @staticmethod
     def get_postgress_user():
-        answer = input("Type in Postgress username:")
-        return answer
+        answer = input("\nPOSTGRES USER: Default value for Postgres user is `postgres`. Press Enter to accept default"
+                       " or Type in Postgress username:")
+        return Prompts.check_default(answer, "postgres")
 
     @staticmethod
     def ask_postgress_location():
         answer = input(
-            "Gateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
+            "\n------ POSTGRES settings for Gateway ----\n"
+            "\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
             "(although not advised) or use a remote managed POSTGRES."
-            "Press ENTER to use default 'local' setup or type in 'remote': ")
+            "\nPress ENTER to use default 'local' setup or type in 'remote': ")
         local_or_remote = Prompts.check_default(answer, 'local')
         if local_or_remote == "local":
             default_postgres_dir = f"{Helpers.get_home_dir()}/postgresdata"
-            postgres_mount = input(f"Press Enter to store POSTGRES data on \"{default_postgres_dir}\" directory"
-                                   f" Or type in the absolute path:")
+            postgres_mount = input(f"\nFor local setup which runs container, "
+                                   f"postgres data needs to be externally mounted from a folder."
+                                   f"\nPress Enter to store POSTGRES data on folder  \"{default_postgres_dir}\""
+                                   f" Or type in the absolute path for the folder:")
             return "local", Prompts.check_default(postgres_mount, default_postgres_dir), "postgres_db:5432"
 
         else:
-            hostname = input("\nEnter the host name of server hosting postgress:")
+            hostname = input("\nFor the remote managed postgres, Enter the host name of server hosting postgress:")
             port = input("\nEnter the port the postgres process is listening on the server:")
             return "remote", None, f"{hostname}:{port}"
 
@@ -46,22 +50,24 @@ class Prompts:
 
     @staticmethod
     def get_postgress_dbname():
-        answer = input("Type in Postgress database name:")
-        return answer
+        answer = input("\nPOSTGRES DB: Default value is 'radix-ledger'. "
+                       "Press Enter to accept default or type in Postgress database name:")
+        return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
     def get_CoreApiAddress():
-        answer = input("------ Core API to read Transactions ----"
-                       "\nThis will be node either running locally or remote. Default settings using local node"
-                       "\nDefault value is `http://core:3333`. Press ENTER to accept default Or Type in CoreApi "
+        answer = input("\n------ Core API to read Transactions ----\n"
+                       "\nThis will be node either running locally or remote. "
+                       "\nDefault settings use local node  and the default value is `http://core:3333`. "
+                       "Press ENTER to accept default Or Type in remote CoreApi "
                        "address in format of url like http(s)://<host and port>:")
         return Prompts.check_default(answer, 'http://core:3333')
 
     @staticmethod
     def get_CopeAPINodeName():
         answer = input(
-            "Type in CoreApi node name. This can be any string and logs would refer this name on related info/errors"
-            "\nPress ENTER to accept default value as 'core':")
+            "\nNODE NAME: This can be any string and logs would refer this name on related info/errors"
+            "\nDefault value is 'core'. Press ENTER to accept default value or type in new name':")
         return Prompts.check_default(answer, 'core')
 
     @staticmethod
@@ -103,21 +109,24 @@ class Prompts:
     @staticmethod
     def get_gateway_release(gateway_or_aggregator):
         # TODO add code to pull latest release
-        answer = input(f"Type in {gateway_or_aggregator} release tag:")
+        answer = input(f"\n-----------Gateway release for {gateway_or_aggregator} -------\n"
+                       f"Type in {gateway_or_aggregator} release tag:")
         return answer
 
     @staticmethod
     def check_for_gateway():
+        print("\n===========Network Gateway settings =================\n")
         print(
-            "Do you want to setup NETWORK GATEWAY on this machine? "
+            "\nDo you want to setup NETWORK GATEWAY on this machine? "
             "\nFor more info refer https://docs.radixdlt.com/main/node-and-gateway/network-gateway.html")
-        answer = input("Default is N, Press ENTER to accept default or type in [Y/N]")
+        answer = input("Default is No[N], Press ENTER to accept default or type in [Y/N]")
         return Helpers.check_Yes(Prompts.check_default(answer, "N"))
 
     @staticmethod
     def check_for_fullnode():
+        print("\n===========Full node settings =================")
         print(
-            "Do you want to setup fullnode or a validator?  "
+            "\nDo you want to setup fullnode or a validator?  "
             "\nFor more information refer "
             "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
         answer = input("Default is Y, Press ENTER to accept default or type in [Y/N]:")
@@ -126,13 +135,14 @@ class Prompts:
     @staticmethod
     def ask_enable_transaction():
         answer = input(
-            "Transactions API on fullnodes are disabled. To enable this, it requires to be set to true,"
+            "\n---------TRANSACTION API --------"
+            "\nTransactions API on fullnodes are disabled. To enable this, it requires to be set to true,"
             "\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
         return Prompts.check_default(answer, "false")
 
     @staticmethod
     def ask_keyfile_path():
-        print(f"------ KEYSTORE FILE ----\n"
+        print(f"\n------ KEYSTORE FILE ----"
               f"\nThe keystore file is very important and it is the identity of the node."
               f"\nIf you are planning to run a validator, defintely make sure you backup this keystore file"
               )
@@ -169,13 +179,14 @@ class Prompts:
 
     @staticmethod
     def ask_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
-        y_n = input("Is this first time you running the node on this machine [Y/N]")
+        y_n = input("\n----------NEW or EXISTING SETUP ------- \n"
+                    "\nIs this first time you running the node on this machine [Y/N]")
         if Helpers.check_Yes(y_n):
             return None
         else:
             prompt_answer = input(
-                f"Is existing docker compose file stored in location '{os.getcwd()}/{default_compose_file}'?"
-                f"\n If so, press 'ENTER' or type in absolute path to file:")
+                f"\nSo you have existing docker compose file. Is it in location '{os.getcwd()}/{default_compose_file}'?"
+                f"\nIf so, press 'ENTER' or type in absolute path to file:")
             if prompt_answer == "":
                 return f"{os.getcwd()}/{default_compose_file}"
             else:

@@ -6,29 +6,30 @@ from utils.utils import Helpers
 
 
 class PostGresSettings(BaseConfig):
-    postgres_user: str = None
-    postgres_password: str = None
-    postgres_dbname: str = "radixdlt_ledger"
+    user: str = None
+    password: str = None
+    dbname: str = "radixdlt_ledger"
     data_mount_path: str = None
     setup: str = None
     host: str = None
 
     def ask_postgress_settings(self):
         self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location()
-        self.postgres_user = Prompts.get_postgress_user()
-        self.postgres_password = Prompts.ask_postgress_password()
-        self.postgres_dbname = Prompts.get_postgress_dbname()
+        self.user = Prompts.get_postgress_user()
+        self.password = Prompts.ask_postgress_password()
+        self.dbname = Prompts.get_postgress_dbname()
 
 
 class CoreApiNode(BaseConfig):
     Name = None
     CoreApiAddress = None
-    TrustWeighting = None
-    RequestWeighting = None
-    Enabled = None
+    TrustWeighting = 1
+    RequestWeighting = 1
+    Enabled = "true"
     basic_auth_user = None
     basic_auth_password = None
     auth_header = None
+    DisableCoreApiHttpsCertificateChecks: str = None
 
     def __iter__(self):
         class_variables = {key: value
@@ -44,6 +45,9 @@ class CoreApiNode(BaseConfig):
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
 
+    def ask_disablehttpsVerify(self):
+        self.DisableCoreApiHttpsCertificateChecks = Prompts.get_disablehttpsVerfiy()
+
 
 class DataAggregatorSetting:
     release: str = None
@@ -51,7 +55,6 @@ class DataAggregatorSetting:
     docker_image: str = None
     restart: str = "unless-stopped"
     PrometheusMetricsPort: str = "1234"
-    DisableCoreApiHttpsCertificateChecks: str = None
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
 
@@ -71,12 +74,6 @@ class DataAggregatorSetting:
             self.set_basic_auth(coreApiNode.CoreApiAddress)
         if not coreApiNode.Name:
             coreApiNode.Name = Prompts.get_CopeAPINodeName()
-        if not coreApiNode.TrustWeighting:
-            coreApiNode.TrustWeighting = Prompts.get_TrustWeighting()
-        if not coreApiNode.RequestWeighting:
-            coreApiNode.RequestWeighting = Prompts.get_RequestWeighting()
-        if not coreApiNode.Enabled:
-            coreApiNode.Enabled = Prompts.get_coreAPINodeEnabled()
         self.coreApiNode = coreApiNode
 
     def set_basic_auth(self, url):
@@ -85,10 +82,7 @@ class DataAggregatorSetting:
             auth = Prompts.get_basic_auth()
             self.coreApiNode.basic_auth_password = auth["password"]
             self.coreApiNode.basic_auth_user = auth["name"]
-            self.set_disablehttpsVerify()
-
-    def set_disablehttpsVerify(self):
-        self.DisableCoreApiHttpsCertificateChecks = Prompts.get_disablehttpsVerfiy()
+            self.coreApiNode.ask_disablehttpsVerify()
 
     def __iter__(self):
         class_variables = {key: value
@@ -105,14 +99,11 @@ class GatewayAPIDockerSettings(BaseConfig):
     release: str = None
     repo: str = "radixdlt/ng-gateway-api"
     docker_image: str = None
-    postgresSettings: PostGresSettings = PostGresSettings({})
     coreApiNode: CoreApiNode = CoreApiNode({})
     restart = "unless-stopped"
     PrometheusMetricsPort = "1234"
-
-    def __init__(self, settings: dict):
-        for key, value in settings.items():
-            setattr(self, key, value)
+    EnableSwagger = "true"
+    MaxPageSize = "30"
 
     def ask_gateway_release(self):
         self.release = Prompts.get_gateway_release("gateway_api")

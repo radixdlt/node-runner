@@ -1,4 +1,5 @@
 services:
+{% if core_node is defined %}
   core:
     cap_add:
     - NET_ADMIN
@@ -49,6 +50,7 @@ services:
         soft: '65536'
     volumes:
     - nginx_secrets:/etc/nginx/secrets
+ {% endif %}
  {% if postgress_db.setup is defined and gateway_api.postgresSettings.setup =='local' %}
   postgres_db:
     image: "postgres:12-alpine"
@@ -62,57 +64,57 @@ services:
       POSTGRES_USER: "{{postgress_db.postgres_user}}"
       POSTGRES_PASSWORD: "{{postgress_db.postgres_password}}"
       POSTGRES_DB: "{{postgress_db.postgres_dbname}}"
- {% endif %}
- {% if gateway_api is defined %}
-    gateway_api: # This is the base -- the _image and _built containers are defined below
-    image: radixdlt/ng-gateway-api:1.1.2
+{% endif %}
+{% if gateway.gateway_api is defined %}
+  gateway_api: # This is the base -- the _image and _built containers are defined below
+    image: {{gateway.gateway_api.docker_image}}
     profiles: ["NONE"]
     ports:
       - "127.0.0.1:5308:80" # This allows you to connect to the API at http://localhost:5308
       - "127.0.0.1:1235:1235" # This allows you to connect to the metrics API at http://localhost:1235
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
     environment:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
-      RADIX_NG_API__PrometheusMetricsPort: "1235"
-      RADIX_NG_API__MaxWaitForDbOnStartupMs: "${MAX_DB_WAIT_MS_ON_START}" # Wait for PostGres to boot up
-      RADIX_NG_API__DisableCoreApiHttpsCertificateChecks: "${DISABLE_CORE_API_CERTIFICATE_CHECKS}"
-      RADIX_NG_API__NetworkName: "${NETWORK_NAME}"
-      RADIX_NG_API__EnableSwagger: "${ENABLE_SWAGGER}"
-      RADIX_NG_API__MaxPageSize: "${MAX_PAGE_SIZE}"
-      RADIX_NG_API__AcceptableLedgerLag__PreventReadRequestsIfDbLedgerIsBehind: "${PREVENT_OUTDATED_READ_REQUESTS}"
-      RADIX_NG_API__AcceptableLedgerLag__PreventConstructionRequestsIfDbLedgerIsBehind: "${PREVENT_OUTDATED_CONSTRUCTION_REQUESTS}"
-      RADIX_NG_API__ConnectionStrings__ReadOnlyDbContext: "Host=postgres_db:5432;Database=${POSTGRES_DB_NAME};Username=${POSTGRES_SUPERUSER};Password=${POSTGRES_SUPERUSER_PASSWORD}"
-      RADIX_NG_API__ConnectionStrings__ReadWriteDbContext: "Host=postgres_db:5432;Database=${POSTGRES_DB_NAME};Username=${POSTGRES_SUPERUSER};Password=${POSTGRES_SUPERUSER_PASSWORD}"
-      RADIX_NG_API__CoreApiNodes__0__Name: "${NODE_0_NAME}"
-      RADIX_NG_API__CoreApiNodes__0__CoreApiAddress: "${NODE_0_CORE_API_ADDRESS}"
-      RADIX_NG_API__CoreApiNodes__0__CoreApiAuthorizationHeader: "${NODE_0_CORE_API_AUTHORIZATION_HEADER}"
-      RADIX_NG_API__CoreApiNodes__0__RequestWeighting: "1"
-      RADIX_NG_API__CoreApiNodes__0__Enabled: "${NODE_0_ENABLED}"
-      RADIX_NG_API__CoreApiNodes__1__Name: "${NODE_1_NAME}"
-      RADIX_NG_API__CoreApiNodes__1__CoreApiAddress: "${NODE_1_CORE_API_ADDRESS}"
-      RADIX_NG_API__CoreApiNodes__1__CoreApiAuthorizationHeader: "${NODE_1_CORE_API_AUTHORIZATION_HEADER}"
-      RADIX_NG_API__CoreApiNodes__1__RequestWeighting: "1"
-      RADIX_NG_API__CoreApiNodes__1__Enabled: "${NODE_1_ENABLED}"
-      RADIX_NG_API__CoreApiNodes__2__Name: "${NODE_2_NAME}"
-      RADIX_NG_API__CoreApiNodes__2__CoreApiAddress: "${NODE_2_CORE_API_ADDRESS}"
-      RADIX_NG_API__CoreApiNodes__2__CoreApiAuthorizationHeader: "${NODE_2_CORE_API_AUTHORIZATION_HEADER}"
-      RADIX_NG_API__CoreApiNodes__2__RequestWeighting: "1"
-      RADIX_NG_API__CoreApiNodes__2__Enabled: "${NODE_2_ENABLED}"
-      RADIX_NG_API__CoreApiNodes__3__Name: "${NODE_3_NAME}"
-      RADIX_NG_API__CoreApiNodes__3__CoreApiAddress: "${NODE_3_CORE_API_ADDRESS}"
-      RADIX_NG_API__CoreApiNodes__3__CoreApiAuthorizationHeader: "${NODE_3_CORE_API_AUTHORIZATION_HEADER}"
-      RADIX_NG_API__CoreApiNodes__3__RequestWeighting: "1"
-      RADIX_NG_API__CoreApiNodes__3__Enabled: "${NODE_3_ENABLED}"
-      RADIX_NG_API__CoreApiNodes__4__Name: "${NODE_4_NAME}"
-      RADIX_NG_API__CoreApiNodes__4__CoreApiAddress: "${NODE_4_CORE_API_ADDRESS}"
-      RADIX_NG_API__CoreApiNodes__4__CoreApiAuthorizationHeader: "${NODE_4_CORE_API_AUTHORIZATION_HEADER}"
-      RADIX_NG_API__CoreApiNodes__4__RequestWeighting: "1"
-      RADIX_NG_API__CoreApiNodes__4__Enabled: "${NODE_4_ENABLED}"
- {% endif %}
-
-version: '2.2'
+      RADIX_NG_API__PrometheusMetricsPort: "{{gateway.gateway_api.PrometheusMetricsPort}}"
+      RADIX_NG_API__MaxWaitForDbOnStartupMs: "90s" # Wait for PostGres to boot up
+      RADIX_NG_API__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.DisableCoreApiHttpsCertificateChecks or 'false'}}"
+      RADIX_NG_API__NetworkName: "{{common_config.network_name}}"
+      RADIX_NG_API__EnableSwagger: "{{gateway.gateway_api.EnableSwagger or 'false'}}"
+      RADIX_NG_API__MaxPageSize: "{{gateway.gateway_api.MaxPageSize or '30'}}"
+      RADIX_NG_API__ConnectionStrings__ReadOnlyDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      RADIX_NG_API__ConnectionStrings__ReadWriteDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      RADIX_NG_API__CoreApiNodes__0__Name: "{{gateway.gateway_api.coreApiNode.Name}}"
+      RADIX_NG_API__CoreApiNodes__0__CoreApiAddress: "{{gateway.gateway_api.coreApiNode.CoreApiAddress}}"
+      {% if gateway.gateway_api.coreApiNode.auth_header is defined %}
+      RADIX_NG_API__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.gateway_api.coreApiNode.auth_header}}"
+      {% endif %}
+      RADIX_NG_API__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.RequestWeighting or '1'}}"
+      RADIX_NG_API__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.Enabled or 'true'}}"
+{% endif %}
+{% if gateway.data_aggregator is defined %}
+ data_aggregator:
+    image: {{gateway.data_aggregator.docker_image}}
+    restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
+    ports:
+      - "127.0.0.1:5207:80" # This allows you to connect to the API (for root and health checks) at http://localhost:5207
+      - "127.0.0.1:1234:1234" # This allows you to connect to the metrics API at http://localhost:1234
+    environment:
+      # WIPE_DATABASE: "true"
+      ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
+      RADIX_NG_AGGREGATOR__PrometheusMetricsPort: "{{gateway.data_aggregator.PrometheusMetricsPort}}"
+      RADIX_NG_AGGREGATOR__MaxWaitForDbOnStartupMs: "90s"
+      RADIX_NG_AGGREGATOR__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.DisableCoreApiHttpsCertificateChecks or 'false'}}"
+      RADIX_NG_AGGREGATOR__NetworkName: "{{common_config.network_name}}"
+      RADIX_NG_AGGREGATOR__ConnectionStrings__AggregatorDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.CoreApiAddress}}"
+      {% if gateway.data_aggregator.coreApiNode.auth_header is defined %}
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header}}"
+      {% endif %}
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.TrustWeighting or '1'}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.Enabled or 'true'}}"
+{% endif %}
+version: '3.8'
 volumes:
  {% if core_node.data_directory is defined %}
   core_ledger:

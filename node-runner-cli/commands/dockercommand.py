@@ -34,7 +34,8 @@ def config(args):
     release = latest_release()
     configuration = DockerConfig(release)
 
-    print("About to create config file using the answers from the questions that would be asked in next steps."
+    print("----- Config file -----"
+          "\nAbout to create config file using the answers from the questions that would be asked in next steps."
           f"\nLocation of the config file is {args.configfile}")
     config_file = args.configfile
 
@@ -51,6 +52,7 @@ def config(args):
 
     run_gateway = Prompts.check_for_gateway()
     if run_gateway:
+
         configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
         configuration.gateway_settings.postgres_db.ask_postgress_settings()
         configuration.gateway_settings.data_aggregator.ask_gateway_release()
@@ -67,7 +69,9 @@ def config(args):
         return self.represent_scalar('tag:yaml.org,2002:null', '')
 
     yaml.add_representer(type(None), represent_none)
-    print(f"Yaml of config \n{yaml.dump(config_to_dump)}")
+    print(f"\n-----------------Below is generated config -----------"
+          f"\n{yaml.dump(config_to_dump)}"
+          f"\n\n Saving to file {config_file} ")
 
     with open(config_file, 'w') as f:
         yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
