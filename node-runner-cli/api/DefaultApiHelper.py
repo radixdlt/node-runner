@@ -5,7 +5,7 @@ from system_client import ApiException, Configuration
 from system_client.api import default_api
 
 from api.Api import API
-from utils.utils import Helpers, Bcolors
+from utils.utils import Helpers, bcolors
 
 
 class DefaultApiHelper(API):
@@ -55,13 +55,13 @@ class DefaultApiHelper(API):
                 Helpers.handleApiException(e)
 
     def check_health(self):
-        Helpers.print_coloured_line("Checking status of the node\n", Bcolors.BOLD)
+        Helpers.print_coloured_line("Checking status of the node\n", bcolors.BOLD)
         health = self.health()
 
         if health["status"] != "UP":
             Helpers.print_coloured_line(
                 f"Node status is {health['status']} Rerun the command once node is completely synced",
-                Bcolors.WARNING)
+                bcolors.WARNING)
             proceed = input(print("Do you want to continue [Y/n]?"))
             if not Helpers.check_Yes(proceed):
                 sys.exit()

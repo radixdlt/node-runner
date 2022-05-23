@@ -5,7 +5,7 @@ from pathlib import Path
 
 import requests
 
-from utils.utils import run_shell_command, Helpers, Bcolors
+from utils.utils import run_shell_command, Helpers, bcolors
 
 
 class Base:
@@ -119,8 +119,8 @@ class Base:
             f"\n-----------LEDGER LOCATION------\n"
             f"\nRadix node stores all the data on ledger on a folder. "
             f"This would allow to restart the node without a need to download ledger on every restart"
-            f"\n{Bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
-            f"Type the absolute path of existing ledger data folder:{Bcolors.ENDC}")
+            f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
+            f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}")
         if data_dir_path == "":
             data_dir_path = f"{Helpers.get_home_dir()}/data"
         if create_dir:

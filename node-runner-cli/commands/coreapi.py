@@ -14,7 +14,7 @@ from api.CoreApiHelper import CoreApiHelper
 from api.DefaultApiHelper import DefaultApiHelper
 from api.ValidatorConfig import ValidatorConfig
 from commands.subcommand import get_decorator, argument
-from utils.utils import Helpers, Bcolors
+from utils.utils import Helpers, bcolors
 from utils.utils import print_vote_and_fork_info
 
 corecli = ArgumentParser(
@@ -169,7 +169,7 @@ def update_validator_config(args):
         engine_configuration = core_api_helper.engine_configuration()
         print_vote_and_fork_info(health, engine_configuration)
         should_vote = input(
-            f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{Bcolors.ENDC}")
+            f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{bcolors.ENDC}")
         if Helpers.check_Yes(should_vote): core_api_helper.vote(print_response=True)
 
 
@@ -180,20 +180,20 @@ def signal_candidate_fork_readiness(args):
     if health['fork_vote_status'] == 'VOTE_REQUIRED':
         candidate_fork_name = core_api_helper.engine_configuration()["forks"][-1]['name']
         print(
-            f"{Bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{Bcolors.WARNING}), " +
+            f"{bcolors.WARNING}NOTICE: Because the validator is running software with a candidate fork ({candidate_fork_name}{bcolors.WARNING}), " +
             "by performing this action, the validator will signal the readiness to run this fork onto the ledger.\n" +
-            f"If you later choose to downgrade the software to a version that no longer includes this fork configuration, you should manually retract your readiness signal by using the retract-candidate-fork-readiness-signal subcommand.{Bcolors.ENDC}"
+            f"If you later choose to downgrade the software to a version that no longer includes this fork configuration, you should manually retract your readiness signal by using the retract-candidate-fork-readiness-signal subcommand.{bcolors.ENDC}"
         )
         should_vote = input(
-            f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{Bcolors.ENDC}")
+            f"Do you want to signal the readiness for {core_api_helper.engine_configuration().forks[-1]['name']} now? [Y/n]{bcolors.ENDC}")
         if Helpers.check_Yes(should_vote): core_api_helper.vote(print_response=True)
     else:
-        print(f"{Bcolors.WARNING}There's no need to signal the readiness for any candidate fork.{Bcolors.ENDC}")
+        print(f"{bcolors.WARNING}There's no need to signal the readiness for any candidate fork.{bcolors.ENDC}")
 
 
 @corecommand()
 def retract_candidate_fork_readiness_signal(args):
     core_api_helper = CoreApiHelper(False)
     should_vote = input(
-        f"This action will retract your candidate fork readiness signal (if there was one), continue? [Y/n]{Bcolors.ENDC}")
+        f"This action will retract your candidate fork readiness signal (if there was one), continue? [Y/n]{bcolors.ENDC}")
     if Helpers.check_Yes(should_vote): core_api_helper.withdraw_vote(print_response=True)
