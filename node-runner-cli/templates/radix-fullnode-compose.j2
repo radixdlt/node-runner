@@ -23,6 +23,11 @@ services:
     init: true
     mem_limit: {{core_node.memory_limit or '12000m'}}
     restart: unless-stopped
+    {% if not (common_config.nginx_settings.protect_core | bool) %}
+    ports:
+       - "3333:3333"
+       - "30000:30000"
+    {% endif %}
     ulimits:
       memlock: '-1'
       nofile:
@@ -36,10 +41,13 @@ services:
     {% if common_config.genesis_json_location is defined %}
     - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis.json"
     {% endif %}
+ {% endif %}
+ {% if common_config.nginx_settings is defined  and  common_config.nginx_settings.protect_core | bool %}
   nginx:
     environment:
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
-    image: radixdlt/radixdlt-nginx:1.1.1
+      RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
+    image: radixdlt/radixdlt-nginx:{{common_config.nginx_settings.release}}
     ports:
     - 443:443
     - 30000:30000
@@ -56,14 +64,14 @@ services:
     image: "postgres:12-alpine"
     ports:
       - "127.0.0.1:5532:5432"
-    stop_grace_period: 90s
+    stop_grace_period: "90"
     restart: unless-stopped
     volumes:
       - {{gateway.postgres_db.data_mount_path}}:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: "{{gateway.postgres_db.postgres_user}}"
-      POSTGRES_PASSWORD: "{{gateway.postgres_db.postgres_password}}"
-      POSTGRES_DB: "{{gateway.postgres_db.postgres_dbname}}"
+      POSTGRES_USER: "{{gateway.postgres_db.user}}"
+      POSTGRES_PASSWORD: "{{gateway.postgres_db.password}}"
+      POSTGRES_DB: "{{gateway.postgres_db.dbname}}"
 {% endif %}
 {% if gateway.gateway_api is defined %}
   gateway_api: # This is the base -- the _image and _built containers are defined below
@@ -75,7 +83,7 @@ services:
     environment:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
       RADIX_NG_API__PrometheusMetricsPort: "{{gateway.gateway_api.PrometheusMetricsPort}}"
-      RADIX_NG_API__MaxWaitForDbOnStartupMs: "90s" # Wait for PostGres to boot up
+      RADIX_NG_API__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
       RADIX_NG_API__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.DisableCoreApiHttpsCertificateChecks or 'false'}}"
       RADIX_NG_API__NetworkName: "{{common_config.network_name}}"
       RADIX_NG_API__EnableSwagger: "{{gateway.gateway_api.EnableSwagger or 'false'}}"
@@ -101,7 +109,7 @@ services:
       # WIPE_DATABASE: "true"
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
       RADIX_NG_AGGREGATOR__PrometheusMetricsPort: "{{gateway.data_aggregator.PrometheusMetricsPort}}"
-      RADIX_NG_AGGREGATOR__MaxWaitForDbOnStartupMs: "90s"
+      RADIX_NG_AGGREGATOR__MaxWaitForDbOnStartupMs: "90"
       RADIX_NG_AGGREGATOR__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.DisableCoreApiHttpsCertificateChecks or 'false'}}"
       RADIX_NG_AGGREGATOR__NetworkName: "{{common_config.network_name}}"
       RADIX_NG_AGGREGATOR__ConnectionStrings__AggregatorDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
@@ -113,7 +121,7 @@ services:
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.TrustWeighting or '1'}}"
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.Enabled or 'true'}}"
 {% endif %}
-version: '3.8'
+version: '2.2'
 volumes:
  {% if core_node.data_directory is defined %}
   core_ledger:

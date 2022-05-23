@@ -11,6 +11,7 @@ class Renderer:
         path_to_template = os.path.abspath(os.path.join(bundle_dir, template_path))
         self.env = Environment(loader=FileSystemLoader(path_to_template), trim_blocks=True,
                                lstrip_blocks=True)
+        self.env.filters['bool'] = bool
         self.template = self.env.get_template(template_file_name)
         return self
 

@@ -49,16 +49,19 @@ def config(args):
         configuration.core_node_settings.ask_data_directory()
         configuration.core_node_settings.ask_enable_transaction()
         configuration.core_node_settings.ask_existing_docker_compose_file()
+        configuration.common_settings.ask_enable_nginx_for_core()
 
     run_gateway = Prompts.check_for_gateway()
     if run_gateway:
-
         configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
         configuration.gateway_settings.postgres_db.ask_postgress_settings()
         configuration.gateway_settings.data_aggregator.ask_gateway_release()
         configuration.gateway_settings.gateway_api.ask_gateway_release()
         configuration.gateway_settings.gateway_api.set_core_api_node_setings(
             configuration.gateway_settings.data_aggregator.coreApiNode)
+        configuration.common_settings.ask_enable_nginx_for_gateway()
+    configuration.common_settings.ask_nginx_release()
+
     config_to_dump = {"common_config": dict(configuration.common_settings)}
     if run_fullnode:
         config_to_dump["core_node"] = dict(configuration.core_node_settings)

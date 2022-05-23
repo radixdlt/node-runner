@@ -82,7 +82,6 @@ class DockerConfig:
     def __init__(self, release: str):
         self.core_node_settings.core_release = release
 
-
     def loadConfig(self, file):
         my_file = Path(file)
         if not my_file.is_file():

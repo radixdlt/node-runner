@@ -29,7 +29,7 @@ class Prompts:
             "\n------ POSTGRES settings for Gateway ----\n"
             "\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
             "(although not advised) or use a remote managed POSTGRES."
-            "\nPress ENTER to use default 'local' setup or type in 'remote': ")
+            "\nPress ENTER to use default value 'local' setup or type in 'remote': ")
         local_or_remote = Prompts.check_default(answer, 'local')
         if local_or_remote == "local":
             default_postgres_dir = f"{Helpers.get_home_dir()}/postgresdata"
@@ -136,7 +136,8 @@ class Prompts:
     def ask_enable_transaction():
         answer = input(
             "\n---------TRANSACTION API --------"
-            "\nTransactions API on fullnodes are disabled. To enable this, it requires to be set to true,"
+            "\nTransactions API on fullnodes are disabled. For it act as node that can stream transactions to a Gateway, it needs to be enabled."
+            "\nTo enable this, it requires to be set to true,"
             "\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
         return Prompts.check_default(answer, "false")
 
@@ -179,7 +180,7 @@ class Prompts:
 
     @staticmethod
     def ask_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
-        y_n = input("\n----------NEW or EXISTING SETUP ------- \n"
+        y_n = input("\n----------NEW or EXISTING SETUP -------"
                     "\nIs this first time you running the node on this machine [Y/N]")
         if Helpers.check_Yes(y_n):
             return None
@@ -191,3 +192,18 @@ class Prompts:
                 return f"{os.getcwd()}/{default_compose_file}"
             else:
                 return prompt_answer
+
+    @staticmethod
+    def ask_enable_nginx(service='CORE'):
+        answer = input(f"\n----------NGINX SETUP FOR {service} NODE----------"
+                       f"\n {service} API can be protected by running Nginx infront of it."
+                       "\n Default value is 'true' to enable it. "
+                       "Press Enter to accept default or type to choose [true/false]:")
+        return Prompts.check_default(answer, "true")
+
+    @staticmethod
+    def get_nginx_release():
+        # TODO add code to pull latest release
+        answer = input(f"\n-----------NGINX-CONFIG -------\n"
+                       f"Type in radixdlt/radixdlt-nginx release tag:")
+        return answer
