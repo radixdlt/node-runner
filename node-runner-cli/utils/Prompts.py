@@ -1,6 +1,7 @@
 import os
 
-from utils.utils import Helpers, run_shell_command
+from github import github
+from utils.utils import Helpers, run_shell_command, bcolors
 
 
 class Prompts:
@@ -14,29 +15,33 @@ class Prompts:
 
     @staticmethod
     def ask_postgress_password():
-        answer = input("\nPOSTGRES USER PASSWORD: Type in Postgress database password:")
+        answer = Helpers.input_guestion("\nPOSTGRES USER PASSWORD: Type in Postgress database password:")
         return answer
 
     @staticmethod
     def get_postgress_user():
-        answer = input("\nPOSTGRES USER: Default value for Postgres user is `postgres`. Press Enter to accept default"
-                       " or Type in Postgress username:")
+        print("\nPOSTGRES USER: This is super admin user which is setup or going to be created if it is local setup.")
+        answer = Helpers.input_guestion(
+            "Default value for Postgres user is `postgres`. Press Enter to accept default"
+            " or Type in Postgress username:")
         return Prompts.check_default(answer, "postgres")
 
     @staticmethod
     def ask_postgress_location():
-        answer = input(
-            "\n------ POSTGRES settings for Gateway ----\n"
-            "\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
-            "(although not advised) or use a remote managed POSTGRES."
+        Helpers.section_headline("POSTGRES SETTINGS")
+        print("\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
+              "(although not advised) as a local setup or use a remote managed POSTGRES.")
+        answer = Helpers.input_guestion(
             "\nPress ENTER to use default value 'local' setup or type in 'remote': ")
+
         local_or_remote = Prompts.check_default(answer, 'local')
         if local_or_remote == "local":
             default_postgres_dir = f"{Helpers.get_home_dir()}/postgresdata"
-            postgres_mount = input(f"\nFor local setup which runs container, "
-                                   f"postgres data needs to be externally mounted from a folder."
-                                   f"\nPress Enter to store POSTGRES data on folder  \"{default_postgres_dir}\""
-                                   f" Or type in the absolute path for the folder:")
+            print(f"\nFor local setup which runs container, "
+                  f"postgres data needs to be externally mounted from a folder.")
+            postgres_mount = Helpers.input_guestion(
+                f"\nPress Enter to store POSTGRES data on folder  \"{bcolors.OKBLUE}{default_postgres_dir}{bcolors.ENDC}\""
+                f" Or type in the absolute path for the folder:")
             return "local", Prompts.check_default(postgres_mount, default_postgres_dir), "postgres_db:5432"
 
         else:
@@ -50,24 +55,26 @@ class Prompts:
 
     @staticmethod
     def get_postgress_dbname():
-        answer = input("\nPOSTGRES DB: Default value is 'radix-ledger'. "
-                       "Press Enter to accept default or type in Postgress database name:")
+        answer = Helpers.input_guestion("\nPOSTGRES DB: Default value is 'radix-ledger'. "
+                                        "Press Enter to accept default or type in Postgress database name:")
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
     def get_CoreApiAddress():
-        answer = input("\n------ Core API to read Transactions ----\n"
-                       "\nThis will be node either running locally or remote. "
-                       "\nDefault settings use local node  and the default value is `http://core:3333`. "
-                       "Press ENTER to accept default Or Type in remote CoreApi "
-                       "address in format of url like http(s)://<host and port>:")
+        Helpers.section_headline("CORE API NODE DETAILS")
+        print(
+            "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
+            f"\nCORE API ADDRESS: Default settings use local node  and the default value is {bcolors.OKBLUE}http://core:3333{bcolors.ENDC} ")
+        answer = Helpers.input_guestion(
+            "Press ENTER to accept default Or Type in remote CoreApi "
+            f"address in format of url like {bcolors.FAIL}http(s)://<host and port>:{bcolors.ENDC}")
         return Prompts.check_default(answer, 'http://core:3333')
 
     @staticmethod
     def get_CopeAPINodeName():
-        answer = input(
-            "\nNODE NAME: This can be any string and logs would refer this name on related info/errors"
-            "\nDefault value is 'core'. Press ENTER to accept default value or type in new name':")
+        print("\nNODE NAME: This can be any string and logs would refer this name on related info/errors")
+        answer = Helpers.input_guestion(
+            "Default value is 'core'. Press ENTER to accept default value or type in new name':")
         return Prompts.check_default(answer, 'core')
 
     @staticmethod
@@ -108,62 +115,69 @@ class Prompts:
 
     @staticmethod
     def get_gateway_release(gateway_or_aggregator):
-        # TODO add code to pull latest release
-        answer = input(f"\n-----------Gateway release for {gateway_or_aggregator} -------\n"
-                       f"Type in {gateway_or_aggregator} release tag:")
-        return answer
+        latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+        Helpers.section_headline("GATEWAY RELEASE")
+
+        print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
+        answer = input(
+            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:")
+        return Prompts.check_default(answer, latest_gateway_release)
 
     @staticmethod
     def check_for_gateway():
-        print("\n===========Network Gateway settings =================\n")
+        Helpers.section_headline("NETWORK GATEWAY SETTINGS")
         print(
-            "\nDo you want to setup NETWORK GATEWAY on this machine? "
-            "\nFor more info refer https://docs.radixdlt.com/main/node-and-gateway/network-gateway.html")
-        answer = input("Default is No[N], Press ENTER to accept default or type in [Y/N]")
+            "\nFor more info on NETWORK GATEWAY refer https://docs.radixdlt.com/main/node-and-gateway/network-gateway.html"
+            "\nDo you want to setup NETWORK GATEWAY on this machine? ")
+
+        answer = Helpers.input_guestion("Default is No[N], Press ENTER to accept default or type in [Y/N]")
         return Helpers.check_Yes(Prompts.check_default(answer, "N"))
 
     @staticmethod
     def check_for_fullnode():
-        print("\n===========Full node settings =================")
+        Helpers.section_headline("FULL NODE")
         print(
-            "\nDo you want to setup fullnode or a validator?  "
-            "\nFor more information refer "
+            f"\nDo you want to setup a fullnode or a validator? For more information refer "
             "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
-        answer = input("Default is Y, Press ENTER to accept default or type in [Y/N]:")
+        answer = Helpers.input_guestion(
+            "Default is Y to setup fullnode , Press ENTER to accept default or type in [Y/N]:")
         return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
 
     @staticmethod
     def ask_enable_transaction():
-        answer = input(
-            "\n---------TRANSACTION API --------"
+        Helpers.section_headline("TRANSACTION API")
+        print(
             "\nTransactions API on fullnodes are disabled. For it act as node that can stream transactions to a Gateway, it needs to be enabled."
-            "\nTo enable this, it requires to be set to true,"
-            "\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
+            "\nTo enable this, it requires to be set to true,")
+        answer = Helpers.input_guestion("\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
         return Prompts.check_default(answer, "false")
 
     @staticmethod
     def ask_keyfile_path():
-        print(f"\n------ KEYSTORE FILE ----"
-              f"\nThe keystore file is very important and it is the identity of the node."
-              f"\nIf you are planning to run a validator, defintely make sure you backup this keystore file"
-              )
-        y_n = input("\nDo you have a keystore file that you want to use [Y/N]?")
+        Helpers.section_headline("KEYSTORE FILE")
+        print(
+            f"\nThe keystore file is the identity of the node and a very important file."
+            f"\nIf you are planning to run a validator,  make sure you definitely backup this keystore file"
+        )
+        y_n = Helpers.input_guestion("\nDo you have a keystore file that you want to use [Y/N]?")
         if Helpers.check_Yes(Prompts.check_default(y_n, "N")):
-            return input("Enter the absolute path of the folder, just the folder, where the keystore file is located:")
+            return input(
+                f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}")
         else:
             radixnode_dir = f"{Helpers.get_home_dir()}/node-config"
-            answer = input(
-                f"\nDefault folder location for Keystore file will be: {radixnode_dir}"
-                "\nPress 'ENTER' to accept default. otherwise enter the absolute path of the new folder:")
+            print(
+                f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{radixnode_dir}{bcolors.ENDC}")
+            answer = Helpers.input_guestion(
+                'Press ENTER to accept default. otherwise enter the absolute path of the new folder:')
             # TODO this needs to moved out of init
             run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
-            return str(radixnode_dir)
+            return Prompts.check_default(answer, radixnode_dir)
 
     @staticmethod
     def ask_keyfile_name():
         default_keyfile_name = "node-keystore.ks"
         value = input(
-            f"\nType in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':").strip()
+            f"\n{bcolors.WARNING}Type in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':{bcolors.ENDC}").strip()
         if value != "":
             keyfile_name = value
         else:
@@ -180,13 +194,13 @@ class Prompts:
 
     @staticmethod
     def ask_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
-        y_n = input("\n----------NEW or EXISTING SETUP -------"
-                    "\nIs this first time you running the node on this machine [Y/N]")
+        Helpers.section_headline("NEW or EXISTING SETUP")
+        y_n = input(f"\n{bcolors.WARNING}Is this first time you running the node on this machine [Y/N]:{bcolors.ENDC}")
         if Helpers.check_Yes(y_n):
             return None
         else:
             prompt_answer = input(
-                f"\nSo you have existing docker compose file. Is it in location '{os.getcwd()}/{default_compose_file}'?"
+                f"\nSo you have existing docker compose file. Is it in location '{bcolors.OKBLUE}{os.getcwd()}/{default_compose_file}{bcolors.ENDC}'?"
                 f"\nIf so, press 'ENTER' or type in absolute path to file:")
             if prompt_answer == "":
                 return f"{os.getcwd()}/{default_compose_file}"
@@ -195,15 +209,18 @@ class Prompts:
 
     @staticmethod
     def ask_enable_nginx(service='CORE'):
-        answer = input(f"\n----------NGINX SETUP FOR {service} NODE----------"
-                       f"\n {service} API can be protected by running Nginx infront of it."
-                       "\n Default value is 'true' to enable it. "
-                       "Press Enter to accept default or type to choose [true/false]:")
+        Helpers.section_headline(f"NGINX SETUP FOR {service} NODE")
+        print(f"\n {service} API can be protected by running Nginx infront of it.")
+        answer = Helpers.input_guestion(
+            "Default value is 'true' to enable it. "
+            "Press Enter to accept default or type to choose [true/false]:")
         return Prompts.check_default(answer, "true")
 
     @staticmethod
     def get_nginx_release():
-        # TODO add code to pull latest release
-        answer = input(f"\n-----------NGINX-CONFIG -------\n"
-                       f"Type in radixdlt/radixdlt-nginx release tag:")
-        return answer
+        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+        Helpers.section_headline("NGINX CONFIG")
+        print(f"Latest release of nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
+        answer = Helpers.input_guestion(
+            f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:")
+        return Prompts.check_default(answer, latest_nginx_release)

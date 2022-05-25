@@ -258,7 +258,17 @@ class Helpers:
     def get_home_dir():
         return Path.home()
 
+    @staticmethod
+    def section_headline(title):
+        print(f"{bcolors.BOLD}--------------{title}----------------------{bcolors.ENDC}")
 
+    @staticmethod
+    def input_guestion(question):
+        return input(f"\n{bcolors.WARNING}{question}{bcolors.ENDC}")
+
+    @staticmethod
+    def print_info(info):
+        print(f"{bcolors.OKBLUE}{info}{bcolors.ENDC}")
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'

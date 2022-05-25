@@ -114,11 +114,10 @@ class Base:
 
     @staticmethod
     def get_data_dir(create_dir=True):
-        # TODO AutoApprove
+        Helpers.section_headline("LEDGER LOCATION")
         data_dir_path = input(
-            f"\n-----------LEDGER LOCATION------\n"
-            f"\nRadix node stores all the data on ledger on a folder. "
-            f"This would allow to restart the node without a need to download ledger on every restart"
+            f"\nRadix node stores all the ledger data on a folder. "
+            f"Mounting this location as a docker volume, will allow to restart the node without a need to download ledger"
             f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
             f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}")
         if data_dir_path == "":
@@ -130,7 +129,8 @@ class Base:
     @staticmethod
     def get_network_id():
         # Network id
-        network_prompt = input("\nEnter the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
+        network_prompt = Helpers.input_guestion(
+            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
         if network_prompt.lower() in ["s", "stokenet"]:
             network_id = 2
         elif network_prompt.lower() in ["m", "mainnet"]:
@@ -150,4 +150,3 @@ class Base:
             genesis_json_location = None
 
         return genesis_json_location
-

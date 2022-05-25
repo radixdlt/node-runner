@@ -9,7 +9,7 @@ from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
 from utils.Prompts import Prompts
-from utils.utils import Helpers, run_shell_command
+from utils.utils import Helpers, run_shell_command, bcolors
 
 dockercli = ArgumentParser(
     description='Docker commands')
@@ -33,10 +33,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 def config(args):
     release = latest_release()
     configuration = DockerConfig(release)
-
-    print("----- Config file -----"
-          "\nAbout to create config file using the answers from the questions that would be asked in next steps."
-          f"\nLocation of the config file is {args.configfile}")
+    Helpers.section_headline("CONFIG FILE")
+    print(
+        "\nCreating config file using the answers from the questions that would be asked in next steps."
+        f"\nLocation of the config file: {bcolors.OKBLUE}{args.configfile}{bcolors.ENDC}")
     config_file = args.configfile
 
     configuration.common_settings.ask_network_id()
@@ -72,8 +72,8 @@ def config(args):
         return self.represent_scalar('tag:yaml.org,2002:null', '')
 
     yaml.add_representer(type(None), represent_none)
-    print(f"\n-----------------Below is generated config -----------"
-          f"\n{yaml.dump(config_to_dump)}"
+    Helpers.section_headline("CONFIG is Generated as below")
+    print(f"\n{yaml.dump(config_to_dump)}"
           f"\n\n Saving to file {config_file} ")
 
     with open(config_file, 'w') as f:
