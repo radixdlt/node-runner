@@ -1,11 +1,12 @@
-from config.BaseConfig import BaseConfig
+from config.BaseConfig import BaseConfig, SetupMode
+from github import github
 from setup import Base
 from utils.Prompts import Prompts
 
 
 class NginxConfig(BaseConfig):
-    protect_gateway = None
-    protect_core = None
+    protect_gateway = True
+    protect_core = True
     release = None
 
 
@@ -54,10 +55,15 @@ class CommonDockerSettings(BaseConfig):
         self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
 
     def ask_nginx_release(self):
-        self.nginx_settings.release = Prompts.get_nginx_release()
+        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+        self.nginx_settings.release = latest_nginx_release
+        if "DETAILED" in SetupMode.instance().mode:
+            self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
 
     def ask_enable_nginx_for_core(self):
-        self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE")
+        if "DETAILED" in SetupMode.instance().mode:
+            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE")
 
     def ask_enable_nginx_for_gateway(self):
-        self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY")
+        if "DETAILED" in SetupMode.instance().mode:
+            self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY")

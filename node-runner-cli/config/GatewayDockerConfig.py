@@ -1,28 +1,33 @@
+from pathlib import Path
 from urllib.parse import urlparse
 
-from config.BaseConfig import BaseConfig
+from config.BaseConfig import BaseConfig, SetupMode
+from github import github
 from utils.Prompts import Prompts
 from utils.utils import Helpers
 
 
 class PostGresSettings(BaseConfig):
-    user: str = None
+    user: str = "postgres"
     password: str = None
     dbname: str = "radixdlt_ledger"
-    data_mount_path: str = None
-    setup: str = None
-    host: str = None
+    data_mount_path: str = f"{Path.home()}/postgresdata"
+    setup: str = "local"
+    host: str = "postgres_db:5432"
 
     def ask_postgress_settings(self):
-        self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location()
-        self.user = Prompts.get_postgress_user()
+        Helpers.section_headline("POSTGRES SETTINGS")
+        if "DETAILED" in SetupMode.instance().mode:
+            self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location(self.host,
+                                                                                         self.data_mount_path)
+            self.user = Prompts.get_postgress_user()
+            self.dbname = Prompts.get_postgress_dbname()
         self.password = Prompts.ask_postgress_password()
-        self.dbname = Prompts.get_postgress_dbname()
 
 
 class CoreApiNode(BaseConfig):
-    Name = None
-    CoreApiAddress = None
+    Name = "Core"
+    CoreApiAddress = "http://core:3333"
     TrustWeighting = 1
     RequestWeighting = 1
     Enabled = "true"
@@ -54,7 +59,7 @@ class DataAggregatorSetting:
     repo: str = "radixdlt/ng-data-aggregator"
     docker_image: str = None
     restart: str = "unless-stopped"
-    PrometheusMetricsPort: str = "1234"
+    prometheusMetricsPort: str = "1234"
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
 
@@ -63,18 +68,18 @@ class DataAggregatorSetting:
             setattr(self, key, value)
 
     def ask_gateway_release(self):
-        self.release = Prompts.get_gateway_release("data_aggregator")
+        latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+        self.release = latest_gateway_release
+        if "DETAILED" in SetupMode.instance().mode:
+            self.release = Prompts.get_gateway_release("data_aggregator", latest_gateway_release)
         self.docker_image = f"{self.repo}:{self.release}"
 
     def ask_core_api_node_settings(self):
-        coreApiNode = self.coreApiNode
-
-        if not coreApiNode.CoreApiAddress:
-            coreApiNode.CoreApiAddress = Prompts.get_CoreApiAddress()
-            self.set_basic_auth(coreApiNode.CoreApiAddress)
-        if not coreApiNode.Name:
-            coreApiNode.Name = Prompts.get_CopeAPINodeName()
-        self.coreApiNode = coreApiNode
+        if "DETAILED" in SetupMode.instance().mode:
+            self.coreApiNode.CoreApiAddress = Prompts.get_CoreApiAddress(self.coreApiNode.CoreApiAddress)
+            self.set_basic_auth(self.coreApiNode.CoreApiAddress)
+            self.coreApiNode.Name = Prompts.get_CopeAPINodeName(self.coreApiNode.Name)
+            self.coreApiNode = self.coreApiNode
 
     def set_basic_auth(self, url):
         parsed_url = urlparse(url)
@@ -101,9 +106,9 @@ class GatewayAPIDockerSettings(BaseConfig):
     docker_image: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
     restart = "unless-stopped"
-    PrometheusMetricsPort = "1234"
-    EnableSwagger = "true"
-    MaxPageSize = "30"
+    prometheusMetricsPort = "1234"
+    enableSwagger = "true"
+    maxPageSize = "30"
 
     def ask_gateway_release(self):
         self.release = Prompts.get_gateway_release("gateway_api")

@@ -1,10 +1,13 @@
 from argparse import ArgumentParser
+from argparse import RawTextHelpFormatter
 
 import yaml
 from deepdiff import DeepDiff
 
 from commands.subcommand import get_decorator, argument
-from config.DockerConfig import DockerConfig
+from config.BaseConfig import SetupMode
+from config.DockerConfig import DockerConfig, CoreDockerSettings
+from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
@@ -12,7 +15,7 @@ from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
 dockercli = ArgumentParser(
-    description='Docker commands')
+    description='Docker commands', formatter_class=RawTextHelpFormatter)
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
 
 
@@ -29,38 +32,85 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              help="Path to config file where the config is going to get saved",
              action="store",
              default=f"{Helpers.get_home_dir()}/config.yaml"),
+    argument("-s", "--setupmode", nargs="+",
+             help="Quick setup with assumed defaults. It supports two mode "
+                  "\nCORE: Use this value to setup CORE using defaults"
+                  "\nGATEWAY: Use this value to setup GATEWAY using defaults"
+                  "\nDETAILED: Default value if not provided. This mode takes your through series of questions",
+             choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store"),
+    # argument("-s", "--setupmode", nargs="+",
+    #          help="""Quick setup with assumed defaults. It supports two mode
+    #               CORE: Use this value to setup CORE using defaults
+    #               GATEWAY: Use this value to setup GATEWAY using defaults
+    #               DETAILED: Default value if not provided. This mode takes your through series of questions
+    #               """,
+    #          choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store")
 ])
 def config(args):
+    Base.install_dependecies()
+    Base.add_user_docker_group()
     release = latest_release()
     configuration = DockerConfig(release)
     Helpers.section_headline("CONFIG FILE")
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{args.configfile}{bcolors.ENDC}")
+
+    setupmode = SetupMode.instance()
+    setupmode.mode = args.setupmode
     config_file = args.configfile
 
     configuration.common_settings.ask_network_id()
-    run_fullnode = Prompts.check_for_fullnode()
-    if run_fullnode:
-        configuration.core_node_settings.set_node_type()
-        configuration.core_node_settings.set_core_release(release)
-        configuration.core_node_settings.set_trusted_node(args.trustednode)
-        configuration.core_node_settings.ask_keydetails()
-        configuration.core_node_settings.ask_data_directory()
-        configuration.core_node_settings.ask_enable_transaction()
-        configuration.core_node_settings.ask_existing_docker_compose_file()
+
+    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
+        print("You cannot have DETAILED option with other options")
+
+    if "CORE" in setupmode.mode:
+        quick_node_settings = CoreDockerSettings({})
+        quick_node_settings.set_core_release(release)
+        quick_node_settings.set_trusted_node(args.trustednode)
+        quick_node_settings.ask_keydetails()
+        quick_node_settings.ask_data_directory()
+        quick_node_settings.ask_enable_transaction()
+        quick_node_settings.ask_existing_docker_compose_file()
+
+        configuration.core_node_settings = quick_node_settings
         configuration.common_settings.ask_enable_nginx_for_core()
 
-    run_gateway = Prompts.check_for_gateway()
-    if run_gateway:
-        configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
-        configuration.gateway_settings.postgres_db.ask_postgress_settings()
-        configuration.gateway_settings.data_aggregator.ask_gateway_release()
-        configuration.gateway_settings.gateway_api.ask_gateway_release()
-        configuration.gateway_settings.gateway_api.set_core_api_node_setings(
-            configuration.gateway_settings.data_aggregator.coreApiNode)
+    if "GATEWAY" in setupmode.mode:
+        quick_gateway_settings = GatewayDockerSettings({})
+        quick_gateway_settings.data_aggregator.ask_core_api_node_settings()
+        quick_gateway_settings.postgres_db.ask_postgress_settings()
+        quick_gateway_settings.data_aggregator.ask_gateway_release()
+        quick_gateway_settings.gateway_api.ask_gateway_release()
+        quick_gateway_settings.gateway_api.set_core_api_node_setings(
+            quick_gateway_settings.data_aggregator.coreApiNode)
+
+        configuration.gateway_settings = quick_gateway_settings
         configuration.common_settings.ask_enable_nginx_for_gateway()
-    configuration.common_settings.ask_nginx_release()
+
+    if "DETAILED" in setupmode.mode:
+        run_fullnode = Prompts.check_for_fullnode()
+        if run_fullnode:
+            configuration.core_node_settings.set_node_type()
+            configuration.core_node_settings.set_core_release(release)
+            configuration.core_node_settings.set_trusted_node(args.trustednode)
+            configuration.core_node_settings.ask_keydetails()
+            configuration.core_node_settings.ask_data_directory()
+            configuration.core_node_settings.ask_enable_transaction()
+            configuration.core_node_settings.ask_existing_docker_compose_file()
+            configuration.common_settings.ask_enable_nginx_for_core()
+
+        run_gateway = Prompts.check_for_gateway()
+        if run_gateway:
+            configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
+            configuration.gateway_settings.postgres_db.ask_postgress_settings()
+            configuration.gateway_settings.data_aggregator.ask_gateway_release()
+            configuration.gateway_settings.gateway_api.ask_gateway_release()
+            configuration.gateway_settings.gateway_api.set_core_api_node_setings(
+                configuration.gateway_settings.data_aggregator.coreApiNode)
+            configuration.common_settings.ask_enable_nginx_for_gateway()
+        configuration.common_settings.ask_nginx_release()
 
     config_to_dump = {"common_config": dict(configuration.common_settings)}
     if run_fullnode:
@@ -118,7 +168,7 @@ def setup(args):
     if autoapprove:
         print("In Auto mode -  Updating the node as per above contents of docker file")
     else:
-        should_start = input("\nOkay to start the node [Y/n]?:")
+        should_start = input("\nOkay to start the containers [Y/n]?:")
     if Helpers.check_Yes(should_start) or autoapprove:
         Docker.run_docker_compose_up(docker_config.core_node_settings.keydetails.keystore_password,
                                      docker_config.core_node_settings.existing_docker_compose,

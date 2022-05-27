@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from config.BaseConfig import BaseConfig
+from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from setup import Base
@@ -11,8 +11,8 @@ from utils.Prompts import Prompts
 
 
 class KeyDetails(BaseConfig):
-    keyfile_path: str = None
-    keyfile_name: str = None
+    keyfile_path: str = f"{Path.home()}/node-config"
+    keyfile_name: str = "node-keystore.ks"
     keygen_tag: str = None
     keystore_password: str = None
 
@@ -22,9 +22,9 @@ class CoreDockerSettings(BaseConfig):
     composefileurl: str = None
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
-    data_directory: str = None
+    data_directory: str = f"{Path.home()}/data"
     enable_transaction: str = False
-    existing_docker_compose: str = None
+    existing_docker_compose: str = f"{Path.home()}/radix-fullnode-compose.yml"
     trusted_node: str = None
 
     def __iter__(self):
@@ -42,12 +42,9 @@ class CoreDockerSettings(BaseConfig):
 
     def ask_keydetails(self):
         keydetails = self.keydetails
-        if not keydetails.keyfile_path:
+        if "DETAILED" in SetupMode.instance().mode:
             keydetails.keyfile_path = Prompts.ask_keyfile_path()
-        if not keydetails.keyfile_name:
             keydetails.keyfile_name = Prompts.ask_keyfile_name()
-        if not keydetails.keygen_tag:
-            keydetails.keygen_tag = self.core_release
 
         keystore_password, file_location = Base.generatekey(
             keyfile_path=keydetails.keyfile_path,
@@ -58,16 +55,19 @@ class CoreDockerSettings(BaseConfig):
 
     def set_core_release(self, release):
         self.core_release = release
+        self.keydetails.keygen_tag = self.core_release
 
     def ask_data_directory(self):
-        if not self.data_directory:
+        if "DETAILED" in SetupMode.instance().mode:
             self.data_directory = Base.get_data_dir(create_dir=False)
 
     def ask_enable_transaction(self):
-        self.enable_transaction = Prompts.ask_enable_transaction()
+        if "GATEWAY" in SetupMode.instance().mode:
+            self.enable_transaction = Prompts.ask_enable_transaction()
 
     def ask_existing_docker_compose_file(self):
-        self.existing_docker_compose = Prompts.ask_existing_compose_file()
+        if "DETAILED" in SetupMode.instance().mode:
+            self.existing_docker_compose = Prompts.ask_existing_compose_file()
 
     def set_trusted_node(self, trusted_node):
         # Prompts.ask_trusted_node()

@@ -1,6 +1,5 @@
 import os
 
-from github import github
 from utils.utils import Helpers, run_shell_command, bcolors
 
 
@@ -27,8 +26,7 @@ class Prompts:
         return Prompts.check_default(answer, "postgres")
 
     @staticmethod
-    def ask_postgress_location():
-        Helpers.section_headline("POSTGRES SETTINGS")
+    def ask_postgress_location(default_host, default_postgres_dir):
         print("\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
               "(although not advised) as a local setup or use a remote managed POSTGRES.")
         answer = Helpers.input_guestion(
@@ -36,13 +34,12 @@ class Prompts:
 
         local_or_remote = Prompts.check_default(answer, 'local')
         if local_or_remote == "local":
-            default_postgres_dir = f"{Helpers.get_home_dir()}/postgresdata"
             print(f"\nFor local setup which runs container, "
                   f"postgres data needs to be externally mounted from a folder.")
             postgres_mount = Helpers.input_guestion(
                 f"\nPress Enter to store POSTGRES data on folder  \"{bcolors.OKBLUE}{default_postgres_dir}{bcolors.ENDC}\""
                 f" Or type in the absolute path for the folder:")
-            return "local", Prompts.check_default(postgres_mount, default_postgres_dir), "postgres_db:5432"
+            return "local", Prompts.check_default(postgres_mount, default_postgres_dir), default_host
 
         else:
             hostname = input("\nFor the remote managed postgres, Enter the host name of server hosting postgress:")
@@ -60,22 +57,22 @@ class Prompts:
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
-    def get_CoreApiAddress():
+    def get_CoreApiAddress(default):
         Helpers.section_headline("CORE API NODE DETAILS")
         print(
             "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
-            f"\nCORE API ADDRESS: Default settings use local node  and the default value is {bcolors.OKBLUE}http://core:3333{bcolors.ENDC} ")
+            f"\nCORE API ADDRESS: Default settings use local node  and the default value is {bcolors.OKBLUE}{default}{bcolors.ENDC} ")
         answer = Helpers.input_guestion(
             "Press ENTER to accept default Or Type in remote CoreApi "
             f"address in format of url like {bcolors.FAIL}http(s)://<host and port>:{bcolors.ENDC}")
-        return Prompts.check_default(answer, 'http://core:3333')
+        return Prompts.check_default(answer, default)
 
     @staticmethod
-    def get_CopeAPINodeName():
+    def get_CopeAPINodeName(default):
         print("\nNODE NAME: This can be any string and logs would refer this name on related info/errors")
         answer = Helpers.input_guestion(
-            "Default value is 'core'. Press ENTER to accept default value or type in new name':")
-        return Prompts.check_default(answer, 'core')
+            f"Default value is '{default}'. Press ENTER to accept default value or type in new name':")
+        return Prompts.check_default(answer, default)
 
     @staticmethod
     def get_TrustWeighting():
@@ -114,8 +111,8 @@ class Prompts:
         return Prompts.check_default(answer, "true")
 
     @staticmethod
-    def get_gateway_release(gateway_or_aggregator):
-        latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+    def get_gateway_release(gateway_or_aggregator, latest_gateway_release):
+
         Helpers.section_headline("GATEWAY RELEASE")
 
         print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
@@ -217,8 +214,8 @@ class Prompts:
         return Prompts.check_default(answer, "true")
 
     @staticmethod
-    def get_nginx_release():
-        latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+    def get_nginx_release(latest_nginx_release):
+
         Helpers.section_headline("NGINX CONFIG")
         print(f"Latest release of nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
