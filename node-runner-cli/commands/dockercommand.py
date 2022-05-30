@@ -33,6 +33,11 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              help="Path to config file where the config is going to get saved",
              action="store",
              default=f"{Helpers.get_home_dir()}/config.yaml"),
+    argument("-n", "--networkid",
+             help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1. This is optional",
+             action="store",
+             type=int,
+             default=0),
     argument("-s", "--setupmode", nargs="+",
              help="""Quick setup with assumed defaults. It supports two mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
@@ -58,7 +63,7 @@ def config(args):
 
     config_file = args.configfile
 
-    configuration.common_settings.ask_network_id()
+    configuration.common_settings.ask_network_id(args.networkid)
 
     config_to_dump = {}
 
@@ -73,6 +78,7 @@ def config(args):
         configuration.gateway_settings = quick_gateway_settings
         configuration.common_settings.ask_enable_nginx_for_gateway()
         config_to_dump["gateway"] = dict(configuration.gateway_settings)
+
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
