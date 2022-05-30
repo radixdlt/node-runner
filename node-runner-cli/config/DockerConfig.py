@@ -23,7 +23,7 @@ class CoreDockerSettings(BaseConfig):
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
     data_directory: str = f"{Path.home()}/data"
-    enable_transaction: str = False
+    enable_transaction: str = "false"
     existing_docker_compose: str = f"{Path.home()}/radix-fullnode-compose.yml"
     trusted_node: str = None
 
@@ -62,7 +62,7 @@ class CoreDockerSettings(BaseConfig):
             self.data_directory = Base.get_data_dir(create_dir=False)
 
     def ask_enable_transaction(self):
-        if "GATEWAY" in SetupMode.instance().mode:
+        if "GATEWAY" in SetupMode.instance().mode or "DETAILED" in SetupMode.instance().mode:
             self.enable_transaction = Prompts.ask_enable_transaction()
 
     def ask_existing_docker_compose_file(self):
@@ -72,6 +72,16 @@ class CoreDockerSettings(BaseConfig):
     def set_trusted_node(self, trusted_node):
         # Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
+
+    def create_config(self, release, trustednode):
+
+        self.set_core_release(release)
+        self.set_trusted_node(trustednode)
+        self.ask_keydetails()
+        self.ask_data_directory()
+        self.ask_enable_transaction()
+        self.ask_existing_docker_compose_file()
+        return self
 
 
 class DockerConfig:

@@ -13,12 +13,12 @@ class Prompts:
             return answer
 
     @staticmethod
-    def ask_postgress_password():
+    def ask_postgress_password() -> str:
         answer = Helpers.input_guestion("\nPOSTGRES USER PASSWORD: Type in Postgress database password:")
         return answer
 
     @staticmethod
-    def get_postgress_user():
+    def get_postgress_user() -> str:
         print("\nPOSTGRES USER: This is super admin user which is setup or going to be created if it is local setup.")
         answer = Helpers.input_guestion(
             "Default value for Postgres user is `postgres`. Press Enter to accept default"
@@ -47,17 +47,17 @@ class Prompts:
             return "remote", None, f"{hostname}:{port}"
 
     @staticmethod
-    def ask_postgress_volume_location():
+    def ask_postgress_volume_location() -> str:
         answer = input("")
 
     @staticmethod
-    def get_postgress_dbname():
+    def get_postgress_dbname() -> str:
         answer = Helpers.input_guestion("\nPOSTGRES DB: Default value is 'radix-ledger'. "
                                         "Press Enter to accept default or type in Postgress database name:")
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
-    def get_CoreApiAddress(default):
+    def get_CoreApiAddress(default) -> str:
         Helpers.section_headline("CORE API NODE DETAILS")
         print(
             "\nThis will be node either running locally or remote using which Gateway aggregator will stream ledger data"
@@ -68,7 +68,7 @@ class Prompts:
         return Prompts.check_default(answer, default)
 
     @staticmethod
-    def get_CopeAPINodeName(default):
+    def get_CopeAPINodeName(default) -> str:
         print("\nNODE NAME: This can be any string and logs would refer this name on related info/errors")
         answer = Helpers.input_guestion(
             f"Default value is '{default}'. Press ENTER to accept default value or type in new name':")
@@ -89,13 +89,13 @@ class Prompts:
         return Prompts.check_default(answer, 1)
 
     @staticmethod
-    def get_coreAPINodeEnabled():
+    def get_coreAPINodeEnabled() -> str:
         answer = input(
             "Is this node enabled for gateway. Press Enter to accept default as true [true/false]:")
-        return Prompts.check_default(answer, "true")
+        return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
-    def get_basic_auth():
+    def get_basic_auth() -> dict:
         print("Core API node is setup on different machine. It would require Nginx admin user and password.")
         admin = input(
             "Type in the username. Press 'ENTER' for default value 'admin':")
@@ -104,14 +104,14 @@ class Prompts:
         return {"name": Prompts.check_default(admin, "admin"), "password": password}
 
     @staticmethod
-    def get_disablehttpsVerfiy():
+    def get_disablehttpsVerfiy() -> str:
         answer = input(
             "If the core api node has self signed certificate, Press 'ENTER' to accept 'true'. otherwise type 'false' "
             "[true/false]:")
-        return Prompts.check_default(answer, "true")
+        return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
-    def get_gateway_release(gateway_or_aggregator, latest_gateway_release):
+    def get_gateway_release(gateway_or_aggregator, latest_gateway_release) -> str:
 
         Helpers.section_headline("GATEWAY RELEASE")
 
@@ -121,7 +121,7 @@ class Prompts:
         return Prompts.check_default(answer, latest_gateway_release)
 
     @staticmethod
-    def check_for_gateway():
+    def check_for_gateway() -> str:
         Helpers.section_headline("NETWORK GATEWAY SETTINGS")
         print(
             "\nFor more info on NETWORK GATEWAY refer https://docs.radixdlt.com/main/node-and-gateway/network-gateway.html"
@@ -131,7 +131,7 @@ class Prompts:
         return Helpers.check_Yes(Prompts.check_default(answer, "N"))
 
     @staticmethod
-    def check_for_fullnode():
+    def check_for_fullnode() -> str:
         Helpers.section_headline("FULL NODE")
         print(
             f"\nDo you want to setup a fullnode or a validator? For more information refer "
@@ -141,16 +141,16 @@ class Prompts:
         return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
 
     @staticmethod
-    def ask_enable_transaction():
+    def ask_enable_transaction() -> str:
         Helpers.section_headline("TRANSACTION API")
         print(
             "\nTransactions API on fullnodes are disabled. For it act as node that can stream transactions to a Gateway, it needs to be enabled."
             "\nTo enable this, it requires to be set to true,")
         answer = Helpers.input_guestion("\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
-        return Prompts.check_default(answer, "false")
+        return Prompts.check_default(answer, "false").lower()
 
     @staticmethod
-    def ask_keyfile_path():
+    def ask_keyfile_path() -> str:
         Helpers.section_headline("KEYSTORE FILE")
         print(
             f"\nThe keystore file is the identity of the node and a very important file."
@@ -171,7 +171,7 @@ class Prompts:
             return Prompts.check_default(answer, radixnode_dir)
 
     @staticmethod
-    def ask_keyfile_name():
+    def ask_keyfile_name() -> str:
         default_keyfile_name = "node-keystore.ks"
         value = input(
             f"\n{bcolors.WARNING}Type in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':{bcolors.ENDC}").strip()
@@ -183,7 +183,7 @@ class Prompts:
         return keyfile_name
 
     @staticmethod
-    def ask_trusted_node():
+    def ask_trusted_node() -> str:
         input("Fullnode needs details another node to connect to network. "
               "\nTo connect to MAINNET details on these node can be found here "
               "- https://docs.radixdlt.com/main/node-and-gateway/cli-install-node-docker.html#_install_the_node"
@@ -205,7 +205,7 @@ class Prompts:
                 return prompt_answer
 
     @staticmethod
-    def ask_enable_nginx(service='CORE'):
+    def ask_enable_nginx(service='CORE') -> str:
         Helpers.section_headline(f"NGINX SETUP FOR {service} NODE")
         print(f"\n {service} API can be protected by running Nginx infront of it.")
         answer = Helpers.input_guestion(
@@ -214,10 +214,10 @@ class Prompts:
         return Prompts.check_default(answer, "true")
 
     @staticmethod
-    def get_nginx_release(latest_nginx_release):
+    def get_nginx_release(latest_nginx_release) -> str:
 
         Helpers.section_headline("NGINX CONFIG")
-        print(f"Latest release of nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
+        print(f"Latest release of radixdlt-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
             f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:")
         return Prompts.check_default(answer, latest_nginx_release)

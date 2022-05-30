@@ -269,6 +269,12 @@ class Helpers:
     @staticmethod
     def print_info(info):
         print(f"{bcolors.OKBLUE}{info}{bcolors.ENDC}")
+
+    @staticmethod
+    def represent_none(self, _):
+        return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'

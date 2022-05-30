@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
 
@@ -33,22 +34,21 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              action="store",
              default=f"{Helpers.get_home_dir()}/config.yaml"),
     argument("-s", "--setupmode", nargs="+",
-             help="Quick setup with assumed defaults. It supports two mode "
-                  "\nCORE: Use this value to setup CORE using defaults"
-                  "\nGATEWAY: Use this value to setup GATEWAY using defaults"
-                  "\nDETAILED: Default value if not provided. This mode takes your through series of questions",
-             choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store"),
-    # argument("-s", "--setupmode", nargs="+",
-    #          help="""Quick setup with assumed defaults. It supports two mode
-    #               CORE: Use this value to setup CORE using defaults
-    #               GATEWAY: Use this value to setup GATEWAY using defaults
-    #               DETAILED: Default value if not provided. This mode takes your through series of questions
-    #               """,
-    #          choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store")
+             help="""Quick setup with assumed defaults. It supports two mode.
+                  \n\nCORE: Use this value to setup CORE using defaults.
+                  \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
+                  \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
+                  """,
+             choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store")
 ])
 def config(args):
-    Base.install_dependecies()
-    Base.add_user_docker_group()
+    setupmode = SetupMode.instance()
+    setupmode.mode = args.setupmode
+    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
+        print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
+              f"\nDETAILED option goes through asking each and every question necessary. Hence cannot be clubbed together with options"
+              f"{bcolors.ENDC}")
+        sys.exit()
     release = latest_release()
     configuration = DockerConfig(release)
     Helpers.section_headline("CONFIG FILE")
@@ -56,72 +56,44 @@ def config(args):
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{args.configfile}{bcolors.ENDC}")
 
-    setupmode = SetupMode.instance()
-    setupmode.mode = args.setupmode
     config_file = args.configfile
 
     configuration.common_settings.ask_network_id()
 
-    if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
-        print("You cannot have DETAILED option with other options")
+    config_to_dump = {}
 
     if "CORE" in setupmode.mode:
-        quick_node_settings = CoreDockerSettings({})
-        quick_node_settings.set_core_release(release)
-        quick_node_settings.set_trusted_node(args.trustednode)
-        quick_node_settings.ask_keydetails()
-        quick_node_settings.ask_data_directory()
-        quick_node_settings.ask_enable_transaction()
-        quick_node_settings.ask_existing_docker_compose_file()
-
+        quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, args.trustednode)
         configuration.core_node_settings = quick_node_settings
         configuration.common_settings.ask_enable_nginx_for_core()
+        config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
     if "GATEWAY" in setupmode.mode:
-        quick_gateway_settings = GatewayDockerSettings({})
-        quick_gateway_settings.data_aggregator.ask_core_api_node_settings()
-        quick_gateway_settings.postgres_db.ask_postgress_settings()
-        quick_gateway_settings.data_aggregator.ask_gateway_release()
-        quick_gateway_settings.gateway_api.ask_gateway_release()
-        quick_gateway_settings.gateway_api.set_core_api_node_setings(
-            quick_gateway_settings.data_aggregator.coreApiNode)
-
+        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config()
         configuration.gateway_settings = quick_gateway_settings
         configuration.common_settings.ask_enable_nginx_for_gateway()
-
+        config_to_dump["gateway"] = dict(configuration.gateway_settings)
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
-            configuration.core_node_settings.set_node_type()
-            configuration.core_node_settings.set_core_release(release)
-            configuration.core_node_settings.set_trusted_node(args.trustednode)
-            configuration.core_node_settings.ask_keydetails()
-            configuration.core_node_settings.ask_data_directory()
-            configuration.core_node_settings.ask_enable_transaction()
-            configuration.core_node_settings.ask_existing_docker_compose_file()
+            detailed_node_settings = CoreDockerSettings({}).create_config(release, args.trustednode)
+            configuration.core_node_settings = detailed_node_settings
             configuration.common_settings.ask_enable_nginx_for_core()
-
+            config_to_dump["core_node"] = dict(configuration.core_node_settings)
         run_gateway = Prompts.check_for_gateway()
         if run_gateway:
-            configuration.gateway_settings.data_aggregator.ask_core_api_node_settings()
-            configuration.gateway_settings.postgres_db.ask_postgress_settings()
-            configuration.gateway_settings.data_aggregator.ask_gateway_release()
-            configuration.gateway_settings.gateway_api.ask_gateway_release()
-            configuration.gateway_settings.gateway_api.set_core_api_node_setings(
-                configuration.gateway_settings.data_aggregator.coreApiNode)
+            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config()
+            configuration.gateway_settings = detailed_gateway_settings
             configuration.common_settings.ask_enable_nginx_for_gateway()
+            config_to_dump["gateway"] = dict(configuration.gateway_settings)
+    if configuration.common_settings.check_nginx_required():
         configuration.common_settings.ask_nginx_release()
+    else:
+        configuration.common_settings.nginx_settings = None
 
-    config_to_dump = {"common_config": dict(configuration.common_settings)}
-    if run_fullnode:
-        config_to_dump["core_node"] = dict(configuration.core_node_settings)
-    if run_gateway:
-        config_to_dump["gateway"] = dict(configuration.gateway_settings)
+    config_to_dump["common_config"] = dict(configuration.common_settings)
 
-    def represent_none(self, _):
-        return self.represent_scalar('tag:yaml.org,2002:null', '')
-
-    yaml.add_representer(type(None), represent_none)
+    yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
     print(f"\n{yaml.dump(config_to_dump)}"
           f"\n\n Saving to file {config_file} ")

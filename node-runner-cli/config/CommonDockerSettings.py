@@ -1,3 +1,5 @@
+import json
+
 from config.BaseConfig import BaseConfig, SetupMode
 from github import github
 from setup import Base
@@ -5,8 +7,8 @@ from utils.Prompts import Prompts
 
 
 class NginxConfig(BaseConfig):
-    protect_gateway = True
-    protect_core = True
+    protect_gateway: str = "true"
+    protect_core: str = "true"
     release = None
 
 
@@ -62,8 +64,15 @@ class CommonDockerSettings(BaseConfig):
 
     def ask_enable_nginx_for_core(self):
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE")
+            self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE").lower()
 
     def ask_enable_nginx_for_gateway(self):
         if "DETAILED" in SetupMode.instance().mode:
-            self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY")
+            self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY").lower()
+
+    def check_nginx_required(self):
+        if json.loads(self.nginx_settings.protect_gateway.lower()) and json.loads(
+                self.nginx_settings.protect_core.lower()):
+            return True
+        else:
+            return False

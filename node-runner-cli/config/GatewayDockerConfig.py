@@ -111,7 +111,10 @@ class GatewayAPIDockerSettings(BaseConfig):
     maxPageSize = "30"
 
     def ask_gateway_release(self):
-        self.release = Prompts.get_gateway_release("gateway_api")
+        latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+        self.release = latest_gateway_release
+        if "DETAILED" in SetupMode.instance().mode:
+            self.release = Prompts.get_gateway_release("gateway_api", latest_gateway_release)
         self.docker_image = f"{self.repo}:{self.release}"
 
     def set_core_api_node_setings(self, coreApiNode: CoreApiNode):
@@ -144,3 +147,12 @@ class GatewayDockerSettings(BaseConfig):
                 yield attr, dict(self.__getattribute__(attr))
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
+
+    def create_config(self):
+        self.data_aggregator.ask_core_api_node_settings()
+        self.postgres_db.ask_postgress_settings()
+        self.data_aggregator.ask_gateway_release()
+        self.gateway_api.ask_gateway_release()
+        self.gateway_api.set_core_api_node_setings(
+            self.data_aggregator.coreApiNode)
+        return self
