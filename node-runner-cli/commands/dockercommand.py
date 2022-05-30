@@ -38,6 +38,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              action="store",
              type=int,
              default=0),
+    argument("-p", "--postgrespassword",
+             help="Password for the postgres user. This is used for Gateway setup",
+             action="store",
+             default=""),
     argument("-s", "--setupmode", nargs="+",
              help="""Quick setup with assumed defaults. It supports two mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
@@ -74,7 +78,7 @@ def config(args):
         config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
     if "GATEWAY" in setupmode.mode:
-        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config()
+        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(args.postgrespassword)
         configuration.gateway_settings = quick_gateway_settings
         configuration.common_settings.ask_enable_nginx_for_gateway()
         config_to_dump["gateway"] = dict(configuration.gateway_settings)
@@ -88,7 +92,8 @@ def config(args):
             config_to_dump["core_node"] = dict(configuration.core_node_settings)
         run_gateway = Prompts.check_for_gateway()
         if run_gateway:
-            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config()
+            detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
+                args.postgrespassword)
             configuration.gateway_settings = detailed_gateway_settings
             configuration.common_settings.ask_enable_nginx_for_gateway()
             config_to_dump["gateway"] = dict(configuration.gateway_settings)

@@ -15,14 +15,17 @@ class PostGresSettings(BaseConfig):
     setup: str = "local"
     host: str = "postgres_db:5432"
 
-    def ask_postgress_settings(self):
+    def ask_postgress_settings(self, postgress_password):
         Helpers.section_headline("POSTGRES SETTINGS")
         if "DETAILED" in SetupMode.instance().mode:
             self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location(self.host,
                                                                                          self.data_mount_path)
             self.user = Prompts.get_postgress_user()
             self.dbname = Prompts.get_postgress_dbname()
-        self.password = Prompts.ask_postgress_password()
+        if postgress_password == "":
+            self.password = Prompts.ask_postgress_password()
+        else:
+            self.password = postgress_password
 
 
 class CoreApiNode(BaseConfig):
@@ -148,9 +151,9 @@ class GatewayDockerSettings(BaseConfig):
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
 
-    def create_config(self):
+    def create_config(self, postgress_password):
         self.data_aggregator.ask_core_api_node_settings()
-        self.postgres_db.ask_postgress_settings()
+        self.postgres_db.ask_postgress_settings(postgress_password)
         self.data_aggregator.ask_gateway_release()
         self.gateway_api.ask_gateway_release()
         self.gateway_api.set_core_api_node_setings(
