@@ -129,7 +129,6 @@ jobs:
               release: 1.1.2
           core_node:
             core_release: 1.1.1
-            data_directory: ${{ github.workspace }}/data
             enable_transaction: 'false'
             existing_docker_compose: ${{ github.workspace }}/radix-fullnode-compose.yml
             java_opts: --enable-preview -server -Xms2g -Xmx2g  -XX:MaxDirectMemorySize=2048m
@@ -151,4 +150,4 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           ./radixnode auth set-admin-password -m DOCKER -p test
-          NGINX_ADMIN_PASSSWORD=test ./radixnode api system health
+          NGINX_ADMIN_PASSWORD=test ./radixnode api system health
