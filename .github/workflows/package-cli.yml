@@ -126,7 +126,7 @@ jobs:
             data_directory: ${{ github.workspace }}/data
             enable_transaction: 'false'
             existing_docker_compose: ${{ github.workspace }}/radix-fullnode-compose.yml
-            java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
+            java_opts: --enable-preview -server -Xms2g -Xmx2g  -XX:MaxDirectMemorySize=2048m
               -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
               -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
             keydetails:
@@ -142,6 +142,6 @@ jobs:
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
-          ./radixnode docker setup -f ${{ github.workspace }}/config.yaml -a
+          ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           ./radixnode auth set-admin-password -m DOCKER test
           NGINX_ADMIN_PASSSWORD=test ./radixnode api system health
