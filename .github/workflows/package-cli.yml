@@ -140,6 +140,7 @@ jobs:
 
       - name: Run CLI setup
         run: |
+          export DISABLE_VERSION_CHECK=true
           ./radixnode docker setup -f config.yaml -a
           ./radixnode auth set-admin-password -m DOCKER test
           NGINX_ADMIN_PASSSWORD=test ./radixnode api system health
