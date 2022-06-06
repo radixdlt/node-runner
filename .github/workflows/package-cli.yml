@@ -139,5 +139,7 @@ jobs:
           DOC
 
       - name: Run CLI setup
-          ./radixnode config setup -f config.yaml
-          ./radixnode api system health
+        run: |
+          ./radixnode config setup -f config.yaml -a
+          ./radixnode auth set-admin-password -m DOCKER test
+          NGINX_ADMIN_PASSSWORD=test ./radixnode api system health
