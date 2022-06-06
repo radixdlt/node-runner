@@ -99,3 +99,45 @@ jobs:
           asset_name: radixnode-ubuntu-20.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
+
+  test-core-only-node:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: [ubuntu-latest]
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Setup config
+        run: |
+          chmod +x ./radixnode
+
+          cat <<DOC > config.yaml
+          common_config:
+            network_id: 2
+            nginx_settings:
+              protect_core: 'true'
+              protect_gateway: 'true'
+              release: 1.1.2
+          core_node:
+            core_release: 1.1.1
+            data_directory: /Users/shambu/data
+            enable_transaction: 'false'
+            existing_docker_compose: /Users/shambu/radix-fullnode-compose.yml
+            java_opts: --enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m
+              -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+              -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+            keydetails:
+              keyfile_name: node-keystore.ks
+              keyfile_path: /Users/shambu/node-config
+              keygen_tag: 1.1.1
+              keystore_password: password
+            nodetype: fullnode
+            trusted_node: radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210
+          DOC
+
+      - name: Run CLI setup
+          ./radixnode config setup -f config.yaml
+          ./radixnode api system health
