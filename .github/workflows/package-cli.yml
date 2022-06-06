@@ -113,7 +113,7 @@ jobs:
       - name: Setup config
         run: |
           chmod +x ./radixnode
-          mkdir -P ${{ github.workspace }}/node-config
+          mkdir -p ${{ github.workspace }}/node-config
           cat <<DOC > ${{ github.workspace }}/node-config/config.yaml
           common_config:
             network_id: 2
