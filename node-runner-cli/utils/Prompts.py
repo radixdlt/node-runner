@@ -161,7 +161,7 @@ class Prompts:
             return input(
                 f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}")
         else:
-            radixnode_dir = f"{Helpers.get_home_dir()}/node-config"
+            radixnode_dir = f"{Helpers.get_default_node_config_dir()}"
             print(
                 f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{radixnode_dir}{bcolors.ENDC}")
             answer = Helpers.input_guestion(

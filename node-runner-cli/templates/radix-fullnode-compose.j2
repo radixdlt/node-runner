@@ -57,7 +57,7 @@ services:
     volumes:
     - nginx_secrets:/etc/nginx/secrets
  {% endif %}
- {% if gateway.postgres_db is defined and gateway.postgres_db.setup =='local' %}
+ {% if (gateway is defined and gateway.postgres_db is defined) and gateway.postgres_db.setup =='local' %}
   postgres_db:
     image: "postgres:12-alpine"
     ports:
@@ -71,7 +71,7 @@ services:
       POSTGRES_PASSWORD: "{{gateway.postgres_db.password}}"
       POSTGRES_DB: "{{gateway.postgres_db.dbname}}"
 {% endif %}
-{% if gateway.gateway_api is defined %}
+{% if (gateway is defined and gateway.gateway_api is defined) %}
   gateway_api: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.gateway_api.docker_image}}
     ports:
@@ -96,7 +96,7 @@ services:
       RADIX_NG_API__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.RequestWeighting or '1'}}"
       RADIX_NG_API__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.Enabled or 'true'}}"
 {% endif %}
-{% if gateway.data_aggregator is defined %}
+{% if (gateway is defined and gateway.data_aggregator is defined) %}
   data_aggregator:
     image: {{gateway.data_aggregator.docker_image}}
     restart: {{gateway.gateway_api.restart or 'unless-stopped'}}

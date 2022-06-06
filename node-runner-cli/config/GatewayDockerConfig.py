@@ -11,7 +11,7 @@ class PostGresSettings(BaseConfig):
     user: str = "postgres"
     password: str = None
     dbname: str = "radixdlt_ledger"
-    data_mount_path: str = f"{Path.home()}/postgresdata"
+    data_mount_path: str = f"{Helpers.get_home_dir()}/postgresdata"
     setup: str = "local"
     host: str = "postgres_db:5432"
 

@@ -259,6 +259,10 @@ class Helpers:
         return Path.home()
 
     @staticmethod
+    def get_default_node_config_dir():
+        return f"{Path.home()}/node-config"
+
+    @staticmethod
     def section_headline(title):
         print(f"{bcolors.BOLD}--------------{title}----------------------{bcolors.ENDC}")
 

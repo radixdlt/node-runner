@@ -8,10 +8,11 @@ from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
 from setup import Base
 from utils.Prompts import Prompts
+from utils.utils import Helpers
 
 
 class KeyDetails(BaseConfig):
-    keyfile_path: str = f"{Path.home()}/node-config"
+    keyfile_path: str = Helpers.get_default_node_config_dir()
     keyfile_name: str = "node-keystore.ks"
     keygen_tag: str = None
     keystore_password: str = None
@@ -22,9 +23,9 @@ class CoreDockerSettings(BaseConfig):
     composefileurl: str = None
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
-    data_directory: str = f"{Path.home()}/data"
+    data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
-    existing_docker_compose: str = f"{Path.home()}/radix-fullnode-compose.yml"
+    existing_docker_compose: str = f"{Helpers.get_home_dir()}/radix-fullnode-compose.yml"
     trusted_node: str = None
     java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                      "-XX:MaxDirectMemorySize=2048m " \
@@ -74,6 +75,8 @@ class CoreDockerSettings(BaseConfig):
     def ask_existing_docker_compose_file(self):
         if "DETAILED" in SetupMode.instance().mode:
             self.existing_docker_compose = Prompts.ask_existing_compose_file()
+        else:
+            open(self.existing_docker_compose, mode='a').close()
 
     def set_trusted_node(self, trusted_node):
         # Prompts.ask_trusted_node()

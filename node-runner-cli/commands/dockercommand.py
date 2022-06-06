@@ -14,7 +14,7 @@ from github.github import latest_release
 from setup import Docker, Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
-
+from pathlib import Path
 dockercli = ArgumentParser(
     description='Docker commands', formatter_class=RawTextHelpFormatter)
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
@@ -29,10 +29,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              required=True,
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
              action="store"),
-    argument("-f", "--configfile",
-             help="Path to config file where the config is going to get saved",
+    argument("-d", "--configdir",
+             help="Path to node-config directory where config file will stored",
              action="store",
-             default=f"{Helpers.get_home_dir()}/config.yaml"),
+             default=f"{Helpers.get_default_node_config_dir}"),
     argument("-n", "--networkid",
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1. This is optional",
              action="store",
@@ -59,13 +59,15 @@ def config(args):
               f"{bcolors.ENDC}")
         sys.exit()
     release = latest_release()
+
+    Path(f"{Helpers.get_default_node_config_dir()}").mkdir(parents=True, exist_ok=True)
+    config_file = f"{args.configdir}/config.yaml"
+
     configuration = DockerConfig(release)
     Helpers.section_headline("CONFIG FILE")
     print(
         "\nCreating config file using the answers from the questions that would be asked in next steps."
-        f"\nLocation of the config file: {bcolors.OKBLUE}{args.configfile}{bcolors.ENDC}")
-
-    config_file = args.configfile
+        f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
     configuration.common_settings.ask_network_id(args.networkid)
 
