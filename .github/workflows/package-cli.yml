@@ -124,7 +124,7 @@ jobs:
           common_config:
             network_id: 2
             nginx_settings:
-              protect_core: 'true'
+              protect_core: 'false'
               protect_gateway: 'true'
               release: 1.1.2
           core_node:
@@ -150,4 +150,5 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           ./radixnode auth set-admin-password -m DOCKER -p test
+          export NODE_END_POINT="http://localhost:3333
           NGINX_ADMIN_PASSWORD=test ./radixnode api system health
