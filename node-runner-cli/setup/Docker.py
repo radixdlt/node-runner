@@ -35,7 +35,8 @@ class Docker(Base):
 
     @staticmethod
     def run_docker_compose_up(keystore_password, composefile, trustednode):
-        run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'],
+        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+        run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
                           env={
                               "RADIXDLT_NETWORK_NODE": trustednode,
                               "RADIXDLT_NODE_KEY_PASSWORD": keystore_password
