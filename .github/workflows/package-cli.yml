@@ -150,5 +150,5 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
-          ./radixnode auth set-admin-password -m DOCKER test
+          ./radixnode auth set-admin-password -m DOCKER -p test
           NGINX_ADMIN_PASSSWORD=test ./radixnode api system health

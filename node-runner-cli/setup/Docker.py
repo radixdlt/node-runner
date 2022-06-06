@@ -10,10 +10,13 @@ from utils.utils import run_shell_command, Helpers
 class Docker(Base):
 
     @staticmethod
-    def setup_nginx_Password(usertype, username):
+    def setup_nginx_Password(usertype, username, password=None):
         print('-----------------------------')
         print(f'Setting up nginx user of type {usertype} with username {username}')
-        nginx_password = getpass.getpass(f"Enter your nginx the password: ")
+        if not password:
+            nginx_password = getpass.getpass(f"Enter your nginx the password: ")
+        else:
+            nginx_password = password
         run_shell_command(['docker', 'run', '--rm', '-v',
                            os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
                            'radixdlt/htpasswd:v1.0.0',
