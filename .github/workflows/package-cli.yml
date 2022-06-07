@@ -12,7 +12,7 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: [nodecli]
+    runs-on: [node-only]
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -102,7 +102,7 @@ jobs:
 
   test-core-only-node:
     if: ${{ github.event_name == 'pull_request' }}
-    runs-on: [nodecli]
+    runs-on: [node-only]
     needs:
       - package_ubuntu_cli
     steps:
