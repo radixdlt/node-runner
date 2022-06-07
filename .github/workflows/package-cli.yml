@@ -122,11 +122,12 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE -n 2 -k password -nk
-
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          #mounting named volumes on github actions throwing issue
+          export MOUNT_LEDGER_VOLUME=false
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
           ./radixnode auth set-admin-password -m DOCKER -p test

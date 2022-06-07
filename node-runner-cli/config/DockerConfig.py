@@ -1,3 +1,5 @@
+import os
+
 import sys
 from pathlib import Path
 
@@ -6,6 +8,7 @@ import yaml
 from config.BaseConfig import BaseConfig, SetupMode
 from config.CommonDockerSettings import CommonDockerSettings
 from config.GatewayDockerConfig import GatewayDockerSettings
+from env_vars import MOUNT_LEDGER_VOLUME
 from setup import Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers
@@ -67,6 +70,8 @@ class CoreDockerSettings(BaseConfig):
     def ask_data_directory(self):
         if "DETAILED" in SetupMode.instance().mode:
             self.data_directory = Base.get_data_dir(create_dir=False)
+        if not os.environ.get(MOUNT_LEDGER_VOLUME, True):
+            self.data_directory = None
 
     def ask_enable_transaction(self):
         if "GATEWAY" in SetupMode.instance().mode or "DETAILED" in SetupMode.instance().mode:
