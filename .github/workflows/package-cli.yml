@@ -124,7 +124,7 @@ jobs:
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p admin
-          NGINX_ADMIN_PASSWORD=test ./radixnode api system health
+          NGINX_ADMIN_PASSWORD=admin ./radixnode api system health
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p metrics
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-superadmin-password -m DOCKER -p superadmin
 

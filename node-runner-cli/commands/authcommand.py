@@ -21,10 +21,8 @@ def authcommand(args=[], parent=auth_parser):
 
     ])
 def set_admin_password(args):
-    if args.password == "":
-        password = None
-    else:
-        password = args.password
+    password = args.password if args.password == "" else None
+
     set_auth(args, usertype="admin",password=password)
 
 
@@ -32,20 +30,24 @@ def set_admin_password(args):
     [
         argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
                  choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="metrics", help="Name of metrics user", action="store")
+        argument("-u", "--username", default="metrics", help="Name of metrics user", action="store"),
+        argument("-p", "--password", default="", help="Password of metrics user", action="store")
     ])
 def set_metrics_password(args):
-    set_auth(args, usertype="metrics")
+    password = args.password if args.password == "" else None
+    set_auth(args, usertype="metrics",password=password)
 
 
 @authcommand(
     [
         argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
                  choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="superadmin", help="Name of metrics user", action="store")
+        argument("-u", "--username", default="superadmin", help="Name of superadmin user", action="store"),
+        argument("-p", "--password", default="", help="Password of superadmin user", action="store")
     ])
 def set_superadmin_password(args):
-    set_auth(args, usertype="superadmin")
+    password = args.password if args.password == "" else None
+    set_auth(args, usertype="superadmin",password=password)
 
 
 def set_auth(args, usertype, password=None):
