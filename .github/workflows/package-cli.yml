@@ -138,7 +138,7 @@ jobs:
           python-version: '3.x'
           architecture: 'x64'
       - name: Checkout
-          uses: actions/checkout@v2
+        uses: actions/checkout@v2
       - name: Run api commands
         run: |
           export DISABLE_VERSION_CHECK=true
