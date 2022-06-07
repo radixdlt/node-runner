@@ -116,7 +116,9 @@ jobs:
           mkdir -p ${{ github.workspace }}/node-config
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE -n 2 -k password -nk
+          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE -n 2 -k $KEYSTORE_PASSWORD -nk
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
@@ -124,10 +126,14 @@ jobs:
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
           export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
-          ./radixnode auth set-admin-password -m DOCKER -p admin
-          NGINX_ADMIN_PASSWORD=admin ./radixnode api system health
-          ./radixnode auth set-metrics-password -m DOCKER -p metrics
-          ./radixnode auth set-superadmin-password -m DOCKER -p superadmin
+          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          NGINX_ADMIN_PASSWORD=$$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
   test-core-api:
     if: ${{ github.event_name == 'pull_request' }}
@@ -148,11 +154,14 @@ jobs:
       - name: Run api commands
         run: |
           export DISABLE_VERSION_CHECK=true
-          export NGINX_ADMIN_PASSWORD=admin
-          export NGINX_METRICS_PASSWORD=metrics
-          export NGINX_SUPERADMIN_PASSWORD=superadmin
+          export NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD
+          export NGINX_METRICS_PASSWORD=$NGINX_METRICS_PASSWORD
+          export NGINX_SUPERADMIN_PASSWORD=$NGINX_SUPERADMIN_PASSWORD
           python node-runner-cli/tests.py
-
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
   test-full-stack:
     if: ${{ github.event_name == 'pull_request' }}
@@ -169,14 +178,22 @@ jobs:
           chmod +x ./radixnode
           mkdir -p ${{ github.workspace }}/node-config
           export DISABLE_VERSION_CHECK=true
-          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE GATEWAY -n 2 -k password -nk -p postgres
+          ./radixnode docker config -d ${{ github.workspace }}/node-config \
+            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+            -s CORE GATEWAY -n 2 -k $POSTGRESS_PASSWORD -nk -p $POSTGRESS_PASSWORD
+        env:
+          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p test
-          NGINX_ADMIN_PASSWORD=test ./radixnode api system health
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+
   test-full-stack-no-nginx:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: [node-cli-without-nginx]
@@ -194,9 +211,12 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
             -s CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false
+        env:
+          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
-          NGINX_ADMIN_PASSWORD=test NODE_END_POINT="http://localhost:3333" ./radixnode api system health
+          NODE_END_POINT="http://localhost:3333" ./radixnode api system health
