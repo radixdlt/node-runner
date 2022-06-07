@@ -73,8 +73,10 @@ class CoreDockerSettings(BaseConfig):
             self.data_directory = None
 
     def ask_enable_transaction(self):
-        if "GATEWAY" in SetupMode.instance().mode or "DETAILED" in SetupMode.instance().mode:
+        if "DETAILED" in SetupMode.instance().mode:
             self.enable_transaction = Prompts.ask_enable_transaction()
+        elif "GATEWAY" in SetupMode.instance().mode:
+            self.enable_transaction = "true"
 
     def ask_existing_docker_compose_file(self):
         if "DETAILED" in SetupMode.instance().mode:
