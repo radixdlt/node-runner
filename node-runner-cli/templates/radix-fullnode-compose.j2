@@ -21,7 +21,7 @@ services:
     init: true
     mem_limit: {{core_node.memory_limit or '12000m'}}
     restart: unless-stopped
-    {% if (common_config.nginx_settings.protect_core | lower | trim) == "false" %}
+    {% if common_config.nginx_settings is defined and (common_config.nginx_settings.protect_core | lower | trim) == "false" %}
     ports:
        - "3333:3333"
        - "30000:30000"
