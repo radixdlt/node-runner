@@ -128,10 +128,17 @@ jobs:
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p metrics
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-superadmin-password -m DOCKER -p superadmin
 
+  test-core-api:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: [node-only]
+    needs:
+      - test-core-only-node
       - uses: actions/setup-python@v3
         with:
           python-version: '3.x'
           architecture: 'x64'
+      - name: Checkout
+          uses: actions/checkout@v2
       - name: Run api commands
         run: |
           export DISABLE_VERSION_CHECK=true
