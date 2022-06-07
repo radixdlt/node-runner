@@ -47,7 +47,7 @@ class CoreDockerSettings(BaseConfig):
     def set_node_type(self, nodetype="fullnode"):
         self.nodetype = nodetype
 
-    def ask_keydetails(self):
+    def ask_keydetails(self, ks_password=None, new_keystore=False):
         keydetails = self.keydetails
         if "DETAILED" in SetupMode.instance().mode:
             keydetails.keyfile_path = Prompts.ask_keyfile_path()
@@ -56,7 +56,7 @@ class CoreDockerSettings(BaseConfig):
         keystore_password, file_location = Base.generatekey(
             keyfile_path=keydetails.keyfile_path,
             keyfile_name=keydetails.keyfile_name,
-            keygen_tag=keydetails.keygen_tag)
+            keygen_tag=keydetails.keygen_tag, ks_password=ks_password, new=new_keystore)
         keydetails.keystore_password = keystore_password
         self.keydetails = keydetails
 
@@ -82,11 +82,11 @@ class CoreDockerSettings(BaseConfig):
         # Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
-    def create_config(self, release, trustednode):
+    def create_config(self, release, trustednode, ks_password, new_keystore):
 
         self.set_core_release(release)
         self.set_trusted_node(trustednode)
-        self.ask_keydetails()
+        self.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
         self.ask_existing_docker_compose_file()

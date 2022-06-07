@@ -31,31 +31,31 @@ class Base:
             shell=True)
 
     @staticmethod
-    def generatekey(keyfile_path, keyfile_name, keygen_tag):
+    def generatekey(keyfile_path, keyfile_name, keygen_tag, ks_password=None, new=False):
         if os.path.isfile(f'{keyfile_path}/{keyfile_name}'):
-            # TODO AutoApprove
             print(f"Node Keystore file already exist at location {keyfile_path}")
-            keystore_password = getpass.getpass(f"Enter the password of the existing keystore file '{keyfile_name}':")
+            keystore_password = ks_password if ks_password else getpass.getpass(
+                f"Enter the password of the existing keystore file '{keyfile_name}':")
         else:
-            # TODO AutoApprove
-            ask_keystore_exists = input \
-                (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
-            if Helpers.check_Yes(ask_keystore_exists):
-                print(
-                    f"\nCopy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
-                sys.exit()
-            else:
-                print(f"""
-                \nGenerating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
-                """)
-                keystore_password = getpass.getpass(f"Enter the password of the new file '{keyfile_name}':")
-                # TODO keygen image needs to be updated
-                run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
-                                   f'radixdlt/keygen:{keygen_tag}',
-                                   f'--keystore=/keygen/key/{keyfile_name}',
-                                   '--password=' + keystore_password], quite=True
-                                  )
-                run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/{keyfile_name}'])
+            if not new:
+                ask_keystore_exists = input \
+                    (f"Do you have keystore file named '{keyfile_name}' already from previous node Y/n?:")
+                if Helpers.check_Yes(ask_keystore_exists):
+                    print(
+                        f"\nCopy the keystore file '{keyfile_name}' to the location {keyfile_path} and then rerun the command")
+                    sys.exit()
+
+            print(f"""
+            \nGenerating new keystore file. Don't forget to backup the key from location {keyfile_path}/{keyfile_name}
+            """)
+            keystore_password = ks_password if ks_password else getpass.getpass(
+                f"Enter the password of the new file '{keyfile_name}':")
+            run_shell_command(['docker', 'run', '--rm', '-v', keyfile_path + ':/keygen/key',
+                               f'radixdlt/keygen:{keygen_tag}',
+                               f'--keystore=/keygen/key/{keyfile_name}',
+                               '--password=' + keystore_password], quite=True
+                              )
+            run_shell_command(['sudo', 'chmod', '644', f'{keyfile_path}/{keyfile_name}'])
 
         return keystore_password, f'{keyfile_path}/{keyfile_name}'
 

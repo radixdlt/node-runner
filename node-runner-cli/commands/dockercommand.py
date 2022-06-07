@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
+from pathlib import Path
 
 import yaml
 from deepdiff import DeepDiff
@@ -14,7 +15,7 @@ from github.github import latest_release
 from setup import Docker, Base
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
-from pathlib import Path
+
 dockercli = ArgumentParser(
     description='Docker commands', formatter_class=RawTextHelpFormatter)
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
@@ -32,9 +33,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
     argument("-d", "--configdir",
              help="Path to node-config directory where config file will stored",
              action="store",
-             default=f"{Helpers.get_default_node_config_dir}"),
+             default=f"{Helpers.get_default_node_config_dir()}"),
     argument("-n", "--networkid",
-             help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1. This is optional",
+             help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
+                  "If not provided you will be prompted to enter a value ",
              action="store",
              type=int,
              default=0),
@@ -42,6 +44,13 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              help="Password for the postgres user. This is used for Gateway setup",
              action="store",
              default=""),
+    argument("-k", "--keystorepassword",
+             help="Password for the keystore file",
+             action="store",
+             default=""),
+    argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
+                                          " defined in argument configdir", action="store_true"),
+
     argument("-s", "--setupmode", nargs="+",
              help="""Quick setup with assumed defaults. It supports two mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
@@ -53,6 +62,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 def config(args):
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
+    keystore_password = args.keystorepassword if args.keystorepassword != "" else None
+    postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
+    new_keystore = args.newkeystore
+
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
               f"\nDETAILED option goes through asking each and every question necessary. Hence cannot be clubbed together with options"
@@ -74,13 +87,14 @@ def config(args):
     config_to_dump = {}
 
     if "CORE" in setupmode.mode:
-        quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, args.trustednode)
+        quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, args.trustednode,
+                                                                                       keystore_password, new_keystore)
         configuration.core_node_settings = quick_node_settings
         configuration.common_settings.ask_enable_nginx_for_core()
         config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
     if "GATEWAY" in setupmode.mode:
-        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(args.postgrespassword)
+        quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
         configuration.gateway_settings = quick_gateway_settings
         configuration.common_settings.ask_enable_nginx_for_gateway()
         config_to_dump["gateway"] = dict(configuration.gateway_settings)
@@ -88,14 +102,15 @@ def config(args):
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
-            detailed_node_settings = CoreDockerSettings({}).create_config(release, args.trustednode)
+            detailed_node_settings = CoreDockerSettings({}).create_config(release, args.trustednode, keystore_password,
+                                                                          new_keystore)
             configuration.core_node_settings = detailed_node_settings
             configuration.common_settings.ask_enable_nginx_for_core()
             config_to_dump["core_node"] = dict(configuration.core_node_settings)
         run_gateway = Prompts.check_for_gateway()
         if run_gateway:
             detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
-                args.postgrespassword)
+                postgrespassword)
             configuration.gateway_settings = detailed_gateway_settings
             configuration.common_settings.ask_enable_nginx_for_gateway()
             config_to_dump["gateway"] = dict(configuration.gateway_settings)

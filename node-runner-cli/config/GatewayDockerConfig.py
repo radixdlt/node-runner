@@ -1,4 +1,3 @@
-from pathlib import Path
 from urllib.parse import urlparse
 
 from config.BaseConfig import BaseConfig, SetupMode
@@ -22,7 +21,7 @@ class PostGresSettings(BaseConfig):
                                                                                          self.data_mount_path)
             self.user = Prompts.get_postgress_user()
             self.dbname = Prompts.get_postgress_dbname()
-        if postgress_password == "":
+        if not postgress_password:
             self.password = Prompts.ask_postgress_password()
         else:
             self.password = postgress_password
