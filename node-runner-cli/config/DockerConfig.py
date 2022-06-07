@@ -1,5 +1,4 @@
 import os
-
 import sys
 from pathlib import Path
 
@@ -70,7 +69,7 @@ class CoreDockerSettings(BaseConfig):
     def ask_data_directory(self):
         if "DETAILED" in SetupMode.instance().mode:
             self.data_directory = Base.get_data_dir(create_dir=False)
-        if not os.environ.get(MOUNT_LEDGER_VOLUME, True):
+        if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
             self.data_directory = None
 
     def ask_enable_transaction(self):
