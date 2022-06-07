@@ -110,6 +110,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
+      - name: Setup config
         run: |
           chmod +x ./radixnode
           mkdir -p ${{ github.workspace }}/node-config
@@ -135,6 +136,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
+      - name: Setup config
         run: |
           chmod +x ./radixnode
           mkdir -p ${{ github.workspace }}/node-config
