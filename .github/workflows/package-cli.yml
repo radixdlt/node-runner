@@ -127,7 +127,7 @@ jobs:
           sleep 60
           export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          NGINX_ADMIN_PASSWORD=$$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
           ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
           ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
         env:
@@ -219,4 +219,4 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
-          NODE_END_POINT="http://localhost:3333" ./radixnode api system health
+          NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health

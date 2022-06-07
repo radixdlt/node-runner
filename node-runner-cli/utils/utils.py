@@ -113,6 +113,8 @@ class Helpers:
             Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
             echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            If you not running nginx, then export below environment variable
+                export NGINX=false
             """)
             sys.exit()
         else:
