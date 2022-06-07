@@ -40,7 +40,7 @@ jobs:
 
   upload-asset-store:
     environment: AWS_ARTIFACT
-    runs-on: [ubuntu-latest]
+    runs-on: [nodecli]
     if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
@@ -102,7 +102,7 @@ jobs:
 
   test-core-only-node:
     if: ${{ github.event_name == 'pull_request' }}
-    runs-on: [ubuntu-latest]
+    runs-on: [nodecli]
     needs:
       - package_ubuntu_cli
     steps:
