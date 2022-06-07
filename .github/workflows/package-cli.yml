@@ -12,7 +12,7 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: [ubuntu-latest]
+    runs-on: [nodecli]
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -40,7 +40,7 @@ jobs:
 
   upload-asset-store:
     environment: AWS_ARTIFACT
-    runs-on: [nodecli]
+    runs-on: [ubuntu-latest]
     if: ${{ github.event_name == 'push' }}
     needs:
       - package_ubuntu_cli
