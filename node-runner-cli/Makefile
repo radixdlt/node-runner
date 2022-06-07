@@ -1,6 +1,6 @@
 .PHONY: output
 install:
-    $(shell chmod +x add-version.sh)
+	$(shell chmod +x add-version.sh)
 	$(shell ./add-version.sh)
 	pip install pipenv
 	pipenv lock -r > requirements.txt
