@@ -50,6 +50,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              default=""),
     argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
                                           " defined in argument configdir", action="store_true"),
+    argument("-xc", "--disablenginxforcore", help="Set this disable to nginx for core",
+             action="store", default="", choices=["true", "false"]),
+    argument("-xg", "--disablenginxforgateway", help="Set this disable to nginx for gateway",
+             action="store", default="", choices=["true", "false"]),
 
     argument("-s", "--setupmode", nargs="+",
              help="""Quick setup with assumed defaults. It supports two mode.
@@ -64,6 +68,9 @@ def config(args):
     setupmode.mode = args.setupmode
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
+    nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
+    nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
+
     new_keystore = args.newkeystore
 
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
@@ -91,13 +98,13 @@ def config(args):
         quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, args.trustednode,
                                                                                        keystore_password, new_keystore)
         configuration.core_node_settings = quick_node_settings
-        configuration.common_settings.ask_enable_nginx_for_core()
+        configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
         config_to_dump["core_node"] = dict(configuration.core_node_settings)
 
     if "GATEWAY" in setupmode.mode:
         quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
         configuration.gateway_settings = quick_gateway_settings
-        configuration.common_settings.ask_enable_nginx_for_gateway()
+        configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
         config_to_dump["gateway"] = dict(configuration.gateway_settings)
 
     if "DETAILED" in setupmode.mode:
@@ -106,14 +113,14 @@ def config(args):
             detailed_node_settings = CoreDockerSettings({}).create_config(release, args.trustednode, keystore_password,
                                                                           new_keystore)
             configuration.core_node_settings = detailed_node_settings
-            configuration.common_settings.ask_enable_nginx_for_core()
+            configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
             config_to_dump["core_node"] = dict(configuration.core_node_settings)
         run_gateway = Prompts.check_for_gateway()
         if run_gateway:
             detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
                 postgrespassword)
             configuration.gateway_settings = detailed_gateway_settings
-            configuration.common_settings.ask_enable_nginx_for_gateway()
+            configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
             config_to_dump["gateway"] = dict(configuration.gateway_settings)
     if configuration.common_settings.check_nginx_required():
         configuration.common_settings.ask_nginx_release()

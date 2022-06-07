@@ -31,7 +31,7 @@ class CommonDockerSettings(BaseConfig):
                            for key, value in self.__class__.__dict__.items()
                            if not key.startswith('__') and not callable(value)}
         for attr, value in class_variables.items():
-            if attr in ['nginx_settings']:
+            if attr in ['nginx_settings'] and self.__getattribute__(attr):
                 yield attr, dict(self.__getattribute__(attr))
             elif self.__getattribute__(attr):
                 yield attr, self.__getattribute__(attr)
@@ -64,16 +64,20 @@ class CommonDockerSettings(BaseConfig):
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
 
-    def ask_enable_nginx_for_core(self):
+    def ask_enable_nginx_for_core(self, nginx_on_core):
+        if nginx_on_core:
+            self.nginx_settings.protect_core = nginx_on_core
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE").lower()
 
-    def ask_enable_nginx_for_gateway(self):
+    def ask_enable_nginx_for_gateway(self,nginx_on_gateway):
+        if nginx_on_gateway:
+            self.nginx_settings.protect_gateway = nginx_on_gateway
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.protect_gateway = Prompts.ask_enable_nginx(service="GATEWAY").lower()
 
     def check_nginx_required(self):
-        if json.loads(self.nginx_settings.protect_gateway.lower()) and json.loads(
+        if json.loads(self.nginx_settings.protect_gateway.lower()) or json.loads(
                 self.nginx_settings.protect_core.lower()):
             return True
         else:
