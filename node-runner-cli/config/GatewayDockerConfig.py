@@ -1,3 +1,4 @@
+from pathlib import Path
 from urllib.parse import urlparse
 
 from config.BaseConfig import BaseConfig, SetupMode
@@ -25,6 +26,8 @@ class PostGresSettings(BaseConfig):
             self.password = Prompts.ask_postgress_password()
         else:
             self.password = postgress_password
+
+        Path(self.data_mount_path).mkdir(parents=True, exist_ok=True)
 
 
 class CoreApiNode(BaseConfig):

@@ -71,6 +71,8 @@ class CoreDockerSettings(BaseConfig):
             self.data_directory = Base.get_data_dir(create_dir=False)
         if os.environ.get(MOUNT_LEDGER_VOLUME, "true").lower() == "false":
             self.data_directory = None
+        if self.data_directory:
+            Path(self.data_directory).mkdir(parents=True, exist_ok=True)
 
     def ask_enable_transaction(self):
         if "DETAILED" in SetupMode.instance().mode:
