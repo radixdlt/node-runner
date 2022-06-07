@@ -123,7 +123,7 @@ jobs:
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
-          ./radixnode auth set-admin-password -m DOCKER -p test
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p test
           NGINX_ADMIN_PASSWORD=test ./radixnode api system health
 
   test-full-stack:
@@ -147,5 +147,5 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
-          ./radixnode auth set-admin-password -m DOCKER -p test
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p test
           NGINX_ADMIN_PASSWORD=test ./radixnode api system health

@@ -3,6 +3,7 @@ import os
 
 import yaml
 
+from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 
@@ -17,8 +18,9 @@ class Docker(Base):
             nginx_password = getpass.getpass(f"Enter your nginx the password: ")
         else:
             nginx_password = password
+        docker_compose_folder_prefix = os.getenv(DOCKER_COMPOSE_FOLDER_PREFIX, os.getcwd().rsplit('/', 1)[-1])
         run_shell_command(['docker', 'run', '--rm', '-v',
-                           os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
+                           docker_compose_folder_prefix + '_nginx_secrets:/secrets',
                            'radixdlt/htpasswd:v1.0.0',
                            'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
 
