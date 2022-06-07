@@ -21,7 +21,7 @@ def authcommand(args=[], parent=auth_parser):
 
     ])
 def set_admin_password(args):
-    password = args.password if args.password == "" else None
+    password = args.password if args.password != "" else None
 
     set_auth(args, usertype="admin",password=password)
 
@@ -34,7 +34,7 @@ def set_admin_password(args):
         argument("-p", "--password", default="", help="Password of metrics user", action="store")
     ])
 def set_metrics_password(args):
-    password = args.password if args.password == "" else None
+    password = args.password if args.password != "" else None
     set_auth(args, usertype="metrics",password=password)
 
 
@@ -46,7 +46,7 @@ def set_metrics_password(args):
         argument("-p", "--password", default="", help="Password of superadmin user", action="store")
     ])
 def set_superadmin_password(args):
-    password = args.password if args.password == "" else None
+    password = args.password if args.password != "" else None
     set_auth(args, usertype="superadmin",password=password)
 
 
