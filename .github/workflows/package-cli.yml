@@ -142,7 +142,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/node-config
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE,GATEWAY -n 2 -k password -nk -p postgres
+          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE GATEWAY -n 2 -k password -nk -p postgres
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
