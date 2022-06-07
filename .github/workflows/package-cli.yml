@@ -133,6 +133,7 @@ jobs:
     runs-on: [node-only]
     needs:
       - test-core-only-node
+    steps:
       - uses: actions/setup-python@v3
         with:
           python-version: '3.x'
