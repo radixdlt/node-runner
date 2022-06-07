@@ -144,7 +144,7 @@ jobs:
       - name: setup python modules
         run: |
           cd node-runner-cli
-          make install
+          make local
       - name: Run api commands
         run: |
           export DISABLE_VERSION_CHECK=true

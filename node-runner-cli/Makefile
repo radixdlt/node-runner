@@ -8,3 +8,7 @@ install:
 .PHONY: output
 output-ubuntu-focal: install
 	DOCKER_BUILDKIT=1 docker build --output type=local,dest=out/ubuntu/focal --progress plain -f Dockerfile.ubuntufocal  .
+
+.PHONY: local
+local: install
+	pip install -r requirements.txt
