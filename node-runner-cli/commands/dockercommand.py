@@ -68,7 +68,8 @@ def config(args):
 
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
         print(f"{bcolors.FAIL}You cannot have DETAILED option with other options together."
-              f"\nDETAILED option goes through asking each and every question necessary. Hence cannot be clubbed together with options"
+              f"\nDETAILED option goes through asking each and every question that to customize setup. "
+              f"Hence cannot be clubbed together with options"
               f"{bcolors.ENDC}")
         sys.exit()
     release = latest_release()
