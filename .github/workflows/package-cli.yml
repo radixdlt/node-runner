@@ -131,5 +131,4 @@ jobs:
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
           ./radixnode auth set-admin-password -m DOCKER -p test
-          export NODE_END_POINT="http://localhost:3333"
           NGINX_ADMIN_PASSWORD=test ./radixnode api system health
