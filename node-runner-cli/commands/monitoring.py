@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 from commands.subcommand import get_decorator, argument
 from monitoring import Monitoring
+from utils.utils import Helpers
 
 monitoringcli = ArgumentParser(
     description='API command')
@@ -19,7 +20,7 @@ def monitoringcommand(args=[], parent=monitoring_parser):
               action="store")])
 def setup(args):
     if args.setupmode == "QUICK_SETUP_MODE":
-        monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{cli_version()}/monitoring'
+        monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/monitoring'
         print(f"Downloading artifacts from {monitor_url_dir}\n")
         Monitoring.setup_prometheus_yml(f"{monitor_url_dir}/prometheus/prometheus.yml")
         Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml")
