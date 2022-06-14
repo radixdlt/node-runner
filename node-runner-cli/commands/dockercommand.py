@@ -56,7 +56,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              action="store", default="", choices=["true", "false"]),
 
     argument("-s", "--setupmode", nargs="+",
-             help="""Quick setup with assumed defaults. It supports two mode.
+             help="""Quick setup with assumed defaults. It supports two quick modes and a detailed setup mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
                   \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
                   \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.

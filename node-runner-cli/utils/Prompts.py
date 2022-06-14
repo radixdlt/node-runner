@@ -95,13 +95,15 @@ class Prompts:
         return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
-    def get_basic_auth() -> dict:
-        print("Core API node is setup on different machine. It would require Nginx admin user and password.")
-        admin = input(
-            "Type in the username. Press 'ENTER' for default value 'admin':")
+    def get_basic_auth(target="CORE_API_NODE",user_type="admin") -> dict:
+        print(
+            f"{target} is setup on different machine or behind https protected by basic auth."
+            f" It would require Nginx {user_type} user and password.")
+        username = input(
+            f"Type in the username. Press 'ENTER' for default value '{user_type}':")
         password = input(
             "Type in the password:")
-        return {"name": Prompts.check_default(admin, "admin"), "password": password}
+        return {"name": Prompts.check_default(username, user_type), "password": password}
 
     @staticmethod
     def get_disablehttpsVerfiy() -> str:
@@ -221,3 +223,36 @@ class Prompts:
         answer = Helpers.input_guestion(
             f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:")
         return Prompts.check_default(answer, latest_nginx_release)
+
+    @staticmethod
+    def ask_metrics_target_details(target_type, default):
+        Helpers.section_headline(f"Metrics target details for {target_type}")
+
+        answer = Helpers.input_guestion(
+            f"This will the target host that prometheus has to scrape. Default settings uses {bcolors.OKBLUE}{default}{bcolors.ENDC} "
+            f"Press Enter to accept default or type the value in format of url like {bcolors.FAIL}'http(s)://host:port':{bcolors.ENDC}:")
+        return Prompts.check_default(answer, default)
+
+    @staticmethod
+    def ask_basic_auth_password(basic_auth_user, target_name) -> str:
+        answer = Helpers.input_guestion(
+            f"\nBASIC AUTH PASSWORD for {target_name}: Type in basic auth password for user named {basic_auth_user}:")
+        return answer
+
+    @staticmethod
+    def check_for_monitoring_core() -> str:
+        Helpers.section_headline("MONITORING CORE NODE")
+        print(
+            f"\nDo you want to monitor core node")
+        answer = Helpers.input_guestion(
+            "Default is Y to monitor core node , Press ENTER to accept default or type in [Y/N]:")
+        return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
+
+    @staticmethod
+    def check_for_monitoring_gateway() -> str:
+        Helpers.section_headline("MONITORING GATEWAY")
+        print(
+            f"\nDo you want to monitor NETWORK GATEWAY")
+        answer = Helpers.input_guestion(
+            "Default is Y , Press ENTER to accept default or type in [Y/N]:")
+        return Helpers.check_Yes(Prompts.check_default(answer, "Y"))

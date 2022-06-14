@@ -7,6 +7,7 @@ from pathlib import Path
 
 import yaml
 
+from config.Renderer import Renderer
 from env_vars import NODE_END_POINT, NODE_HOST_IP_OR_NAME
 from utils.utils import Helpers, run_shell_command
 
@@ -37,6 +38,22 @@ class Monitoring:
             yaml.dump(prometheus_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
+    def template_prometheus_yml(monitoring_config):
+        render_template = Renderer().load_file_based_template("prometheus.j2").render(monitoring_config).to_yaml()
+
+        yaml.add_representer(type(None), Helpers.represent_none)
+
+        Path("monitoring/prometheus").mkdir(parents=True, exist_ok=True)
+        prometheus_file_location = "monitoring/prometheus/prometheus.yml"
+        Helpers.section_headline("Promtheus config is Generated as below")
+
+        print(f"\n{yaml.dump(render_template)}"
+              f"\n\n Saving to file {prometheus_file_location} ")
+
+        with open(prometheus_file_location, 'w') as f:
+            yaml.dump(render_template, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+
+    @staticmethod
     def merge_auth_config(default_prometheus_yaml, node_ip):
         user = Helpers.get_nginx_user("metrics", "metrics")
         # TODO fix the issue where volumes array gets merged correctly
@@ -58,22 +75,22 @@ class Monitoring:
         return final_conf
 
     @staticmethod
-    def setup_datasource(default_datasource_cfg_url):
+    def setup_datasource(default_datasource_cfg_url,monitoring_config_dir):
         req = requests.Request('GET', f'{default_datasource_cfg_url}')
         prepared = req.prepare()
         resp = Helpers.send_request(prepared, print_response=False)
-        Path("monitoring/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/grafana/provisioning/datasources/datasource.yml", 'wb') as f:
+        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
+        with open(f"{monitoring_config_dir}/grafana/provisioning/datasources/datasource.yml", 'wb') as f:
             f.write(resp.content)
 
     @staticmethod
-    def setup_dashboard(default_dashboard_cfg_url, files):
+    def setup_dashboard(default_dashboard_cfg_url, files,monitoring_config_dir):
         for file in files:
             req = requests.Request('GET', f'{default_dashboard_cfg_url}/{file}')
             prepared = req.prepare()
             resp = Helpers.send_request(prepared, print_response=False)
-            Path("monitoring/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
-            with open(f"monitoring/grafana/provisioning/dashboards/{file}", 'wb') as f:
+            Path(f"{monitoring_config_dir}/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
+            with open(f"{monitoring_config_dir}/grafana/provisioning/dashboards/{file}", 'wb') as f:
                 f.write(resp.content)
 
     @staticmethod
@@ -82,28 +99,26 @@ class Monitoring:
         run_shell_command(["docker", "volume", "create", "grafana-storage"])
 
     @staticmethod
-    def setup_monitoring_containers(default_monitoring_cfg_url):
+    def setup_monitoring_containers(default_monitoring_cfg_url,monitoring_config_dir):
         req = requests.Request('GET', f'{default_monitoring_cfg_url}')
         prepared = req.prepare()
         resp = Helpers.send_request(prepared, print_response=False)
-        Path("monitoring").mkdir(parents=True, exist_ok=True)
-        with open("monitoring/node-monitoring.yml", 'wb') as f:
+        Path(monitoring_config_dir).mkdir(parents=True, exist_ok=True)
+        with open(f"{monitoring_config_dir}/node-monitoring.yml", 'wb') as f:
             f.write(resp.content)
 
     @staticmethod
-    def start_monitoring(composefile):
+    def start_monitoring(composefile,auto_approve=False):
         print(f"----- output of node monitoring docker compose file {composefile}")
         run_shell_command(f"cat {composefile}", shell=True)
-        start_monitoring_answer = input(
-            f"Do you want to start monitoring using file {composefile} [Y/n]?")
-        if Helpers.check_Yes(start_monitoring_answer):
-            user = Helpers.get_nginx_user(usertype="metrics", default_username="metrics")
-            node_endpoint = Monitoring.get_node_host_ip()
-            run_shell_command(f'docker-compose -f {composefile} up -d',
-                              env={
-                                  "BASIC_AUTH_USER_CREDENTIALS": f'{user["name"]}:{user["password"]}',
-                                  f"{NODE_END_POINT}": node_endpoint
-                              }, shell=True)
+        start_monitoring_answer = ""
+        if auto_approve:
+            print("In Auto mode -  Updating the monitoring as per above docker compose file")
+        else:
+            start_monitoring_answer = input(
+                f"Do you want to start monitoring using file {composefile} [Y/n]?")
+        if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
+            run_shell_command(f'docker-compose -f {composefile} up -d', shell=True)
         else:
             print(f"""Exiting the command ..
                      Once you verified the file {composefile}, you can start the monitoring by running
