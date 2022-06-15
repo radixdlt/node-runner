@@ -3,10 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
+        "datasource": "${prometheus}",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -23,768 +20,20 @@
   },
   "description": "Main dashboard for the network gateway",
   "editable": true,
-  "fiscalYearStartMonth": 0,
+  "gnetId": null,
   "graphTooltip": 0,
-  "id": 180,
-  "iteration": 1654772642779,
+  "id": 7,
+  "iteration": 1655297671217,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": {
-        "type": "datasource",
-        "uid": "grafana"
-      },
+      "datasource": "${prometheus}",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
-      },
-      "id": 17,
-      "panels": [],
-      "title": "Overview",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 0,
-        "y": 1
-      },
-      "id": 35,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.5.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "count(count_over_time(kube_pod_created{namespace=~\"$namespace\", pod=~\"gateway-api.*\"}[$__interval]))",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "API Pods",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 3,
-        "y": 1
-      },
-      "id": 55,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.5.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "sum(ng_aggregator_is_primary_info{namespace=\"$namespace\"}) ",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Write Primaries",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 8,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "decbytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 9,
-        "x": 6,
-        "y": 1
-      },
-      "id": 19,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "avg(container_memory_working_set_bytes{namespace=\"$namespace\", container=~\"gateway-api|data-aggregator\"}) by (container)",
-          "interval": "",
-          "legendFormat": "{{container}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Avg. Memory Usage",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 9,
-        "x": 15,
-        "y": 1
-      },
-      "id": 21,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "avg(sum by (container, name) (rate(container_cpu_usage_seconds_total{container=\"data-aggregator\", namespace=\"$namespace\"}[60s]) * 1024 * 60) / on (container, name) (container_spec_cpu_shares{container=\"data-aggregator\", namespace=\"$namespace\"}) / 60 * 100) by (container)",
-          "interval": "",
-          "legendFormat": "{{container}}",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "avg(sum by (container, name) (rate(container_cpu_usage_seconds_total{container=\"gateway-api\", namespace=\"$namespace\"}[60s]) * 1024 * 60) / on (container, name) (container_spec_cpu_shares{container=\"gateway-api\", namespace=\"$namespace\"}) / 60 * 100) by (container)",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "{{container}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Avg. CPU Utilization",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 0,
-        "y": 6
-      },
-      "id": 36,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.5.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "count(count_over_time(kube_pod_created{namespace=~\"$namespace\", pod=~\"data-aggregator.*\"}[$__interval]))",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "Data Aggregator Pods",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 3,
-        "x": 3,
-        "y": 6
-      },
-      "id": 23,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "8.5.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "sum(http_requests_in_progress{namespace=\"$namepace\", container=\"gateway-api\"}) or vector(0)",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "title": "API Reqs In Progress",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 9,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 0,
-        "y": 11
-      },
-      "id": 29,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "avg(process_num_threads{namespace=\"$namespace\", container=~\"gateway-api|data-aggregator\"}) by (container)",
-          "interval": "",
-          "legendFormat": "{{pod}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Avg. Number of Threads",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "decbytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 8,
-        "y": 11
-      },
-      "id": 27,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "avg(dotnet_total_memory_bytes{namespace=\"$namespace\", container=~\"gateway-api|data-aggregator\"}) by (container)",
-          "interval": "",
-          "legendFormat": "{{container}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Avg .NET allocated memory",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 8,
-        "x": 16,
-        "y": 11
-      },
-      "id": 68,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "avg(rate(dotnet_collection_count_total{namespace=\"$namespace\", container=~\"gateway-api|data-aggregator\"}[5m])) by (container)",
-          "interval": "",
-          "legendFormat": "{{container}}",
-          "refId": "A"
-        }
-      ],
-      "title": "GC Collection",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "datasource": {
-        "type": "datasource",
-        "uid": "grafana"
-      },
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 21
       },
       "id": 44,
       "panels": [],
@@ -792,10 +41,7 @@
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -833,7 +79,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -852,7 +99,7 @@
         "h": 4,
         "w": 2,
         "x": 0,
-        "y": 22
+        "y": 1
       },
       "id": 59,
       "options": {
@@ -865,17 +112,15 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"database_connection_check\", container=\"data-aggregator\"}) / count(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"database_connection_check\", container=\"data-aggregator\"})",
+          "expr": "sum(aspnetcore_healthcheck_status{ name=\"database_connection_check\", container=\"data-aggregator\"}) / count(aspnetcore_healthcheck_status{ name=\"database_connection_check\", container=\"data-aggregator\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -885,10 +130,7 @@
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -926,7 +168,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -945,7 +188,7 @@
         "h": 4,
         "w": 2,
         "x": 2,
-        "y": 22
+        "y": 1
       },
       "id": 51,
       "options": {
@@ -958,17 +201,15 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"aggregator_health_check\", container=\"data-aggregator\"}) / count(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"aggregator_health_check\", container=\"data-aggregator\"})",
+          "expr": "sum(aspnetcore_healthcheck_status{ name=\"aggregator_health_check\", container=\"data-aggregator\"}) / count(aspnetcore_healthcheck_status{ name=\"aggregator_health_check\", container=\"data-aggregator\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -978,10 +219,7 @@
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "All three numbers are slightly different numbers to measure.\n\nLag at last commit measures the \"best case\", Lag at last loop start measures the \"current situation\" and \"Peak lag before last commit\" measures the worst case.\n \nA large number here indicates either a delay between network commit and the aggregator ingestion somewhere OR clock drift between the Data Aggregator and Network.",
       "fieldConfig": {
         "defaults": {
@@ -996,6 +234,7 @@
             "fillOpacity": 9,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -1007,21 +246,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "line"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1072,7 +305,7 @@
         "h": 12,
         "w": 8,
         "x": 4,
-        "y": 22
+        "y": 1
       },
       "id": 46,
       "interval": "1s",
@@ -1086,53 +319,27 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "avg_over_time((max(ng_ledger_commit_last_commit_timestamp_seconds{namespace=\"$namespace\", container=\"data-aggregator\"} > 0) - max(ng_ledger_commit_tip_round_unix_timestamp_seconds{namespace=\"$namespace\", container=\"data-aggregator\"} > 0))[$__interval:1s])",
-          "interval": "",
-          "legendFormat": "Avg lag at last commit",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "max(avg_over_time(ng_ledger_commit_peak_round_timestamp_data_aggregator_clock_delay_before_last_commit_seconds{namespace=\"$namespace\", container=\"data-aggregator\"}[$__interval]))",
+          "expr": "max(avg_over_time(ng_ledger_commit_peak_round_timestamp_data_aggregator_clock_delay_before_last_commit_seconds{container=\"data-aggregator\"}[$__interval]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Avg peak lag before last commit",
           "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "max_over_time((max(ng_ledger_commit_last_ledger_extension_attempt_start_timestamp_seconds{namespace=\"$namespace\", container=\"data-aggregator\"} > 0) - max(ng_ledger_commit_tip_round_unix_timestamp_seconds{namespace=\"$namespace\", container=\"data-aggregator\"} > 0))[$__interval:1s])",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Worst case lag in interval",
-          "refId": "B"
         }
       ],
       "title": "Time delay between Aggregator and Round Timestamp",
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Includes system transactions",
       "fieldConfig": {
         "defaults": {
@@ -1147,6 +354,7 @@
             "fillOpacity": 9,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -1158,21 +366,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1219,7 +421,7 @@
         "h": 12,
         "w": 6,
         "x": 12,
-        "y": 22
+        "y": 1
       },
       "id": 48,
       "maxDataPoints": 300,
@@ -1232,16 +434,16 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_ledger_commit_committed_transactions_count{namespace=\"$namespace\", container=\"data-aggregator\"}[$__interval])) ",
+          "expr": "sum(rate(ng_ledger_commit_committed_transactions_count{ container=\"data-aggregator\"}[$__interval])) ",
           "interval": "",
           "legendFormat": "data-aggregator",
           "refId": "A"
@@ -1251,10 +453,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1269,6 +468,7 @@
             "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -1280,21 +480,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "green",
@@ -1310,7 +504,7 @@
         "h": 12,
         "w": 6,
         "x": 18,
-        "y": 22
+        "y": 1
       },
       "id": 50,
       "maxDataPoints": 300,
@@ -1323,16 +517,16 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_ledger_commit_batch_commit_time_seconds_count{container=\"data-aggregator\", namespace=\"$namespace\"}[$__interval]))\n",
+          "expr": "sum(rate(ng_ledger_commit_batch_commit_time_seconds_count{container=\"data-aggregator\", }[$__interval]))\n",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -1342,10 +536,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "This number includes the time for the metrics to get to Grafana and render the dashboard! A time <10 seconds is expected.",
       "fieldConfig": {
         "defaults": {
@@ -1357,7 +548,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1377,7 +569,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 26
+        "y": 5
       },
       "id": 70,
       "options": {
@@ -1392,17 +584,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "time() - (max(ng_ledger_commit_last_commit_timestamp_seconds{namespace=\"$namespace\"} > 0) OR (max(max_over_time(ng_ledger_commit_last_commit_timestamp_seconds{namespace=\"$namespace\"}[$__range]) > 0)))",
+          "expr": "time() - (max(ng_ledger_commit_last_commit_timestamp_seconds{} > 0) OR (max(max_over_time(ng_ledger_commit_last_commit_timestamp_seconds{}[$__range]) > 0)))",
           "format": "table",
           "interval": "",
           "legendFormat": "",
@@ -1413,10 +603,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The number of nodes which are sufficiently synced up to contribute to calculations on ledger extension.",
       "fieldConfig": {
         "defaults": {
@@ -1430,7 +617,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1449,7 +637,7 @@
         "h": 4,
         "w": 2,
         "x": 0,
-        "y": 30
+        "y": 9
       },
       "id": 52,
       "options": {
@@ -1464,17 +652,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(ng_ledger_sync_sufficiently_synced_up_nodes_total{container=\"data-aggregator\", namespace=\"$namespace\"})",
+          "expr": "max(ng_ledger_sync_sufficiently_synced_up_nodes_total{container=\"data-aggregator\", })",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1484,10 +670,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The number of nodes which are sufficiently synced up to contribute to calculations on ledger extension.",
       "fieldConfig": {
         "defaults": {
@@ -1500,7 +683,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1519,7 +703,7 @@
         "h": 4,
         "w": 2,
         "x": 2,
-        "y": 30
+        "y": 9
       },
       "id": 86,
       "options": {
@@ -1534,17 +718,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(ceil(ng_ledger_sync_sufficiently_synced_up_nodes_total{container=\"data-aggregator\", namespace=\"$namespace\"}\n* ng_ledger_sync_trust_weighting_required_for_quorum_total{container=\"data-aggregator\", namespace=\"$namespace\"}\n/ ng_ledger_sync_sufficiently_synced_up_nodes_trust_weighting_total{container=\"data-aggregator\", namespace=\"$namespace\"}\n))",
+          "expr": "max(ceil(ng_ledger_sync_sufficiently_synced_up_nodes_total{container=\"data-aggregator\", }\n* ng_ledger_sync_trust_weighting_required_for_quorum_total{container=\"data-aggregator\", }\n/ ng_ledger_sync_sufficiently_synced_up_nodes_trust_weighting_total{container=\"data-aggregator\", }\n))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1554,10 +736,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The number of nodes which are sufficiently synced up to contribute to calculations on ledger extension.",
       "fieldConfig": {
         "defaults": {
@@ -1570,7 +749,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -1581,7 +761,7 @@
         "h": 4,
         "w": 2,
         "x": 0,
-        "y": 34
+        "y": 13
       },
       "id": 91,
       "options": {
@@ -1596,17 +776,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(max_over_time(ng_ledger_commit_tip_state_version{container=\"data-aggregator\", namespace=\"$namespace\"}[$__interval]))",
+          "expr": "max(max_over_time(ng_ledger_commit_tip_state_version{container=\"data-aggregator\", }[$__interval]))",
           "interval": "",
           "legendFormat": "State Version",
           "refId": "A"
@@ -1616,10 +794,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The highest seen target state version across nodes, minus the database state version.\n\nThis can be negative because the Core API can report a target state version less than its ledger tip somehow.",
       "fieldConfig": {
         "defaults": {
@@ -1632,7 +807,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -1651,7 +827,7 @@
         "h": 4,
         "w": 2,
         "x": 2,
-        "y": 34
+        "y": 13
       },
       "id": 92,
       "options": {
@@ -1666,17 +842,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(max_over_time(ng_node_ledger_target_state_version{container=\"data-aggregator\", namespace=\"$namespace\"}[$__interval]))\n- max(max_over_time(ng_ledger_commit_tip_state_version{container=\"data-aggregator\", namespace=\"$namespace\"}[$__interval]))",
+          "expr": "max(max_over_time(ng_node_ledger_target_state_version{container=\"data-aggregator\", }[$__interval]))\n- max(max_over_time(ng_ledger_commit_tip_state_version{container=\"data-aggregator\", }[$__interval]))",
           "interval": "",
           "legendFormat": "Lag",
           "refId": "A"
@@ -1686,10 +860,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1704,6 +875,7 @@
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -1715,21 +887,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               }
             ]
           }
@@ -1740,7 +906,7 @@
         "h": 12,
         "w": 8,
         "x": 4,
-        "y": 34
+        "y": 13
       },
       "id": 90,
       "interval": "200ms",
@@ -1754,17 +920,17 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "pluginVersion": "8.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max by (node) (max_over_time(ng_node_ledger_tip_state_version{container=\"data-aggregator\",namespace=\"$namespace\"}[$__interval]))\n- ignoring (node) group_left max(max_over_time(ng_ledger_commit_tip_state_version{container=\"data-aggregator\",namespace=\"$namespace\"}[$__interval]))",
+          "expr": "max by (node) (max_over_time(ng_node_ledger_tip_state_version{container=\"data-aggregator\"}[$__interval]))\n- ignoring (node) group_left max(max_over_time(ng_ledger_commit_tip_state_version{container=\"data-aggregator\"}[$__interval]))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1777,10 +943,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Broken down by worker, node and error.\n(Summed over each interval)",
       "fieldConfig": {
         "defaults": {
@@ -1795,6 +958,7 @@
             "fillOpacity": 50,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -1806,14 +970,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "noValue": "0",
@@ -1821,7 +978,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -1833,7 +991,7 @@
         "h": 12,
         "w": 6,
         "x": 12,
-        "y": 34
+        "y": 13
       },
       "id": 80,
       "interval": "15s",
@@ -1847,28 +1005,25 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(increase(ng_workers_global_error_count{namespace=\"$namespace\", container=\"data-aggregator\"}[$__interval])) by (worker, error) > 0",
+          "expr": "sum(increase(ng_workers_global_error_count{ container=\"data-aggregator\"}[$__interval])) by (worker, error) > 0",
           "interval": "",
           "intervalFactor": 1,
           "legendFormat": "{{worker}} ({{error}})",
           "refId": "A"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(increase(ng_workers_node_error_count{namespace=\"$namespace\", container=\"data-aggregator\"}[$__interval])) by (worker, node, error) > 0",
+          "expr": "sum(increase(ng_workers_node_error_count{ container=\"data-aggregator\"}[$__interval])) by (worker, node, error) > 0",
           "hide": false,
           "interval": "",
           "intervalFactor": 1,
@@ -1880,10 +1035,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1898,6 +1050,7 @@
             "fillOpacity": 9,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -1909,21 +1062,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -1935,7 +1082,7 @@
         "h": 12,
         "w": 6,
         "x": 18,
-        "y": 34
+        "y": 13
       },
       "id": 67,
       "options": {
@@ -1947,16 +1094,16 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.9, avg(rate(ng_node_fetch_transaction_batch_time_seconds_bucket{namespace=\"$namespace\", container=\"data-aggregator\"}[5m])) by (le, node))",
+          "expr": "histogram_quantile(0.9, avg(rate(ng_node_fetch_transaction_batch_time_seconds_bucket{ container=\"data-aggregator\"}[5m])) by (le, node))",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{node}}",
@@ -1967,58 +1114,17 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Whether we've been able to commit an extension at the last attempt.\n\nWe take max_over_time in order to report any successful attempt in the period.",
       "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "fillOpacity": 70,
-            "lineWidth": 1
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "index": 0,
-                  "text": "No Consensus"
-                },
-                "1": {
-                  "color": "green",
-                  "index": 2,
-                  "text": "Committed"
-                },
-                "0.5": {
-                  "color": "yellow",
-                  "index": 1,
-                  "text": "No Extension"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red"
-              }
-            ]
-          }
-        },
+        "defaults": {},
         "overrides": []
       },
       "gridPos": {
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 38
+        "y": 17
       },
       "id": 87,
       "maxDataPoints": 30,
@@ -2038,12 +1144,9 @@
       "pluginVersion": "8.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(max_over_time(ng_ledger_sync_quorum_exists_status{container=\"data-aggregator\",namespace=\"$namespace\"}[$__interval]))",
+          "expr": "max(max_over_time(ng_ledger_sync_quorum_exists_status{container=\"data-aggregator\"}[$__interval]))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -2056,58 +1159,17 @@
       "type": "status-history"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "If the last agreed extension is self-consistent with itself and the parent in the database (based on transaction hashes and accumulators).\n\nWe take the max over all data aggregators as consistency is marked as unknown at boot-up time.",
       "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "fillOpacity": 70,
-            "lineWidth": 1
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "index": 0,
-                  "text": "INCONSISTENT"
-                },
-                "1": {
-                  "color": "green",
-                  "index": 2,
-                  "text": "Consistent"
-                },
-                "0.5": {
-                  "color": "yellow",
-                  "index": 1,
-                  "text": "Unknown (likely just started up)"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red"
-              }
-            ]
-          }
-        },
+        "defaults": {},
         "overrides": []
       },
       "gridPos": {
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 42
+        "y": 21
       },
       "id": 88,
       "maxDataPoints": 30,
@@ -2127,12 +1189,9 @@
       "pluginVersion": "8.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(min_over_time(ng_ledger_sync_quorum_extension_consistent_status{container=\"data-aggregator\",namespace=\"$namespace\"}[$__interval]))",
+          "expr": "max(min_over_time(ng_ledger_sync_quorum_extension_consistent_status{container=\"data-aggregator\"}[$__interval]))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -2145,58 +1204,17 @@
       "type": "status-history"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Consistent indicates ledger is consistent with the DB (and/or a majority of other synced up nodes).\nUnknown indicates they might not be synced up (or the data aggregator has just been restarted).\nINCONSISTENT indicates known inconsistent against DB ledger or quorum. This is a critical issue.",
       "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "fillOpacity": 70,
-            "lineWidth": 1
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "index": 0,
-                  "text": "INCONSISTENT"
-                },
-                "1": {
-                  "color": "green",
-                  "index": 2,
-                  "text": "Consistent"
-                },
-                "0.5": {
-                  "color": "yellow",
-                  "index": 1,
-                  "text": "Unknown"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red"
-              }
-            ]
-          }
-        },
+        "defaults": {},
         "overrides": []
       },
       "gridPos": {
         "h": 12,
         "w": 4,
         "x": 0,
-        "y": 46
+        "y": 25
       },
       "id": 82,
       "maxDataPoints": 120,
@@ -2216,12 +1234,9 @@
       "pluginVersion": "8.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "min(min_over_time(ng_node_ledger_tip_is_consistent_with_quorum_status{container=\"data-aggregator\",namespace=\"$namespace\"}[$__interval])) by (node)",
+          "expr": "min(min_over_time(ng_node_ledger_tip_is_consistent_with_quorum_status{container=\"data-aggregator\"}[$__interval])) by (node)",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -2234,118 +1249,13 @@
       "type": "status-history"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 9,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "binBps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 8,
-        "x": 4,
-        "y": 46
-      },
-      "id": 57,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"$namespace\", pod=~\"data-aggregator.*\"}[5m]))",
-          "interval": "",
-          "legendFormat": "In",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "- sum(rate(container_network_transmit_bytes_total{namespace=\"$namespace\", pod=~\"data-aggregator.*\"}[5m]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Out",
-          "refId": "B"
-        }
-      ],
-      "title": "Network Traffic",
-      "type": "timeseries"
-    },
-    {
       "collapsed": false,
-      "datasource": {
-        "type": "datasource",
-        "uid": "grafana"
-      },
+      "datasource": "${prometheus}",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 58
+        "y": 37
       },
       "id": 42,
       "panels": [],
@@ -2353,10 +1263,7 @@
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2394,7 +1301,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -2413,7 +1321,7 @@
         "h": 4,
         "w": 2,
         "x": 0,
-        "y": 59
+        "y": 38
       },
       "id": 53,
       "options": {
@@ -2426,17 +1334,15 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"readonly_database_connection_check\", container=\"gateway-api\"}) / count(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"readonly_database_connection_check\", container=\"gateway-api\"})",
+          "expr": "sum(aspnetcore_healthcheck_status{ name=\"readonly_database_connection_check\", container=\"gateway-api\"}) / count(aspnetcore_healthcheck_status{ name=\"readonly_database_connection_check\", container=\"gateway-api\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2446,10 +1352,7 @@
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2487,7 +1390,8 @@
             "mode": "percentage",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -2506,7 +1410,7 @@
         "h": 4,
         "w": 2,
         "x": 2,
-        "y": 59
+        "y": 38
       },
       "id": 54,
       "options": {
@@ -2519,17 +1423,15 @@
           "values": false
         },
         "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showThresholdMarkers": true,
+        "text": {}
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"readwrite_database_connection_check\", container=\"gateway-api\"}) / count(aspnetcore_healthcheck_status{namespace=\"$namespace\", name=\"readwrite_database_connection_check\", container=\"gateway-api\"})",
+          "expr": "sum(aspnetcore_healthcheck_status{ name=\"readwrite_database_connection_check\", container=\"gateway-api\"}) / count(aspnetcore_healthcheck_status{ name=\"readwrite_database_connection_check\", container=\"gateway-api\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2539,10 +1441,7 @@
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2557,6 +1456,7 @@
             "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -2568,21 +1468,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2611,7 +1505,7 @@
         "h": 13,
         "w": 9,
         "x": 4,
-        "y": 59
+        "y": 38
       },
       "id": 4,
       "options": {
@@ -2623,16 +1517,16 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(http_requests_received_total{namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (action)",
+          "expr": "sum(rate(http_requests_received_total{ container=\"gateway-api\"}[5m])) by (action)",
           "interval": "",
           "legendFormat": "{{action}}",
           "refId": "A"
@@ -2642,10 +1536,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2660,6 +1551,7 @@
             "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -2671,21 +1563,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2714,7 +1600,7 @@
         "h": 13,
         "w": 11,
         "x": 13,
-        "y": 59
+        "y": 38
       },
       "id": 73,
       "options": {
@@ -2726,16 +1612,16 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (le, action))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", container=\"gateway-api\"}[5m])) by (le, action))",
           "interval": "",
           "legendFormat": "{{action}}",
           "refId": "A"
@@ -2745,112 +1631,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 9,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "binBps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 4,
-        "x": 0,
-        "y": 63
-      },
-      "id": 58,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"$namespace\", pod=~\"gateway-api.*\"}[5m]))",
-          "interval": "",
-          "legendFormat": "In",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
-          "exemplar": true,
-          "expr": "- sum(rate(container_network_transmit_bytes_total{namespace=\"$namespace\", pod=~\"gateway-api.*\"}[5m]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Out",
-          "refId": "B"
-        }
-      ],
-      "title": "Network Traffic",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2865,6 +1646,7 @@
             "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -2876,21 +1658,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2906,7 +1682,7 @@
         "h": 12,
         "w": 6,
         "x": 0,
-        "y": 72
+        "y": 51
       },
       "id": 2,
       "options": {
@@ -2918,16 +1694,16 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(http_requests_received_total{namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (code)",
+          "expr": "sum(rate(http_requests_received_total{ container=\"gateway-api\"}[5m])) by (code)",
           "interval": "",
           "legendFormat": "{{code}}",
           "refId": "A"
@@ -2937,10 +1713,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2955,6 +1728,7 @@
             "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -2966,21 +1740,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2996,7 +1764,7 @@
         "h": 12,
         "w": 7,
         "x": 6,
-        "y": 72
+        "y": 51
       },
       "id": 7,
       "options": {
@@ -3008,39 +1776,33 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", , container=\"gateway-api\"}[5m])) by (le))",
           "interval": "",
           "legendFormat": "p99",
           "refId": "A"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", , container=\"gateway-api\"}[5m])) by (le))",
           "hide": false,
           "interval": "",
           "legendFormat": "p95",
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", , container=\"gateway-api\"}[5m])) by (le))",
           "hide": false,
           "interval": "",
           "legendFormat": "p50",
@@ -3051,24 +1813,27 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -3076,7 +1841,7 @@
         "h": 12,
         "w": 11,
         "x": 13,
-        "y": 72
+        "y": 51
       },
       "id": 84,
       "maxDataPoints": 20,
@@ -3097,6 +1862,7 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "tooltip": {
           "mode": "single",
           "sort": "none"
@@ -3105,12 +1871,9 @@
       "pluginVersion": "8.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": false,
-          "expr": "topk(10, sum(increase(ng_gateway_response_error_count{namespace=\"$namespace\", container=\"gateway-api\"}[$__range])) by (action, status_code, exception, gateway_error) > 0)",
+          "expr": "topk(10, sum(increase(ng_gateway_response_error_count{ container=\"gateway-api\"}[$__range])) by (action, status_code, exception, gateway_error) > 0)",
           "instant": true,
           "interval": "",
           "legendFormat": "{{action}} {{status_code}} ({{exception}}, {{gateway_error}})",
@@ -3121,10 +1884,7 @@
       "type": "piechart"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "A large number here indicates either a delay between network commit and the aggregator ingestion (see graph above), a DB replication delay OR clock drift between the Gateway API/s and Network.",
       "fieldConfig": {
         "defaults": {
@@ -3139,6 +1899,7 @@
             "fillOpacity": 9,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -3150,21 +1911,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "line"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "yellow",
@@ -3200,7 +1955,7 @@
         "h": 11,
         "w": 6,
         "x": 0,
-        "y": 84
+        "y": 63
       },
       "id": 89,
       "options": {
@@ -3212,27 +1967,24 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "min(min_over_time(ng_gateway_ledger_tip_round_timestamp_gateway_api_clock_lag_at_last_request_seconds{namespace=\"$namespace\", container=\"gateway-api\"}[$__interval]))",
+          "expr": "min(min_over_time(ng_gateway_ledger_tip_round_timestamp_gateway_api_clock_lag_at_last_request_seconds{ container=\"gateway-api\"}[$__interval]))",
           "interval": "",
           "legendFormat": "Min delay (across all requests and Gateway APIs)",
           "refId": "A"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "max(max_over_time(ng_gateway_ledger_tip_round_timestamp_gateway_api_clock_lag_at_last_request_seconds{namespace=\"$namespace\", container=\"gateway-api\"}[$__interval]))",
+          "expr": "max(max_over_time(ng_gateway_ledger_tip_round_timestamp_gateway_api_clock_lag_at_last_request_seconds{ container=\"gateway-api\"}[$__interval]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Max delay (across all requests and Gateway APIs)",
@@ -3243,10 +1995,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -3261,6 +2010,7 @@
             "fillOpacity": 50,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -3272,21 +2022,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -3311,7 +2055,7 @@
         "h": 11,
         "w": 18,
         "x": 6,
-        "y": 84
+        "y": 63
       },
       "id": 83,
       "maxDataPoints": 50,
@@ -3324,16 +2068,16 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_gateway_response_error_count{namespace=\"$namespace\", container=\"gateway-api\"}[$__interval])) by (action, status_code, exception, gateway_error) > 0",
+          "expr": "sum(rate(ng_gateway_response_error_count{ container=\"gateway-api\"}[$__interval])) by (action, status_code, exception, gateway_error) > 0",
           "interval": "",
           "legendFormat": "{{action}} {{status_code}} ({{exception}}, {{gateway_error}})",
           "refId": "A"
@@ -3343,58 +2087,17 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Shows the worst status seen across all Gateway APIs",
       "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "fillOpacity": 70,
-            "lineWidth": 1
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "index": 2,
-                  "text": "Unhealthy"
-                },
-                "1": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Healthy"
-                },
-                "0.5": {
-                  "color": "orange",
-                  "index": 1,
-                  "text": "Healthy but lagging"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red"
-              }
-            ]
-          }
-        },
+        "defaults": {},
         "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 95
+        "y": 74
       },
       "id": 94,
       "maxDataPoints": 100,
@@ -3414,12 +2117,9 @@
       "pluginVersion": "8.5.2",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "editorMode": "code",
-          "expr": "min by (node) (ng_node_gateway_health_check_status{container=\"gateway-api\",namespace=\"$namespace\"})",
+          "expr": "min by (node) (ng_node_gateway_health_check_status{container=\"gateway-api\"})",
           "legendFormat": "{{node}}",
           "range": true,
           "refId": "A"
@@ -3429,10 +2129,7 @@
       "type": "status-history"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -3447,6 +2144,7 @@
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -3458,21 +2156,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               }
             ]
           }
@@ -3483,7 +2175,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 95
+        "y": 74
       },
       "id": 95,
       "options": {
@@ -3495,17 +2187,19 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "pluginVersion": "8.5.2",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "editorMode": "code",
-          "expr": "ng_nodes_gateway_health_check_node_statuses{container=\"gateway-api\",namespace=\"$namespace\",status=\"HEALTHY_AND_SYNCED\"}",
+          "exemplar": true,
+          "expr": "ng_nodes_gateway_health_check_node_statuses{container=\"gateway-api\",status=\"HEALTHY_AND_SYNCED\"}",
+          "interval": "",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "Healthy"
@@ -3515,10 +2209,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -3533,6 +2224,7 @@
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -3544,21 +2236,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               }
             ]
           }
@@ -3569,7 +2255,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 95
+        "y": 74
       },
       "id": 96,
       "options": {
@@ -3581,17 +2267,19 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "pluginVersion": "8.5.2",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "editorMode": "code",
-          "expr": "ng_nodes_gateway_health_check_node_statuses{container=\"gateway-api\",namespace=\"$namespace\",status=\"HEALTHY_BUT_LAGGING\"}",
+          "exemplar": true,
+          "expr": "ng_nodes_gateway_health_check_node_statuses{container=\"gateway-api\",status=\"HEALTHY_BUT_LAGGING\"}",
+          "interval": "",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "Healthy"
@@ -3601,10 +2289,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -3619,6 +2304,7 @@
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -3630,21 +2316,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red"
+                "color": "red",
+                "value": null
               }
             ]
           }
@@ -3655,7 +2335,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 95
+        "y": 74
       },
       "id": 97,
       "options": {
@@ -3667,17 +2347,19 @@
         "tooltip": {
           "mode": "single",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "pluginVersion": "8.5.2",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "editorMode": "code",
-          "expr": "ng_nodes_gateway_health_check_node_statuses{container=\"gateway-api\",namespace=\"$namespace\",status=\"UNHEALTHY\"}",
+          "exemplar": true,
+          "expr": "ng_nodes_gateway_health_check_node_statuses{container=\"gateway-api\",status=\"UNHEALTHY\"}",
+          "interval": "",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "Healthy"
@@ -3688,15 +2370,12 @@
     },
     {
       "collapsed": false,
-      "datasource": {
-        "type": "datasource",
-        "uid": "grafana"
-      },
+      "datasource": "${prometheus}",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 103
+        "y": 82
       },
       "id": 61,
       "panels": [],
@@ -3704,10 +2383,7 @@
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Count of transactions needing resubmission",
       "fieldConfig": {
         "defaults": {
@@ -3719,7 +2395,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -3734,7 +2411,7 @@
         "h": 6,
         "w": 3,
         "x": 0,
-        "y": 104
+        "y": 83
       },
       "id": 66,
       "options": {
@@ -3749,17 +2426,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(ng_db_mempool_transactions_needing_resubmission_total{namespace=\"$namespace\", container=\"data-aggregator\"}) by (container)",
+          "expr": "sum(ng_db_mempool_transactions_needing_resubmission_total{ container=\"data-aggregator\"}) by (container)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -3769,10 +2444,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -3787,6 +2459,7 @@
             "fillOpacity": 5,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -3798,21 +2471,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -3874,7 +2541,7 @@
         "h": 12,
         "w": 9,
         "x": 3,
-        "y": 104
+        "y": 83
       },
       "id": 63,
       "options": {
@@ -3886,135 +2553,105 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_added_from_gateway_submission_count{namespace=\"$namespace\", container=\"gateway-api\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_added_from_gateway_submission_count{ container=\"gateway-api\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "First submitted to Gateway",
           "refId": "Submitted to Gateway"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_added_from_node_mempool_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_added_from_node_mempool_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Discovered in node mempool",
           "refId": "Added from Node Mempool"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_as_missing_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_as_missing_count{ container=\"data-aggregator\"}[5m]))",
           "interval": "",
           "legendFormat": "Now missing",
           "refId": "Marked as missing"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_assumed_in_node_mempool_after_resubmission_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_assumed_in_node_mempool_after_resubmission_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Resubmitted",
           "refId": "Marked as resubmitted"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_reappeared_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_reappeared_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Reappeared",
           "refId": "Marked as reappeared"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_as_failed_for_timeout_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_as_failed_for_timeout_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Timeout failure",
           "refId": "Marked as failed for timeout"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_failed_from_initial_submission_count{namespace=\"$namespace\", container=\"gateway-api\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_failed_from_initial_submission_count{ container=\"gateway-api\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Failed at submission",
           "refId": "Marked as failed from initial submission"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_failed_during_resubmission_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_failed_during_resubmission_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Failed at resubmission",
           "refId": "Marked as failed from resubmission"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_resolved_but_unknown_status_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_resolved_but_unknown_status_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Yet unknown resolution",
           "refId": "Marked as resolved but unknown"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_committed_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_committed_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Committed",
           "refId": "Marked committed"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_db_mempool_transactions_marked_committed_which_were_failed_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_db_mempool_transactions_marked_committed_which_were_failed_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Committed after failed",
@@ -4025,10 +2662,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The mempool union can lag slightly behind individual nodes, as we combine the latest snapshot of the node mempools regularly.\n\nIt also only includes transactions we've managed to read the contents of - we can \"miss\" transactions which leave the mempool before we managed to read their contents.",
       "fieldConfig": {
         "defaults": {
@@ -4043,6 +2677,7 @@
             "fillOpacity": 9,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -4054,21 +2689,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4083,7 +2712,7 @@
         "h": 12,
         "w": 7,
         "x": 12,
-        "y": 104
+        "y": 83
       },
       "id": 65,
       "options": {
@@ -4095,29 +2724,26 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "pluginVersion": "8.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "avg(ng_node_mempool_combined_current_size_total{namespace=\"$namespace\",container=\"data-aggregator\"})",
+          "expr": "avg(ng_node_mempool_combined_current_size_total{container=\"data-aggregator\"})",
           "hide": false,
           "interval": "",
           "legendFormat": "Mempool union across all nodes",
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "avg(ng_node_mempool_size_total{namespace=\"$namespace\", container=\"data-aggregator\"}) by (node)",
+          "expr": "avg(ng_node_mempool_size_total{ container=\"data-aggregator\"}) by (node)",
           "interval": "",
           "legendFormat": "Node: {{node}}",
           "refId": "A"
@@ -4127,10 +2753,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The DB table gets pruned regularly. Committed currently get pruned after a few seconds, Failed/Missing after a week. \n\nExcessive MISSING typically indicates a race condition between non-Gateway Txns being discovered in a mempool and being committed to the DB ledger.",
       "fieldConfig": {
         "defaults": {
@@ -4145,6 +2768,7 @@
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -4156,21 +2780,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4231,7 +2849,7 @@
         "h": 12,
         "w": 5,
         "x": 19,
-        "y": 104
+        "y": 83
       },
       "id": 79,
       "options": {
@@ -4243,16 +2861,16 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "avg(ng_db_mempool_size_by_status_total{namespace=\"$namespace\", container=\"data-aggregator\"}) by (status)",
+          "expr": "avg(ng_db_mempool_size_by_status_total{ container=\"data-aggregator\"}) by (status)",
           "interval": "",
           "legendFormat": "{{status}}",
           "refId": "A"
@@ -4262,10 +2880,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "Count of any pending transactions temporarily marked as failed before being marked as committed in the last 24h. We don't want this to ever happen.",
       "fieldConfig": {
         "defaults": {
@@ -4277,7 +2892,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4292,7 +2908,7 @@
         "h": 6,
         "w": 3,
         "x": 0,
-        "y": 110
+        "y": 89
       },
       "id": 75,
       "options": {
@@ -4307,17 +2923,15 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.5.2",
+      "pluginVersion": "7.5.4",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(increase(ng_db_mempool_transactions_marked_committed_which_were_failed_count{namespace=\"$namespace\", container=\"data-aggregator\"}[24h])) or vector(0)",
+          "expr": "sum(increase(ng_db_mempool_transactions_marked_committed_which_were_failed_count{ container=\"data-aggregator\"}[24h])) or vector(0)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -4327,10 +2941,7 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The Attempt/Error/Success lines show the request response. The Result: X lines show what happened at initial submission to a node.",
       "fieldConfig": {
         "defaults": {
@@ -4345,6 +2956,7 @@
             "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -4359,21 +2971,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -4446,7 +3052,7 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 116
+        "y": 95
       },
       "id": 72,
       "options": {
@@ -4458,51 +3064,42 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_submission_request_count{namespace=\"$namespace\", container=\"gateway-api\"}[$__interval]))",
+          "expr": "sum(rate(ng_construction_transaction_submission_request_count{ container=\"gateway-api\"}[$__interval]))",
           "interval": "",
           "legendFormat": "Attempt",
           "refId": "A"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_submission_error_count{namespace=\"$namespace\", container=\"gateway-api\"}[$__interval]))",
+          "expr": "sum(rate(ng_construction_transaction_submission_error_count{ container=\"gateway-api\"}[$__interval]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Error",
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_submission_success_count{namespace=\"$namespace\", container=\"gateway-api\"}[5m]))",
+          "expr": "sum(rate(ng_construction_transaction_submission_success_count{ container=\"gateway-api\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Success",
           "refId": "C"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_submission_resolution_count{namespace=\"$namespace\", container=\"gateway-api\"}[5m])) by (result)",
+          "expr": "sum(rate(ng_construction_transaction_submission_resolution_count{ container=\"gateway-api\"}[5m])) by (result)",
           "hide": false,
           "interval": "",
           "legendFormat": "Result: {{result}}",
@@ -4513,10 +3110,7 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Hb6qlgmnz"
-      },
+      "datasource": "${prometheus}",
       "description": "The Attempt/Error/Success lines show the overall status of the resubmission request made to the node. The Result: X lines show a more detailed view by error code.",
       "fieldConfig": {
         "defaults": {
@@ -4532,6 +3126,7 @@
             "fillOpacity": 9,
             "gradientMode": "none",
             "hideFrom": {
+              "graph": false,
               "legend": false,
               "tooltip": false,
               "viz": false
@@ -4543,21 +3138,15 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "spanNulls": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -4619,7 +3208,7 @@
         "h": 12,
         "w": 12,
         "x": 12,
-        "y": 116
+        "y": 95
       },
       "id": 69,
       "options": {
@@ -4631,51 +3220,42 @@
         "tooltip": {
           "mode": "multi",
           "sort": "none"
+        },
+        "tooltipOptions": {
+          "mode": "single"
         }
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_resubmission_attempt_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_construction_transaction_resubmission_attempt_count{ container=\"data-aggregator\"}[5m]))",
           "interval": "",
           "legendFormat": "Attempt",
           "refId": "A"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_resubmission_error_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_construction_transaction_resubmission_error_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Error",
           "refId": "B"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_resubmission_success_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m]))",
+          "expr": "sum(rate(ng_construction_transaction_resubmission_success_count{ container=\"data-aggregator\"}[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Success",
           "refId": "C"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Hb6qlgmnz"
-          },
+          "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "sum(rate(ng_construction_transaction_resubmission_resolution_count{namespace=\"$namespace\", container=\"data-aggregator\"}[5m])) by (result)",
+          "expr": "sum(rate(ng_construction_transaction_resubmission_resolution_count{ container=\"data-aggregator\"}[5m])) by (result)",
           "hide": false,
           "interval": "",
           "legendFormat": "Result: {{result}}",
@@ -4687,7 +3267,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 36,
+  "schemaVersion": 27,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -4695,30 +3275,22 @@
       {
         "current": {
           "selected": false,
-          "text": "ng-mainnet",
-          "value": "ng-mainnet"
+          "text": "Prometheus",
+          "value": "Prometheus"
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "Hb6qlgmnz"
-        },
-        "definition": "label_values(up{namespace=~\"ng-.*\"}, namespace)",
-        "description": "The kubernetes namespace of the deployment",
-        "hide": 0,
+        "description": null,
+        "error": null,
+        "hide": 2,
         "includeAll": false,
-        "label": "Namespace",
+        "label": null,
         "multi": false,
-        "name": "namespace",
+        "name": "prometheus",
         "options": [],
-        "query": {
-          "query": "label_values(up{namespace=~\"ng-.*\"}, namespace)",
-          "refId": "StandardVariableQuery"
-        },
+        "query": "prometheus",
         "refresh": 1,
-        "regex": "",
+        "regex": "Prometheus",
         "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
+        "type": "datasource"
       }
     ]
   },
@@ -4729,7 +3301,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Network Gateway",
-  "uid": "HAHXXmT7z",
-  "version": 1,
-  "weekStart": ""
+  "uid": "network-gateway",
+  "version": 8
 }
