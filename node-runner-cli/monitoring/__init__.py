@@ -109,7 +109,7 @@ class Monitoring:
         for file in files:
             render_template = Renderer().load_file_based_template(f"{file}.j2").render({}).to_yaml()
             file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/{file}"
-            Helpers.dump_rendered_template(render_template, file_location, quite=True)
+            Helpers.dump_rendered_template(render_template, file_location, quiet=True)
 
     @staticmethod
     def setup_external_volumes():
