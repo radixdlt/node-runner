@@ -214,7 +214,6 @@ class Helpers:
         else:
             return f"{color}{text}{bcolors.ENDC}"
 
-
     @staticmethod
     def get_basic_auth_header(user):
         import base64
@@ -262,8 +261,8 @@ class Helpers:
 
     @staticmethod
     def get_default_node_config_dir():
-        return f"{Path.home()}/node-config"    \
-
+        return f"{Path.home()}/node-config" \
+ \
     @staticmethod
     def get_default_monitoring_config_dir():
         return f"{Path.home()}/monitoring"
@@ -295,6 +294,15 @@ class Helpers:
         else:
             node_endpoint = os.environ.get(NODE_HOST_IP_OR_NAME)
         return node_endpoint
+
+    @staticmethod
+    def dump_rendered_template(render_template, file_location, quiet=False):
+        yaml.add_representer(type(None), Helpers.represent_none)
+        if not quiet:
+            print(f"\n{yaml.dump(render_template)}")
+        print(f"\n\n Saving to file {file_location} ")
+        with open(file_location, 'w') as f:
+            yaml.dump(render_template, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
 
 class bcolors:

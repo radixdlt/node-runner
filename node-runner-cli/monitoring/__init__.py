@@ -39,7 +39,7 @@ class Monitoring:
 
     @staticmethod
     def template_prometheus_yml(monitoring_config):
-        render_template = Renderer().load_file_based_template("prometheus.j2").render(monitoring_config).to_yaml()
+        render_template = Renderer().load_file_based_template("prometheus.yml.j2").render(monitoring_config).to_yaml()
 
         yaml.add_representer(type(None), Helpers.represent_none)
 
@@ -75,7 +75,7 @@ class Monitoring:
         return final_conf
 
     @staticmethod
-    def setup_datasource(default_datasource_cfg_url,monitoring_config_dir):
+    def setup_datasource(default_datasource_cfg_url, monitoring_config_dir):
         req = requests.Request('GET', f'{default_datasource_cfg_url}')
         prepared = req.prepare()
         resp = Helpers.send_request(prepared, print_response=False)
@@ -84,7 +84,15 @@ class Monitoring:
             f.write(resp.content)
 
     @staticmethod
-    def setup_dashboard(default_dashboard_cfg_url, files,monitoring_config_dir):
+    def template_datasource(monitoring_config_dir):
+        render_template = Renderer().load_file_based_template("datasource.yml.j2").render().to_yaml()
+        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
+        file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/datasource.yml"
+        Helpers.section_headline("Downloading datasource for grafana")
+        Helpers.dump_rendered_template(render_template, file_location)
+
+    @staticmethod
+    def setup_dashboard(default_dashboard_cfg_url, files, monitoring_config_dir):
         for file in files:
             req = requests.Request('GET', f'{default_dashboard_cfg_url}/{file}')
             prepared = req.prepare()
@@ -94,12 +102,22 @@ class Monitoring:
                 f.write(resp.content)
 
     @staticmethod
+    def template_dashboards(files, monitoring_config_dir):
+        Helpers.section_headline("Downloading Dashboard files for grafana")
+
+        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
+        for file in files:
+            render_template = Renderer().load_file_based_template(f"{file}.j2").render().to_yaml()
+            file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/{file}"
+            Helpers.dump_rendered_template(render_template, file_location, quite=True)
+
+    @staticmethod
     def setup_external_volumes():
         run_shell_command(["docker", "volume", "create", "prometheus_tsdb"])
         run_shell_command(["docker", "volume", "create", "grafana-storage"])
 
     @staticmethod
-    def setup_monitoring_containers(default_monitoring_cfg_url,monitoring_config_dir):
+    def setup_monitoring_containers(default_monitoring_cfg_url, monitoring_config_dir):
         req = requests.Request('GET', f'{default_monitoring_cfg_url}')
         prepared = req.prepare()
         resp = Helpers.send_request(prepared, print_response=False)
@@ -108,7 +126,15 @@ class Monitoring:
             f.write(resp.content)
 
     @staticmethod
-    def start_monitoring(composefile,auto_approve=False):
+    def template_monitoring_containers(monitoring_config_dir):
+        render_template = Renderer().load_file_based_template("node-monitoring.yml.j2").render().to_yaml()
+        Path(monitoring_config_dir).mkdir(parents=True, exist_ok=True)
+        file_location = f"{monitoring_config_dir}/node-monitoring.yml"
+        Helpers.section_headline("Docker compose for monitoring containers")
+        Helpers.dump_rendered_template(render_template, file_location)
+
+    @staticmethod
+    def start_monitoring(composefile, auto_approve=False):
         print(f"----- output of node monitoring docker compose file {composefile}")
         run_shell_command(f"cat {composefile}", shell=True)
         start_monitoring_answer = ""
@@ -128,4 +154,3 @@ class Monitoring:
     @staticmethod
     def stop_monitoring(composefile, remove_volumes):
         Helpers.docker_compose_down(composefile, remove_volumes)
-

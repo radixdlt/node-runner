@@ -120,12 +120,10 @@ def setup(args):
 
     monitoring_config_dir = all_config["common_config"]["config_dir"]
     Monitoring.template_prometheus_yml(all_config)
-    Monitoring.setup_datasource(f"{monitor_url_dir}/grafana/provisioning/datasources/datasource.yml",
-                                monitoring_config_dir)
-    Monitoring.setup_dashboard(f"{monitor_url_dir}/grafana/provisioning/dashboards/",
-                               ["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],
-                               monitoring_config_dir)
-    Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml", monitoring_config_dir)
+    Monitoring.template_datasource(monitoring_config_dir)
+    Monitoring.template_dashboards(["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],monitoring_config_dir)
+
+    Monitoring.template_monitoring_containers(monitoring_config_dir)
     Monitoring.setup_external_volumes()
     monitoring_file_location = f"{monitoring_config_dir}/node-monitoring.yml"
     Monitoring.stop_monitoring(monitoring_file_location, remove_volumes=False)
