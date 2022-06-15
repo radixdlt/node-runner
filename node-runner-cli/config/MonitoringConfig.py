@@ -39,7 +39,6 @@ class PrometheusSettings(BaseConfig):
             self.basic_auth_user = auth["name"]
 
 
-
 class MonitoringSettings(BaseConfig):
     core_prometheus_settings: PrometheusSettings = PrometheusSettings({})
     gateway_api_prometheus_settings: PrometheusSettings = PrometheusSettings({})
