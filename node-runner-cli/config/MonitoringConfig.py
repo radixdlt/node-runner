@@ -12,12 +12,13 @@ class CommonMonitoringSettings(BaseConfig):
 
 class PrometheusSettings(BaseConfig):
     metrics_path = "/metrics"
-    metrics_target = f"{Helpers.get_node_host_ip()}"
+    metrics_target = "localhost"
     basic_auth_password = None
     basic_auth_user = None
     scheme = "https"
 
     def ask_prometheus_target(self, basic_auth_password, target_name):
+        self.metrics_target = f"{Helpers.get_node_host_ip()}"
         if "DETAILED" in SetupMode.instance().mode:
             url = Prompts.ask_metrics_target_details(target_name, f"https://{self.metrics_target}")
             self.set_target_details(url, target_name)
