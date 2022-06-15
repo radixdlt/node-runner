@@ -128,7 +128,7 @@ def setup(args):
     Monitoring.setup_monitoring_containers(f"{monitor_url_dir}/node-monitoring.yml", monitoring_config_dir)
     Monitoring.setup_external_volumes()
     monitoring_file_location = f"{monitoring_config_dir}/node-monitoring.yml"
-    Monitoring.stop_monitoring(monitoring_file_location, args.removevolumes)
+    Monitoring.stop_monitoring(monitoring_file_location, remove_volumes=False)
     Monitoring.start_monitoring(monitoring_file_location)
 
 
@@ -144,7 +144,7 @@ def start(args):
     monitoring_config_dir = all_config["common_config"]["config_dir"]
 
     monitoring_file_location = f"{monitoring_config_dir}/node-monitoring.yml"
-    Monitoring.stop_monitoring(monitoring_file_location, args.removevolumes)
+    Monitoring.stop_monitoring(monitoring_file_location, remove_volumes=False)
     Monitoring.start_monitoring(monitoring_file_location)
 
 
