@@ -261,8 +261,8 @@ class Helpers:
 
     @staticmethod
     def get_default_node_config_dir():
-        return f"{Path.home()}/node-config" \
- \
+        return f"{Path.home()}/node-config"
+
     @staticmethod
     def get_default_monitoring_config_dir():
         return f"{Path.home()}/monitoring"
