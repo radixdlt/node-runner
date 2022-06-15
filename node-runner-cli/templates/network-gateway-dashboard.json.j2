@@ -592,7 +592,7 @@
         {
           "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "time() - (max(ng_ledger_commit_last_commit_timestamp_seconds{} > 0) OR (max(max_over_time(ng_ledger_commit_last_commit_timestamp_seconds{}[$__range]) > 0)))",
+          "expr": "(time() - (max(ng_ledger_commit_last_commit_timestamp_seconds{} > 0) OR (max(max_over_time(ng_ledger_commit_last_commit_timestamp_seconds{}[$__range]) > 0))))",
           "format": "table",
           "interval": "",
           "legendFormat": "",
@@ -2486,7 +2486,7 @@
     },
     {
       "datasource": "${prometheus}",
-      "description": "The mempool union can lag slightly behind individual nodes, as we combine the latest snapshot of the node mempools regularly.\n\nIt also only includes transactions we've managed to read the contents of - we can \"miss\" transactions which leave the mempool before we managed to read their contents.",
+      "description": "The mempool union can lag slightly behind individual nodes, as we combine the latest snapshot of the node mempools regularly.\n\nIt also only includes transactions we've managed to read the contents of we can \"miss\" transactions which leave the mempool before we managed to read their contents.",
       "fieldConfig": {
         "defaults": {
           "color": {

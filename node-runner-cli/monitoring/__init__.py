@@ -109,7 +109,12 @@ class Monitoring:
         for file in files:
             render_template = Renderer().load_file_based_template(f"{file}.j2").render({}).to_yaml()
             file_location = f"{monitoring_config_dir}/grafana/provisioning/dashboards/{file}"
-            Helpers.dump_rendered_template(render_template, file_location, quiet=True)
+            if file.endswith('.yml') or file.endswith('.yaml') :
+                Helpers.dump_rendered_template(render_template, file_location, quiet=True)
+            if file.endswith('.json'):
+                import json
+                with open(file_location, 'w') as fp:
+                    json.dump(render_template, fp)
 
     @staticmethod
     def setup_external_volumes():
