@@ -9,7 +9,7 @@ import requests
 import yaml
 from system_client import ApiException
 
-from env_vars import PRINT_REQUEST
+from env_vars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME
 from version import __version__
 
 
@@ -283,6 +283,18 @@ class Helpers:
     @staticmethod
     def represent_none(self, _):
         return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+    @staticmethod
+    def get_node_host_ip():
+        if os.environ.get('%s' % NODE_HOST_IP_OR_NAME) is None:
+            print(
+                f"{NODE_HOST_IP_OR_NAME} environment variable not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
+                "the node.")
+            ip = Helpers.get_public_ip()
+            node_endpoint = f"{ip}"
+        else:
+            node_endpoint = os.environ.get(NODE_HOST_IP_OR_NAME)
+        return node_endpoint
 
 
 class bcolors:

@@ -22,7 +22,7 @@ def monitoringcommand(args=[], parent=monitoring_parser):
 
 
 def read_monitoring_config(args):
-    yaml.add_representer(type(None), Helpers.represent_none())
+    yaml.add_representer(type(None), Helpers.represent_none)
     with open(args.monitoringconfigfile, 'r') as file:
         all_config = yaml.safe_load(file)
     return all_config
@@ -108,11 +108,8 @@ def config(args):
 
 @monitoringcommand(
     [
-        argument("-g", "--monitornetworkgateway",
-                 help="Pass this option to monitor gateway as well",
-                 action='store_true'),
         argument("-f", "--monitoringconfigfile", required=True,
-                 help="Path to config file",
+                 help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
     ])
 def setup(args):
@@ -137,9 +134,8 @@ def setup(args):
 @monitoringcommand(
     [
         argument("-f", "--monitoringconfigfile", required=True,
-                 help="Path to config file",
+                 help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
-
     ]
 )
 def start(args):
@@ -152,7 +148,7 @@ def start(args):
 
 @monitoringcommand([
     argument("-f", "--monitoringconfigfile", required=True,
-             help="Path to config file",
+             help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
              action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
 def stop(args):

@@ -68,7 +68,7 @@ if __name__ == "__main__":
     if args.subcommand is None:
         cli.print_help()
     else:
-        if args.subcommand != "version":
+        if args.subcommand == "version":
             check_latest_cli()
 
     if args.subcommand == "docker":

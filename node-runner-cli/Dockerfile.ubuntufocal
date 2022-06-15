@@ -37,7 +37,7 @@ RUN pip install -r requirements.txt
 COPY . /app
 RUN pyinstaller --onefile --windowed radixnode.spec
 
-RUN /app/dist/radixnode version
+RUN DISABLE_VERSION_CHECK=true /app/dist/radixnode version
 
 FROM scratch AS export-stage
 COPY --from=BUILD /app/dist /
