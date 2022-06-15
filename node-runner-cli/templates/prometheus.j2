@@ -31,7 +31,8 @@ scrape_configs:
       - targets:
           - {{monitor_gateway_api.metrics_target}}
         labels:
-          network: gateway
+          network: mynode
+          container: gateway-api
 {% if (monitor_gateway_api.scheme == "https") %}
     scheme: https
     tls_config:
@@ -48,7 +49,8 @@ scrape_configs:
       - targets:
           - {{monitor_aggregator.metrics_target}}
         labels:
-          network: aggregator
+          network: mynode
+          container: data-aggregator
 {% if (monitor_aggregator.scheme == "https") %}
     scheme: https
     tls_config:
