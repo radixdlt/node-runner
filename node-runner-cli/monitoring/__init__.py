@@ -85,7 +85,7 @@ class Monitoring:
 
     @staticmethod
     def template_datasource(monitoring_config_dir):
-        render_template = Renderer().load_file_based_template("datasource.yml.j2").render().to_yaml()
+        render_template = Renderer().load_file_based_template("datasource.yml.j2").render({}).to_yaml()
         Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
         file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/datasource.yml"
         Helpers.section_headline("Downloading datasource for grafana")
@@ -107,7 +107,7 @@ class Monitoring:
 
         Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
         for file in files:
-            render_template = Renderer().load_file_based_template(f"{file}.j2").render().to_yaml()
+            render_template = Renderer().load_file_based_template(f"{file}.j2").render({}).to_yaml()
             file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/{file}"
             Helpers.dump_rendered_template(render_template, file_location, quite=True)
 
@@ -127,7 +127,7 @@ class Monitoring:
 
     @staticmethod
     def template_monitoring_containers(monitoring_config_dir):
-        render_template = Renderer().load_file_based_template("node-monitoring.yml.j2").render().to_yaml()
+        render_template = Renderer().load_file_based_template("node-monitoring.yml.j2").render({}).to_yaml()
         Path(monitoring_config_dir).mkdir(parents=True, exist_ok=True)
         file_location = f"{monitoring_config_dir}/node-monitoring.yml"
         Helpers.section_headline("Docker compose for monitoring containers")
