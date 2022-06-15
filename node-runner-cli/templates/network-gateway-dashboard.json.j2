@@ -22,8 +22,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 7,
-  "iteration": 1655298831562,
+  "id": 2,
+  "iteration": 1655300502368,
   "links": [],
   "panels": [
     {
@@ -1114,148 +1114,13 @@
       "type": "timeseries"
     },
     {
-      "datasource": "${prometheus}",
-      "description": "Whether we've been able to commit an extension at the last attempt.\n\nWe take max_over_time in order to report any successful attempt in the period.",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 17
-      },
-      "id": 87,
-      "maxDataPoints": 30,
-      "options": {
-        "colWidth": 0.75,
-        "legend": {
-          "displayMode": "hidden",
-          "placement": "bottom"
-        },
-        "rowHeight": 0.9,
-        "showValue": "never",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.3.3",
-      "targets": [
-        {
-          "datasource": "${prometheus}",
-          "exemplar": true,
-          "expr": "max(max_over_time(ng_ledger_sync_quorum_exists_status{container=\"data-aggregator\"}[$__interval]))",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "Status",
-          "refId": "A"
-        }
-      ],
-      "title": "Could commit",
-      "type": "status-history"
-    },
-    {
-      "datasource": "${prometheus}",
-      "description": "If the last agreed extension is self-consistent with itself and the parent in the database (based on transaction hashes and accumulators).\n\nWe take the max over all data aggregators as consistency is marked as unknown at boot-up time.",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 21
-      },
-      "id": 88,
-      "maxDataPoints": 30,
-      "options": {
-        "colWidth": 0.75,
-        "legend": {
-          "displayMode": "hidden",
-          "placement": "bottom"
-        },
-        "rowHeight": 0.9,
-        "showValue": "never",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.3.3",
-      "targets": [
-        {
-          "datasource": "${prometheus}",
-          "exemplar": true,
-          "expr": "max(min_over_time(ng_ledger_sync_quorum_extension_consistent_status{container=\"data-aggregator\"}[$__interval]))",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "Status",
-          "refId": "A"
-        }
-      ],
-      "title": "Consistency",
-      "type": "status-history"
-    },
-    {
-      "datasource": "${prometheus}",
-      "description": "Consistent indicates ledger is consistent with the DB (and/or a majority of other synced up nodes).\nUnknown indicates they might not be synced up (or the data aggregator has just been restarted).\nINCONSISTENT indicates known inconsistent against DB ledger or quorum. This is a critical issue.",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 4,
-        "x": 0,
-        "y": 25
-      },
-      "id": 82,
-      "maxDataPoints": 120,
-      "options": {
-        "colWidth": 0.75,
-        "legend": {
-          "displayMode": "hidden",
-          "placement": "bottom"
-        },
-        "rowHeight": 0.9,
-        "showValue": "never",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.3.3",
-      "targets": [
-        {
-          "datasource": "${prometheus}",
-          "exemplar": true,
-          "expr": "min(min_over_time(ng_node_ledger_tip_is_consistent_with_quorum_status{container=\"data-aggregator\"}[$__interval])) by (node)",
-          "format": "time_series",
-          "instant": false,
-          "interval": "",
-          "intervalFactor": 3,
-          "legendFormat": "{{node}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Inter-Node Consistency Status",
-      "type": "status-history"
-    },
-    {
       "collapsed": false,
       "datasource": "${prometheus}",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 25
       },
       "id": 42,
       "panels": [],
@@ -1321,7 +1186,7 @@
         "h": 4,
         "w": 2,
         "x": 0,
-        "y": 38
+        "y": 26
       },
       "id": 53,
       "options": {
@@ -1410,7 +1275,7 @@
         "h": 4,
         "w": 2,
         "x": 2,
-        "y": 38
+        "y": 26
       },
       "id": 54,
       "options": {
@@ -1505,7 +1370,7 @@
         "h": 13,
         "w": 9,
         "x": 4,
-        "y": 38
+        "y": 26
       },
       "id": 4,
       "options": {
@@ -1600,7 +1465,7 @@
         "h": 13,
         "w": 11,
         "x": 13,
-        "y": 38
+        "y": 26
       },
       "id": 73,
       "options": {
@@ -1682,7 +1547,7 @@
         "h": 12,
         "w": 6,
         "x": 0,
-        "y": 51
+        "y": 39
       },
       "id": 2,
       "options": {
@@ -1764,7 +1629,7 @@
         "h": 12,
         "w": 7,
         "x": 6,
-        "y": 51
+        "y": 39
       },
       "id": 7,
       "options": {
@@ -1841,7 +1706,7 @@
         "h": 12,
         "w": 11,
         "x": 13,
-        "y": 51
+        "y": 39
       },
       "id": 84,
       "maxDataPoints": 20,
@@ -1955,7 +1820,7 @@
         "h": 11,
         "w": 6,
         "x": 0,
-        "y": 63
+        "y": 51
       },
       "id": 89,
       "options": {
@@ -2055,7 +1920,7 @@
         "h": 11,
         "w": 18,
         "x": 6,
-        "y": 63
+        "y": 51
       },
       "id": 83,
       "maxDataPoints": 50,
@@ -2085,48 +1950,6 @@
       ],
       "title": "API Error Response Overview",
       "type": "timeseries"
-    },
-    {
-      "datasource": "${prometheus}",
-      "description": "Shows the worst status seen across all Gateway APIs",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 74
-      },
-      "id": 94,
-      "maxDataPoints": 100,
-      "options": {
-        "colWidth": 0.9,
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "rowHeight": 0.9,
-        "showValue": "auto",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.5.2",
-      "targets": [
-        {
-          "datasource": "${prometheus}",
-          "editorMode": "code",
-          "expr": "min by (node) (ng_node_gateway_health_check_status{container=\"gateway-api\"})",
-          "legendFormat": "{{node}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Core APIs -  Gateway Health Check",
-      "type": "status-history"
     },
     {
       "datasource": "${prometheus}",
@@ -2175,7 +1998,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 74
+        "y": 62
       },
       "id": 95,
       "options": {
@@ -2255,7 +2078,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 74
+        "y": 62
       },
       "id": 96,
       "options": {
@@ -2335,7 +2158,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 74
+        "y": 62
       },
       "id": 97,
       "options": {
@@ -2375,7 +2198,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 82
+        "y": 70
       },
       "id": 61,
       "panels": [],
@@ -2411,7 +2234,7 @@
         "h": 6,
         "w": 3,
         "x": 0,
-        "y": 83
+        "y": 71
       },
       "id": 66,
       "options": {
@@ -2541,7 +2364,7 @@
         "h": 12,
         "w": 9,
         "x": 3,
-        "y": 83
+        "y": 71
       },
       "id": 63,
       "options": {
@@ -2712,7 +2535,7 @@
         "h": 12,
         "w": 7,
         "x": 12,
-        "y": 83
+        "y": 71
       },
       "id": 65,
       "options": {
@@ -2849,7 +2672,7 @@
         "h": 12,
         "w": 5,
         "x": 19,
-        "y": 83
+        "y": 71
       },
       "id": 79,
       "options": {
@@ -2908,7 +2731,7 @@
         "h": 6,
         "w": 3,
         "x": 0,
-        "y": 89
+        "y": 77
       },
       "id": 75,
       "options": {
@@ -3052,7 +2875,7 @@
         "h": 12,
         "w": 12,
         "x": 0,
-        "y": 95
+        "y": 83
       },
       "id": 72,
       "options": {
@@ -3208,7 +3031,7 @@
         "h": 12,
         "w": 12,
         "x": 12,
-        "y": 95
+        "y": 83
       },
       "id": 69,
       "options": {
@@ -3302,5 +3125,5 @@
   "timezone": "",
   "title": "Network Gateway",
   "uid": "network-gateway-01",
-  "version": 9
+  "version": 2
 }

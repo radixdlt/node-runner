@@ -56,9 +56,6 @@ def check_latest_cli():
                     chmod +x radixnode
                     sudo mv radixnode /usr/local/bin
                 """)
-            abort = input("Do you want to ABORT the command now to update the cli Y/n?:")
-            if Helpers.check_Yes(abort):
-                sys.exit()
 
 
 if __name__ == "__main__":
