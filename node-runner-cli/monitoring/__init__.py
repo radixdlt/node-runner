@@ -105,10 +105,10 @@ class Monitoring:
     def template_dashboards(files, monitoring_config_dir):
         Helpers.section_headline("Downloading Dashboard files for grafana")
 
-        Path(f"{monitoring_config_dir}/grafana/provisioning/datasources").mkdir(parents=True, exist_ok=True)
+        Path(f"{monitoring_config_dir}/grafana/provisioning/dashboards").mkdir(parents=True, exist_ok=True)
         for file in files:
             render_template = Renderer().load_file_based_template(f"{file}.j2").render({}).to_yaml()
-            file_location = f"{monitoring_config_dir}/grafana/provisioning/datasources/{file}"
+            file_location = f"{monitoring_config_dir}/grafana/provisioning/dashboards/{file}"
             Helpers.dump_rendered_template(render_template, file_location, quiet=True)
 
     @staticmethod
