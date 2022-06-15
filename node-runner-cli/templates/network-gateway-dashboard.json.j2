@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 7,
-  "iteration": 1655297671217,
+  "iteration": 1655298831562,
   "links": [],
   "panels": [
     {
@@ -1785,7 +1785,7 @@
         {
           "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", , container=\"gateway-api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", container=\"gateway-api\"}[5m])) by (le))",
           "interval": "",
           "legendFormat": "p99",
           "refId": "A"
@@ -1793,7 +1793,7 @@
         {
           "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", , container=\"gateway-api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", container=\"gateway-api\"}[5m])) by (le))",
           "hide": false,
           "interval": "",
           "legendFormat": "p95",
@@ -1802,7 +1802,7 @@
         {
           "datasource": "${prometheus}",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\", , container=\"gateway-api\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{code=~\"[23]..\",  container=\"gateway-api\"}[5m])) by (le))",
           "hide": false,
           "interval": "",
           "legendFormat": "p50",
@@ -3301,6 +3301,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Network Gateway",
-  "uid": "network-gateway-01",
-  "version": 8
+  "uid": "network-gateway",
+  "version": 9
 }
