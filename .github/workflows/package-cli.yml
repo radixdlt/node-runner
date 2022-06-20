@@ -192,9 +192,21 @@ jobs:
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          curl -k -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
+          #curl -k -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+      - name: Run Monitoring
+        run: |
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./radixnode monitoring config \
+              -s MONITOR_CORE MONITOR_GATEWAY \
+              -cm $NGINX_METRICS_PASSWORD  \
+              -gm $NGINX_METRICS_PASSWORD  \
+              -am $NGINX_METRICS_PASSWORD
+
+          ./radixnode monitoring setup
+        env:
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
 
   test-full-stack-no-nginx:
     if: ${{ github.event_name == 'pull_request' }}
