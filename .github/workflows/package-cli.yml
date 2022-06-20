@@ -198,6 +198,7 @@ jobs:
       - name: Run Monitoring
         run: |
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./radixnode monitoring stop
           ./radixnode monitoring config \
               -s MONITOR_CORE MONITOR_GATEWAY \
               -cm $NGINX_METRICS_PASSWORD  \
