@@ -139,7 +139,7 @@ def config(args):
 
 
 @dockercommand([
-    argument("-f", "--configfile", required=True,
+    argument("-f", "--configfile",
              help="Path to config file",
              default=f"{Helpers.get_default_node_config_dir()}/config.yaml",
              action="store"),

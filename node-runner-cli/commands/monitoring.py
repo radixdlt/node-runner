@@ -108,7 +108,7 @@ def config(args):
 
 @monitoringcommand(
     [
-        argument("-f", "--monitoringconfigfile", required=True,
+        argument("-f", "--monitoringconfigfile",
                  help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
     ])
