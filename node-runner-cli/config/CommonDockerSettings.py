@@ -8,6 +8,7 @@ from utils.Prompts import Prompts
 
 class NginxConfig(BaseConfig):
     protect_gateway: str = "true"
+    gateway_behind_auth: str = "true"
     protect_core: str = "true"
     release = None
 
