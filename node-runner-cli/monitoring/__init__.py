@@ -44,7 +44,7 @@ class Monitoring:
         yaml.add_representer(type(None), Helpers.represent_none)
 
         Path(f"{monitoring_config_dir}/prometheus").mkdir(parents=True, exist_ok=True)
-        prometheus_file_location = "monitoring/prometheus/prometheus.yml"
+        prometheus_file_location = f"{monitoring_config_dir}/prometheus/prometheus.yml"
         Helpers.section_headline("Promtheus config is Generated as below")
 
         print(f"\n{yaml.dump(render_template)}"
