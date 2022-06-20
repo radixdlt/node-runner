@@ -192,7 +192,7 @@ jobs:
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          curl -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
+          curl -k -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
 
