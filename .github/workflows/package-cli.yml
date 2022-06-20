@@ -204,7 +204,7 @@ jobs:
               -gm $NGINX_METRICS_PASSWORD  \
               -am $NGINX_METRICS_PASSWORD
 
-          ./radixnode monitoring setup
+          ./radixnode monitoring setup -a
         env:
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
 
