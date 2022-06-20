@@ -101,7 +101,7 @@ services:
     image: {{gateway.data_aggregator.docker_image}}
     restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
     ports:
-      - "127.0.0.1:{{gateway.data_aggregator.applicationPortHostBinding or '5207'}}:80" # This allows you to connect to the API (for root and health checks) at http://localhost:5207
+      - "127.0.0.1:{{gateway.data_aggregator.applicationPortHostBinding or '5208'}}:80" # This allows you to connect to the API (for root and health checks) at http://localhost:5207
       - "127.0.0.1:{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}:1234" # This allows you to connect to the metrics API at http://localhost:1234
     environment:
       # WIPE_DATABASE: "true"
