@@ -54,7 +54,7 @@ class CommonDockerSettings(BaseConfig):
 
     def ask_network_id(self, network_id):
         if network_id != 0:
-            self.network_id = network_id
+            self.set_network_id(network_id)
         else:
             self.set_network_id(Base.get_network_id())
         self.set_genesis_json_location(Base.path_to_genesis_json(self.network_id))
