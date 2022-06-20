@@ -38,12 +38,12 @@ class Monitoring:
             yaml.dump(prometheus_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
-    def template_prometheus_yml(monitoring_config):
+    def template_prometheus_yml(monitoring_config,monitoring_config_dir):
         render_template = Renderer().load_file_based_template("prometheus.yml.j2").render(monitoring_config).to_yaml()
 
         yaml.add_representer(type(None), Helpers.represent_none)
 
-        Path("monitoring/prometheus").mkdir(parents=True, exist_ok=True)
+        Path(f"{monitoring_config_dir}/prometheus").mkdir(parents=True, exist_ok=True)
         prometheus_file_location = "monitoring/prometheus/prometheus.yml"
         Helpers.section_headline("Promtheus config is Generated as below")
 
