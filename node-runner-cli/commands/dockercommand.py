@@ -50,13 +50,13 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              default=""),
     argument("-nk", "--newkeystore", help="Set this to true to create a new store without any prompts using location"
                                           " defined in argument configdir", action="store_true"),
-    argument("-xc", "--disablenginxforcore", help="Set this disable to nginx for core",
+    argument("-xc", "--disablenginxforcore", help="Set this to disable to nginx for core",
              action="store", default="", choices=["true", "false"]),
-    argument("-xg", "--disablenginxforgateway", help="Set this disable to nginx for gateway",
+    argument("-xg", "--disablenginxforgateway", help="Set this to disable to nginx for gateway",
              action="store", default="", choices=["true", "false"]),
 
     argument("-s", "--setupmode", nargs="+",
-             help="""Quick setup with assumed defaults. It supports two quick modes and a detailed setup mode.
+             help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
                   \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
                   \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
@@ -141,6 +141,7 @@ def config(args):
 @dockercommand([
     argument("-f", "--configfile", required=True,
              help="Path to config file",
+             default=f"{Helpers.get_default_node_config_dir()}/config.yaml",
              action="store"),
     argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true"),
 ])

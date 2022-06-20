@@ -180,7 +180,7 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker config -d ${{ github.workspace }}/node-config \
             -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-            -s CORE GATEWAY -n 2 -k $POSTGRESS_PASSWORD -nk -p $POSTGRESS_PASSWORD
+            -s CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}

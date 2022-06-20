@@ -27,17 +27,18 @@ def info(args):
     print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
 
 
-@keycommand([
-    argument("-p", "--password", required=True,
-             help="Password of the keystore",
-             action="store"),
-    argument("-f", "--filelocation", required=True,
-             help="Location of keystore on the disk",
-             action="store"),
-    argument("-ps", "--payloadtosign", required=True,
-             help="payload to sign",
-             action="store")
-])
-def sign_payload(args):
-    key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
-    print(f"Signed DER from payload {key.sign_payload(args.payloadtosign)}")
+# @keycommand([
+#     argument("-p", "--password", required=True,
+#              help="Password of the keystore",
+#              action="store"),
+#     argument("-f", "--filelocation", required=True,
+#              help="Location of keystore on the disk",
+#              action="store"),
+#     argument("-ps", "--payloadtosign", required=True,
+#              help="payload to sign",
+#              action="store")
+# ])
+# def sign_payload(args):
+#     print(f"These commands are in Alpha state and not tested enough ")
+#     key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
+#     print(f"Signed DER from payload {key.sign_payload(args.payloadtosign)}")
