@@ -111,23 +111,25 @@ def config(args):
         argument("-f", "--monitoringconfigfile",
                  help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
+        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true")
     ])
 def setup(args):
     monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/monitoring'
     print(f"Downloading artifacts from {monitor_url_dir}\n==")
-
+    autoapprove = args.autoapprove
     all_config = read_monitoring_config(args)
 
     monitoring_config_dir = all_config["common_config"]["config_dir"]
     Monitoring.template_prometheus_yml(all_config)
     Monitoring.template_datasource(monitoring_config_dir)
-    Monitoring.template_dashboards(["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],monitoring_config_dir)
+    Monitoring.template_dashboards(["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],
+                                   monitoring_config_dir)
 
     Monitoring.template_monitoring_containers(monitoring_config_dir)
     Monitoring.setup_external_volumes()
     monitoring_file_location = f"{monitoring_config_dir}/node-monitoring.yml"
     Monitoring.stop_monitoring(monitoring_file_location, remove_volumes=False)
-    Monitoring.start_monitoring(monitoring_file_location)
+    Monitoring.start_monitoring(monitoring_file_location, autoapprove)
 
 
 @monitoringcommand(
@@ -135,15 +137,17 @@ def setup(args):
         argument("-f", "--monitoringconfigfile", required=True,
                  help=f"Path to config file. Default is '{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml'",
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
+        argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true")
     ]
 )
 def start(args):
     all_config = read_monitoring_config(args)
+    autoapprove = args.autoapprove
     monitoring_config_dir = all_config["common_config"]["config_dir"]
 
     monitoring_file_location = f"{monitoring_config_dir}/node-monitoring.yml"
     Monitoring.stop_monitoring(monitoring_file_location, remove_volumes=False)
-    Monitoring.start_monitoring(monitoring_file_location)
+    Monitoring.start_monitoring(monitoring_file_location, autoapprove)
 
 
 @monitoringcommand([
