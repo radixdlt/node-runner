@@ -100,8 +100,8 @@ services:
 {% if (gateway is defined and gateway.data_aggregator is defined) %}
   data_aggregator:
     image: {{gateway.data_aggregator.docker_image}}
-    restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
-    cpus: 2.0
+    restart: {{gateway.data_aggregator.restart or 'unless-stopped'}}
+    cpus: {{gateway.data_aggregator.cpus or '2.0'}}
     ports:
       - "127.0.0.1:{{gateway.data_aggregator.applicationPortHostBinding or '5208'}}:80" # This allows you to connect to the API (for root and health checks) at http://localhost:5207
       - "127.0.0.1:{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}:1234" # This allows you to connect to the metrics API at http://localhost:1234

@@ -196,6 +196,7 @@ jobs:
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
       - name: Run Monitoring
+        if: false
         run: |
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
           ./radixnode monitoring stop
