@@ -1,3 +1,4 @@
+version: '2.4'
 services:
 {% if core_node is defined %}
   core:
@@ -121,7 +122,6 @@ services:
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.TrustWeighting or '1'}}"
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.Enabled or 'true'}}"
 {% endif %}
-version: '2.2'
 volumes:
  {% if core_node.data_directory is defined %}
   core_ledger:
