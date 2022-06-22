@@ -192,7 +192,6 @@ jobs:
           ./radixnode docker stop -f $HOME/node-config/config.yaml
 
           #Below PATH require when ansible is installed as part of pip
-
           export PATH="$PATH:/home/ubuntu/.local/bin"
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a 2>&1
@@ -240,6 +239,10 @@ jobs:
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
+          ./radixnode docker stop -f $HOME/node-config/config.yaml
+
+          #Below PATH require when ansible is installed as part of pip
+          export PATH="$PATH:/home/ubuntu/.local/bin"
           ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
           sleep 60
           NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health

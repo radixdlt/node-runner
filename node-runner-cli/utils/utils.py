@@ -35,6 +35,7 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         print('----------stderr-------------------')
         print(result.stderr)
         print('----------stdout-------------------')
+        print(result.stdout)
 
     if fail_on_error and result.returncode != 0:
         print("""
