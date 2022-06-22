@@ -115,17 +115,17 @@ jobs:
       - name: Setup config
         run: |
           chmod +x ./radixnode
-          mkdir -p ${{ github.workspace }}/node-config
+          mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE -n 2 -k $KEYSTORE_PASSWORD -nk
+          ./radixnode docker config -d $HOME/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE -n 2 -k $KEYSTORE_PASSWORD -nk
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
+          ./radixnode docker setup -f $HOME/node-config/config.yaml -a
           sleep 60
           export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
@@ -229,9 +229,9 @@ jobs:
       - name: Setup config
         run: |
           chmod +x ./radixnode
-          mkdir -p ${{ github.workspace }}/node-config
+          mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
-          ./radixnode docker config -d ${{ github.workspace }}/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+          ./radixnode docker config -d $HOME/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
             -s CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
@@ -243,6 +243,6 @@ jobs:
 
           #Below PATH require when ansible is installed as part of pip
           export PATH="$PATH:/home/ubuntu/.local/bin"
-          ./radixnode docker setup -f ${{ github.workspace }}/node-config/config.yaml -a
+          ./radixnode docker setup -f $HOME/node-config/config.yaml -a
           sleep 60
           NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
