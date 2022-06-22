@@ -162,7 +162,11 @@ def setup(args):
     postgres_db = all_config.get('gateway', {}).get('postgres_db')
     if postgres_db and postgres_db.get("setup", None) == "local":
         ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
-        AnsibleRunner(ansible_dir).run_setup_postgress(postgres_db.get("password"), 'ansible/project/provision.yml')
+        AnsibleRunner(ansible_dir).run_setup_postgress(
+            postgres_db.get("password"),
+            postgres_db.get("user"),
+            postgres_db.get("dbname"),
+            'ansible/project/provision.yml')
 
     old_compose_file = Helpers.yaml_as_dict(f"{all_config['core_node']['existing_docker_compose']}")
     print(dict(DeepDiff(old_compose_file, render_template)))

@@ -191,7 +191,7 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker stop -f $HOME/node-config/config.yaml
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
-          ./radixnode docker setup -f $HOME/node-config/config.yaml -a
+          ./radixnode docker setup -f $HOME/node-config/config.yaml -a 2>&1
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health

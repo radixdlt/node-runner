@@ -55,10 +55,12 @@ class AnsibleRunner:
             f"ansible-playbook ansible/project/provision.yml -e setup_swap={setup_swap} -e swap_size={setup_swap_size}",
             shell=True)
 
-    def run_setup_postgress(self, postgress_password, file):
+    def run_setup_postgress(self, postgress_password, postgresql_user, postgresql_db_name, file):
         self.check_install_ansible()
         self.download_ansible_file(file)
         # run_shell_command(f"ansible-galaxy collection install community.postgresql", shell=True)
         run_shell_command(
-            f"ansible-playbook ansible/project/provision.yml -e postgres_local='true' -e postgress_password={postgress_password}",
+            f"ansible-playbook ansible/project/provision.yml -e postgres_local='true' "
+            f"-e postgress_password={postgress_password} -e postgresql_user={postgresql_user} "
+            f"-e postgresql_db_name={postgresql_db_name}",
             shell=True)

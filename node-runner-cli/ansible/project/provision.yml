@@ -9,7 +9,7 @@
     setup_swap: false
     setup_limits: false
     postgresql_version: 12
-    postgresql_user: postgress
+    postgresql_user: postgres
     postgresql_db_name: radixdlt_ledger
   tasks:
     - block:
