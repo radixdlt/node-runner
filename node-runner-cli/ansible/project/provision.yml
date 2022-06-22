@@ -82,7 +82,6 @@
           become_method: sudo
           become_user: "{{ postgresql_user }}"
           community.postgresql.postgresql_user:
-            db: "{{ postgresql_db_name }}"
             name: "{{ postgresql_user }}"
             password: "{{postgress_password}}"
 
