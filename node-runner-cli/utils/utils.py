@@ -31,11 +31,14 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
     else:
         result = subprocess.run(cmd, shell=shell)
     if fail_on_error and result.returncode != 0:
+        print('----------stderr-------------------')
         print(result.stderr)
+        print('----------stdout-------------------')
+        print(result.stdout)
         print("""
             Command failed. Exiting...
         """)
-        sys.exit()
+        sys.exit(1)
     return result
 
 
