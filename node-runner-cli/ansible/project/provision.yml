@@ -97,7 +97,6 @@
         - name: Configure PostgreSQL. Set listen_addresses.
           lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
             regexp="listen_addresses =" line="listen_addresses = '*'" state=present
-          notify: restart postgresql
 
         - name: Configure PostgreSQL. Set checkpoint timeout.
           lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
