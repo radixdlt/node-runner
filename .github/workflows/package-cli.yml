@@ -190,9 +190,10 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker stop -f $HOME/node-config/config.yaml
-          whoami
-          which ansible-playbook
-          ls -l /home/ubuntu/.local/bin/ansible-playbook
+
+          #Below PATH require when ansible is installed as part of pip
+
+          export PATH="$PATH:/home/ubuntu/.local/bin/"
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a 2>&1
           sleep 60
