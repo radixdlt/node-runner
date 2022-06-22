@@ -226,4 +226,6 @@ def stop(args):
 @dockercommand([])
 def configure(args):
     Base.install_dependecies()
+    ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
+    AnsibleRunner(ansible_dir).check_install_ansible(False)
     Base.add_user_docker_group()

@@ -27,7 +27,7 @@ class AnsibleRunner:
         with open(file, 'wb') as f:
             f.write(resp.content)
 
-    def check_install_ansible(self):
+    def check_install_ansible(self, exit_cmd=False):
         check_ansible = run_shell_command(f"pip list | grep ansible", shell=True, fail_on_error=False)
         user = subprocess.check_output('whoami', shell=True).strip()
         if check_ansible.returncode != 0:
@@ -35,12 +35,13 @@ class AnsibleRunner:
             check_pip = run_shell_command("pip -V ", shell=True, fail_on_error=False)
             if check_pip.returncode != 0:
                 print(f"Pip is not installed. Installing pip now")
-                run_shell_command('sudo apt install python3-pip', shell=True)
+                run_shell_command('sudo apt install python3-pip -y', shell=True)
             run_shell_command(f"pip install --user ansible==2.10.0", shell=True)
             print("""
                              ----------------------------------------------------------------------------------------
                             Ansible installed successfully. You need exit shell and login back""")
-            sys.exit()
+            if exit_cmd:
+                sys.exit()
         return
 
     @classmethod

@@ -69,7 +69,7 @@
             - postgresql-{{ postgresql_version }}
             - postgresql-client-{{ postgresql_version }}
             - postgresql-contrib-{{ postgresql_version }}
-            - libpq-dev
+          state: present
 
         - name: Create PostgreSQL DB
           postgresql_db: name={{ postgresql_db_name }}
