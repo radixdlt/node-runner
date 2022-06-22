@@ -187,7 +187,7 @@ jobs:
       - name: Run CLI setup
         run: |
           export DISABLE_VERSION_CHECK=true
-          ./radixdnode docker stop -f $HOME/node-config/config.yaml
+          ./radixnode docker stop -f $HOME/node-config/config.yaml
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a
           sleep 60
