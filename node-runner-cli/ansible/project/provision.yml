@@ -65,15 +65,12 @@
 
     - block:
         - name: install PostgreSQL
-          apt: pkg={{ item }} update_cache=yes state=present
-          sudo: yes
-          tags: postgres
-          with_items:
+          ansible.builtin.package:
             - postgresql-{{ postgresql_version }}
             - postgresql-client-{{ postgresql_version }}
             - postgresql-contrib-{{ postgresql_version }}
             - libpq-dev
-            -
+
         - name: Create PostgreSQL DB
           postgresql_db: name={{ postgresql_db_name }}
           sudo: yes
@@ -122,4 +119,4 @@
           service: name=postgresql state=restarted enabled=yes
 
       become: true
-        when: postgres_local | bool
+      when: postgres_local | bool
