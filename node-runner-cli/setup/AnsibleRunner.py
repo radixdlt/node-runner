@@ -58,6 +58,7 @@ class AnsibleRunner:
     def run_setup_postgress(self, postgress_password, file):
         self.check_install_ansible()
         self.download_ansible_file(file)
+        run_shell_command(f"ansible-galaxy collection install community.postgresql", shell=True)
         run_shell_command(
             f"ansible-playbook ansible/project/provision.yml -e postgres_local='true' -e postgress_password={postgress_password}",
             shell=True)
