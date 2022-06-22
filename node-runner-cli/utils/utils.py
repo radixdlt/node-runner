@@ -30,11 +30,13 @@ def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=Fals
         result = subprocess.run(cmd, env=env, shell=shell)
     else:
         result = subprocess.run(cmd, shell=shell)
-    if fail_on_error and result.returncode != 0:
+    if result.returncode != 0:
+        print(result)
         print('----------stderr-------------------')
         print(result.stderr)
         print('----------stdout-------------------')
-        print(result.stdout)
+
+    if fail_on_error and result.returncode != 0:
         print("""
             Command failed. Exiting...
         """)
