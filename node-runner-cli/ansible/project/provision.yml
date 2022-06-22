@@ -103,5 +103,23 @@
           notify: restart postgresql
           sudo: yes
           tags: postgres
+
+        - name: Configure PostgreSQL. Set checkpoint timeout.
+          lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp="checkpoint_timeout =" line="checkpoint_timeout = 15min" state=present
+          notify: restart postgresql
+          sudo: yes
+          tags: postgres
+
+        - name: Configure PostgreSQL. Set max_wal_size timeout.
+          lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp="max_wal_size =" line="max_wal_size = 10GB" state=present
+          notify: restart postgresql
+          sudo: yes
+          tags: postgres
+
+        - name: restart postgresql
+          service: name=postgresql state=restarted enabled=yes
+
       become: true
         when: postgres_local | bool

@@ -3,7 +3,7 @@ import os
 
 import yaml
 
-from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX
+from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 
@@ -44,7 +44,8 @@ class Docker(Base):
         run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
                           env={
                               "RADIXDLT_NETWORK_NODE": trustednode,
-                              "RADIXDLT_NODE_KEY_PASSWORD": keystore_password
+                              "RADIXDLT_NODE_KEY_PASSWORD": keystore_password,
+                              COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, 200)
                           })
 
     @staticmethod
@@ -55,4 +56,3 @@ class Docker(Base):
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):
         Helpers.docker_compose_down(composefile, removevolumes)
-

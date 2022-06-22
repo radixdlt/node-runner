@@ -27,8 +27,8 @@ class Prompts:
 
     @staticmethod
     def ask_postgress_location(default_host):
-        print("\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
-              "(although not advised) as a local setup or use a remote managed POSTGRES.")
+        print("\nGateway uses POSTGRES as a datastore. \nIt can be run a systemd process on same machine "
+              "as a local setup or use a remote managed POSTGRES.")
         answer = Helpers.input_guestion(
             "\nPress ENTER to use default value 'local' setup or type in 'remote': ")
 

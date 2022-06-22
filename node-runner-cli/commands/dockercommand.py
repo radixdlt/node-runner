@@ -13,6 +13,7 @@ from config.GatewayDockerConfig import GatewayDockerSettings
 from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
+from setup.AnsibleRunner import AnsibleRunner
 from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
@@ -161,6 +162,10 @@ def setup(args):
     with open(args.configfile, 'r') as file:
         all_config = yaml.safe_load(file)
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
+    postgres_db = all_config.get('gateway', {}).get('postgres_db')
+    if postgres_db and postgres_db.setup == "local":
+        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
+        AnsibleRunner(ansible_dir).run_setup_postgress(postgres_db.password, 'ansible/project/provision.yml')
 
     old_compose_file = Helpers.yaml_as_dict(f"{all_config['core_node']['existing_docker_compose']}")
     print(dict(DeepDiff(old_compose_file, render_template)))
