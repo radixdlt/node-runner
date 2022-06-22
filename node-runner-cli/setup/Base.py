@@ -5,6 +5,8 @@ from pathlib import Path
 
 import requests
 
+from setup.AnsibleRunner import AnsibleRunner
+from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
 
@@ -60,64 +62,27 @@ class Base:
         return keystore_password, f'{keyfile_path}/{keyfile_name}'
 
     @staticmethod
-    def download_ansible_file(ansible_dir, file):
-        req = requests.Request('GET', f'{ansible_dir}/{file}')
-        prepared = req.prepare()
-
-        resp = Helpers.send_request(prepared, print_response=False)
-        if not resp.ok:
-            print(f"{resp.status_code} error retrieving ansible playbook.. Existing the command...")
-            sys.exit()
-
-        directory = file.rsplit('/', 1)[0]
-        Path(directory).mkdir(parents=True, exist_ok=True)
-        with open(file, 'wb') as f:
-            f.write(resp.content)
-
-    @staticmethod
     def setup_node_optimisation_config(version):
-        check_ansible = run_shell_command(f"pip list | grep ansible", shell=True, fail_on_error=False)
-        import subprocess
-        user = subprocess.check_output('whoami', shell=True).strip()
-        if check_ansible.returncode != 0:
-            print(f"Ansible not found for the user {user.decode('utf-8')}. Installing ansible now")
-            check_pip = run_shell_command("pip -V ", shell=True, fail_on_error=False)
-            if check_pip.returncode != 0:
-                print(f"Pip is not installed. Installing pip now")
-                run_shell_command('sudo apt install python3-pip', shell=True)
-            run_shell_command(f"pip install --user ansible==2.10.0", shell=True)
-            print("""
-                     ----------------------------------------------------------------------------------------
-                    Ansible installed successfully. You need exit shell and login back""")
-            sys.exit()
+        ansibleRunner = AnsibleRunner(
+            f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli')
+        file = 'ansible/project/provision.yml'
+        ansibleRunner.check_install_ansible()
+        ansibleRunner.download_ansible_file(file)
+        setup_limits = Prompts.ask_ansible_setup_limits()
+        if setup_limits:
+            ansibleRunner.run_setup_limits(setup_limits)
 
-        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{version}/node-runner-cli'
-        print(f"Downloading artifacts from {ansible_dir}\n")
-        Base.download_ansible_file(ansible_dir, 'ansible/project/provision.yml')
-        ask_setup_limits = input \
-            ("Do you want to setup ulimits [Y/n]?:")
-        setup_limits = "true" if Helpers.check_Yes(ask_setup_limits) else "false"
-        run_shell_command(
-            f"ansible-playbook ansible/project/provision.yml -e setup_limits={setup_limits}",
-            shell=True)
-        ask_setup_swap = input \
-            ("Do you want to setup swap space [Y/n]?:")
-        if Helpers.check_Yes(ask_setup_swap):
-            setup_swap = "true"
-            ask_swap_size = input \
-                ("Enter swap size in GB. Example - 1G or 3G or 8G ?:")
-            run_shell_command(
-                f"ansible-playbook ansible/project/provision.yml -e setup_swap={setup_swap} -e swap_size={ask_swap_size}",
-                shell=True)
-        else:
-            setup_swap = "false"
+        setup_swap, ask_swap_size = Prompts.ask_ansible_swap_setup()
+        if setup_swap:
+            ansibleRunner.run_swap_size(setup_swap, ask_swap_size)
 
     @staticmethod
     def get_data_dir(create_dir=True):
         Helpers.section_headline("LEDGER LOCATION")
         data_dir_path = input(
             f"\nRadix node stores all the ledger data on a folder. "
-            f"Mounting this location as a docker volume, will allow to restart the node without a need to download ledger"
+            f"Mounting this location as a docker volume, "
+            f"will allow to restart the node without a need to download ledger"
             f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
             f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}")
         if data_dir_path == "":

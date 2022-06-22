@@ -59,20 +59,6 @@ services:
     volumes:
     - nginx_secrets:/etc/nginx/secrets
  {% endif %}
- {% if (gateway is defined and gateway.postgres_db is defined) and gateway.postgres_db.setup =='local' %}
-  postgres_db:
-    image: "postgres:12-alpine"
-    ports:
-      - "127.0.0.1:5532:5432"
-    stop_grace_period: "90"
-    restart: unless-stopped
-    volumes:
-      - {{gateway.postgres_db.data_mount_path}}:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: "{{gateway.postgres_db.user}}"
-      POSTGRES_PASSWORD: "{{gateway.postgres_db.password}}"
-      POSTGRES_DB: "{{gateway.postgres_db.dbname}}"
-{% endif %}
 {% if (gateway is defined and gateway.gateway_api is defined) %}
   gateway_api: # This is the base -- the _image and _built containers are defined below
     image: {{gateway.gateway_api.docker_image}}
@@ -80,6 +66,10 @@ services:
       - "127.0.0.1:{{gateway.gateway_api.applicationPortHostBinding or '5207'}}:80" # This allows you to connect to the API at http://localhost:5308
       - "127.0.0.1:{{gateway.gateway_api.prometheusMetricsPortHostBinding or '1235' }}:1235" # This allows you to connect to the metrics API at http://localhost:1235
     restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
+{% if (gateway.postgres_db is defined and gateway.postgres_db.setup == 'local') %}
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+{% endif %}
     environment:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
       RADIX_NG_API__PrometheusMetricsPort: "1235"
@@ -103,6 +93,10 @@ services:
     image: {{gateway.data_aggregator.docker_image}}
     restart: {{gateway.data_aggregator.restart or 'unless-stopped'}}
     cpus: {{gateway.data_aggregator.cpus or '2.0'}}
+{% if (gateway.postgres_db is defined and gateway.postgres_db.setup == 'local') %}
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+{% endif %}
     ports:
       - "127.0.0.1:{{gateway.data_aggregator.applicationPortHostBinding or '5208'}}:80" # This allows you to connect to the API (for root and health checks) at http://localhost:5207
       - "127.0.0.1:{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}:1234" # This allows you to connect to the metrics API at http://localhost:1234

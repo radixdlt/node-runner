@@ -8,7 +8,9 @@
     swap_size: 8G
     setup_swap: false
     setup_limits: false
-
+    postgresql_version: 12
+    postgresql_user: postgress
+    postgresql_db_name: radixdlt_ledger
   tasks:
     - block:
         - name: Run whoami without become.
@@ -60,3 +62,46 @@
 
       become: true
       when: setup_swap | bool
+
+    - block:
+        - name: install PostgreSQL
+          apt: pkg={{ item }} update_cache=yes state=present
+          sudo: yes
+          tags: postgres
+          with_items:
+            - postgresql-{{ postgresql_version }}
+            - postgresql-client-{{ postgresql_version }}
+            - postgresql-contrib-{{ postgresql_version }}
+            - libpq-dev
+            -
+        - name: Create PostgreSQL DB
+          postgresql_db: name={{ postgresql_db_name }}
+          sudo: yes
+          sudo_user: {{ postgresql_user }}
+
+        - name: change postgress password
+          become: yes
+          become_method: sudo
+          become_user: {{ postgresql_user }}
+          community.postgresql.postgresql_user:
+            db: "{{ postgresql_db_name }}"
+            name: "{{ postgresql_user }}"
+            password: "{{postgress_password}}"
+
+        - name: Grant
+          community.postgresql.postgresql_pg_hba:
+            dest: /etc/postgresql/12/main/pg_hba.conf
+            contype: host
+            users: all
+            source: 0.0.0.0/0
+            databases: all
+            method: md5
+
+        - name: Configure PostgreSQL. Set listen_addresses.
+          lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp="listen_addresses =" line="listen_addresses = '*'" state=present
+          notify: restart postgresql
+          sudo: yes
+          tags: postgres
+      become: true
+        when: postgres_local | bool

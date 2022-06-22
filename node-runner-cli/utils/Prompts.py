@@ -26,7 +26,7 @@ class Prompts:
         return Prompts.check_default(answer, "postgres")
 
     @staticmethod
-    def ask_postgress_location(default_host, default_postgres_dir):
+    def ask_postgress_location(default_host):
         print("\nGateway uses POSTGRES as a datastore. \nIt can be run as container on same machine "
               "(although not advised) as a local setup or use a remote managed POSTGRES.")
         answer = Helpers.input_guestion(
@@ -34,17 +34,12 @@ class Prompts:
 
         local_or_remote = Prompts.check_default(answer, 'local')
         if local_or_remote == "local":
-            print(f"\nFor local setup which runs container, "
-                  f"postgres data needs to be externally mounted from a folder.")
-            postgres_mount = Helpers.input_guestion(
-                f"\nPress Enter to store POSTGRES data on folder  \"{bcolors.OKBLUE}{default_postgres_dir}{bcolors.ENDC}\""
-                f" Or type in the absolute path for the folder:")
-            return "local", Prompts.check_default(postgres_mount, default_postgres_dir), default_host
+            return "local", default_host
 
         else:
             hostname = input("\nFor the remote managed postgres, Enter the host name of server hosting postgress:")
             port = input("\nEnter the port the postgres process is listening on the server:")
-            return "remote", None, f"{hostname}:{port}"
+            return "remote", f"{hostname}:{port}"
 
     @staticmethod
     def ask_postgress_volume_location() -> str:
@@ -95,7 +90,7 @@ class Prompts:
         return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
-    def get_basic_auth(target="CORE_API_NODE",user_type="admin") -> dict:
+    def get_basic_auth(target="CORE_API_NODE", user_type="admin") -> dict:
         print(
             f"{target} is setup on different machine or behind https protected by basic auth."
             f" It would require Nginx {user_type} user and password.")
@@ -256,3 +251,22 @@ class Prompts:
         answer = Helpers.input_guestion(
             "Default is Y , Press ENTER to accept default or type in [Y/N]:")
         return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
+
+    @staticmethod
+    def ask_ansible_setup_limits():
+        ask_setup_limits = input \
+            ("Do you want to setup ulimits. Default is Y , Press ENTER to accept default or type in [Y/N]?:")
+        return "true" if Helpers.check_Yes(Prompts.check_default(ask_setup_limits, "Y")) else "false"
+
+    @staticmethod
+    def ask_ansible_swap_setup():
+        ask_setup_swap = input \
+            ("Do you want to setup swap space [Y/n]?:")
+        setup_swap = "false"
+        ask_swap_size = None
+        if Helpers.check_Yes(ask_setup_swap):
+            setup_swap = "true"
+            ask_swap_size = input \
+                ("Enter swap size in GB. Example - 1G or 3G or 8G ?:")
+            return setup_swap, ask_swap_size
+        return setup_swap, ask_swap_size

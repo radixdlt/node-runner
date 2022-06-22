@@ -103,6 +103,7 @@ def config(args):
 
     if "GATEWAY" in setupmode.mode:
         quick_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(postgrespassword)
+
         configuration.gateway_settings = quick_gateway_settings
         configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
         config_to_dump["gateway"] = dict(configuration.gateway_settings)

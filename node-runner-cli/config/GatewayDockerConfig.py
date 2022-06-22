@@ -11,23 +11,19 @@ class PostGresSettings(BaseConfig):
     user: str = "postgres"
     password: str = None
     dbname: str = "radixdlt_ledger"
-    data_mount_path: str = f"{Helpers.get_home_dir()}/postgresdata"
     setup: str = "local"
-    host: str = "postgres_db:5432"
+    host: str = "host.docker.internal:5432"
 
     def ask_postgress_settings(self, postgress_password):
         Helpers.section_headline("POSTGRES SETTINGS")
         if "DETAILED" in SetupMode.instance().mode:
-            self.setup, self.data_mount_path, self.host = Prompts.ask_postgress_location(self.host,
-                                                                                         self.data_mount_path)
+            self.setup, self.host = Prompts.ask_postgress_location(self.host)
             self.user = Prompts.get_postgress_user()
             self.dbname = Prompts.get_postgress_dbname()
         if not postgress_password:
             self.password = Prompts.ask_postgress_password()
         else:
             self.password = postgress_password
-
-        Path(self.data_mount_path).mkdir(parents=True, exist_ok=True)
 
 
 class CoreApiNode(BaseConfig):
