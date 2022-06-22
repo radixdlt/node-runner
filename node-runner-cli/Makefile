@@ -1,4 +1,4 @@
-.PHONY: output
+.PHONY: install
 install:
 	$(shell chmod +x add-version.sh)
 	$(shell ./add-version.sh)
