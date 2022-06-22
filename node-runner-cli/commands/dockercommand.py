@@ -154,10 +154,7 @@ def setup(args):
     docker_config = DockerConfig(release)
     docker_config.loadConfig(args.configfile)
 
-    def represent_none(self, _):
-        return self.represent_scalar('tag:yaml.org,2002:null', '')
-
-    yaml.add_representer(type(None), represent_none)
+    yaml.add_representer(type(None), Helpers.represent_none)
 
     with open(args.configfile, 'r') as file:
         all_config = yaml.safe_load(file)
@@ -191,7 +188,8 @@ def setup(args):
 
 
 @dockercommand([
-    argument("-f", "--configfile", required=True,
+    argument("-f", "--configfile",
+             default=f"{Helpers.get_default_node_config_dir()}/config.yaml",
              help="Path to config file",
              action="store"),
 ])
@@ -206,8 +204,9 @@ def start(args):
 
 
 @dockercommand([
-    argument("-f", "--configfile", required=True,
+    argument("-f", "--configfile",
              help="Path to config file",
+             default=f"{Helpers.get_default_node_config_dir()}/config.yaml",
              action="store"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true"),
 ])
