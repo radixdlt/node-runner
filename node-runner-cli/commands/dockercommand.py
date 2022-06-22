@@ -163,7 +163,7 @@ def setup(args):
         all_config = yaml.safe_load(file)
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
     postgres_db = all_config.get('gateway', {}).get('postgres_db')
-    if postgres_db and postgres_db.setup == "local":
+    if postgres_db and postgres_db.get("setup", None) == "local":
         ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
         AnsibleRunner(ansible_dir).run_setup_postgress(postgres_db.password, 'ansible/project/provision.yml')
 
