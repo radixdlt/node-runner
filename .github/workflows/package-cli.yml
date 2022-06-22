@@ -193,7 +193,7 @@ jobs:
 
           #Below PATH require when ansible is installed as part of pip
 
-          export PATH="$PATH:/home/ubuntu/.local/bin/"
+          export PATH="$PATH:/home/ubuntu/.local/bin"
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a 2>&1
           sleep 60
