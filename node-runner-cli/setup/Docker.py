@@ -45,7 +45,7 @@ class Docker(Base):
                           env={
                               "RADIXDLT_NETWORK_NODE": trustednode,
                               "RADIXDLT_NODE_KEY_PASSWORD": keystore_password,
-                              COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, 200)
+                              COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
                           })
 
     @staticmethod

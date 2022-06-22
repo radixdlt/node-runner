@@ -131,7 +131,7 @@ class Helpers:
         if remove_volumes:
             command.append('-v')
         run_shell_command(command, env={
-            COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, 200)
+            COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
         })
 
     @staticmethod
