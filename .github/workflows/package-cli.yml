@@ -20,6 +20,8 @@ jobs:
           access_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+           fetch-depth: 0
       - name: Dump context
         uses: crazy-max/ghaction-dump-context@v1
       - name: Install build essentials
