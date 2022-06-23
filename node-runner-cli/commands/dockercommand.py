@@ -9,7 +9,7 @@ from deepdiff import DeepDiff
 from commands.subcommand import get_decorator, argument
 from config.BaseConfig import SetupMode
 from config.DockerConfig import DockerConfig, CoreDockerSettings
-from config.GatewayDockerConfig import GatewayDockerSettings
+from config.GatewayDockerConfig import GatewayDockerSettings, PostGresSettings
 from config.Renderer import Renderer
 from github.github import latest_release
 from setup import Docker, Base
@@ -159,14 +159,9 @@ def setup(args):
     with open(args.configfile, 'r') as file:
         all_config = yaml.safe_load(file)
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
-    postgres_db = all_config.get('gateway', {}).get('postgres_db')
-    if postgres_db and postgres_db.get("setup", None) == "local":
-        ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
-        AnsibleRunner(ansible_dir).run_setup_postgress(
-            postgres_db.get("password"),
-            postgres_db.get("user"),
-            postgres_db.get("dbname"),
-            'ansible/project/provision.yml')
+
+    all_config = Docker.check_set_passwords(all_config)
+    Docker.check_run_local_postgress(all_config)
 
     old_compose_file = Helpers.yaml_as_dict(f"{all_config['core_node']['existing_docker_compose']}")
     print(dict(DeepDiff(old_compose_file, render_template)))

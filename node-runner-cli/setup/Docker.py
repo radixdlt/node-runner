@@ -1,9 +1,12 @@
 import getpass
 import os
+import sys
 
 import yaml
 
-from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT
+from config.GatewayDockerConfig import PostGresSettings
+from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
+from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
 from utils.utils import run_shell_command, Helpers
 
@@ -56,3 +59,40 @@ class Docker(Base):
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):
         Helpers.docker_compose_down(composefile, removevolumes)
+
+    @staticmethod
+    def check_set_passwords(all_config):
+        keystore_password = all_config.get('core_node', {}).get('keydetails', {}).get("keystore_password")
+        if all_config.get('core_node') and not keystore_password:
+            keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
+            if not keystore_password_from_env:
+                print(
+                    "Cannot find Keystore password either in config "
+                    "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
+                sys.exit(1)
+            else:
+                all_config['core_node']["keydetails"]["keystore_password"] = keystore_password_from_env
+
+        postgres_password = all_config.get('gateway', {}).get('postgres_db', {}).get("password")
+        if all_config.get('gateway') and not postgres_password:
+            postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
+
+            if not postgres_password_from_env:
+                print(
+                    "Cannot find POSTGRES_PASSWORD either in config"
+                    "or as environment variable POSTGRES_PASSWORD")
+                sys.exit(1)
+            else:
+                all_config['gateway']["postgres_db"]["password"] = postgres_password_from_env
+        return all_config
+
+    @staticmethod
+    def check_run_local_postgress(all_config):
+        postgres_db = all_config.get('gateway', {}).get('postgres_db')
+        if PostGresSettings.check_post_db_local(all_config):
+            ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
+            AnsibleRunner(ansible_dir).run_setup_postgress(
+                postgres_db.get("password"),
+                postgres_db.get("user"),
+                postgres_db.get("dbname"),
+                'ansible/project/provision.yml')

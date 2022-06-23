@@ -183,6 +183,8 @@ jobs:
           ./radixnode docker config -d $HOME/node-config \
             -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
             -s CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD
+          grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
+          cat $HOME/node-config/config.yaml
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
@@ -190,6 +192,7 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
+
           ./radixnode docker stop -f $HOME/node-config/config.yaml
 
           #Below PATH require when ansible is installed as part of pip
@@ -205,6 +208,8 @@ jobs:
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+          RADIXDLT_NODE_KEY_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run Monitoring
         run: |
           export COMPOSE_HTTP_TIMEOUT=360
