@@ -90,7 +90,6 @@ class CoreDockerSettings(BaseConfig):
         self.ask_keydetails(ks_password, new_keystore)
         self.ask_data_directory()
         self.ask_enable_transaction()
-        self.ask_existing_docker_compose_file()
         return self
 
 

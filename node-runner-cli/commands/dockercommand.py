@@ -92,6 +92,7 @@ def config(args):
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
     configuration.common_settings.ask_network_id(args.networkid)
+    configuration.common_settings.ask_existing_docker_compose_file()
 
     config_to_dump = {"version": "0.1"}
 
