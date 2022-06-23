@@ -251,3 +251,4 @@ jobs:
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a
           sleep 60
           NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
+          curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207
