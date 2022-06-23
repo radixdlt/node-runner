@@ -27,7 +27,6 @@ class CoreDockerSettings(BaseConfig):
     core_release: str = None
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
-    existing_docker_compose: str = f"{Helpers.get_home_dir()}/radix-fullnode-compose.yml"
     trusted_node: str = None
     java_opts: str = "--enable-preview -server -Xms8g -Xmx8g  " \
                      "-XX:MaxDirectMemorySize=2048m " \
@@ -79,12 +78,6 @@ class CoreDockerSettings(BaseConfig):
             self.enable_transaction = Prompts.ask_enable_transaction()
         elif "GATEWAY" in SetupMode.instance().mode:
             self.enable_transaction = "true"
-
-    def ask_existing_docker_compose_file(self):
-        if "DETAILED" in SetupMode.instance().mode:
-            self.existing_docker_compose = Prompts.ask_existing_compose_file()
-        else:
-            open(self.existing_docker_compose, mode='a').close()
 
     def set_trusted_node(self, trusted_node):
         # Prompts.ask_trusted_node()

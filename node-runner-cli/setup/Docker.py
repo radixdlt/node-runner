@@ -42,12 +42,10 @@ class Docker(Base):
         return nginx_password
 
     @staticmethod
-    def run_docker_compose_up(keystore_password, composefile, trustednode):
+    def run_docker_compose_up(composefile):
         docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
         run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
                           env={
-                              "RADIXDLT_NETWORK_NODE": trustednode,
-                              "RADIXDLT_NODE_KEY_PASSWORD": keystore_password,
                               COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
                           })
 
@@ -98,8 +96,20 @@ class Docker(Base):
                 'ansible/project/provision.yml')
 
     @staticmethod
-    def check_post_db_local( all_config):
+    def check_post_db_local(all_config):
         postgres_db = all_config.get('gateway', {}).get('postgres_db')
         if postgres_db and postgres_db.get("setup", None) == "local":
             return True
         return False
+
+    @staticmethod
+    def load_all_config(configfile):
+        yaml.add_representer(type(None), Helpers.represent_none)
+        with open(configfile, 'r') as file:
+            all_config = yaml.safe_load(file)
+            return all_config
+
+    @staticmethod
+    def get_existing_compose_file(all_config):
+        compose_file = all_config['common_config']['existing_docker_compose']
+        return compose_file, Helpers.yaml_as_dict(compose_file)

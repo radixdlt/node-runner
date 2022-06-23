@@ -3,7 +3,7 @@ import json
 from config.BaseConfig import BaseConfig, SetupMode
 from github import github
 from setup import Base
-from utils.Prompts import Prompts
+from utils.Prompts import Prompts, Helpers
 
 
 class NginxConfig(BaseConfig):
@@ -18,6 +18,7 @@ class CommonDockerSettings(BaseConfig):
     network_name: str = None
     genesis_json_location: str = None
     nginx_settings: NginxConfig = NginxConfig({})
+    existing_docker_compose: str = f"{Helpers.get_home_dir()}/radix-fullnode-compose.yml"
 
     def __init__(self, settings: dict):
         super().__init__(settings)
@@ -71,7 +72,7 @@ class CommonDockerSettings(BaseConfig):
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.protect_core = Prompts.ask_enable_nginx(service="CORE").lower()
 
-    def ask_enable_nginx_for_gateway(self,nginx_on_gateway):
+    def ask_enable_nginx_for_gateway(self, nginx_on_gateway):
         if nginx_on_gateway:
             self.nginx_settings.protect_gateway = nginx_on_gateway
         if "DETAILED" in SetupMode.instance().mode:
@@ -83,3 +84,9 @@ class CommonDockerSettings(BaseConfig):
             return True
         else:
             return False
+
+    def ask_existing_docker_compose_file(self):
+        if "DETAILED" in SetupMode.instance().mode:
+            self.existing_docker_compose = Prompts.ask_existing_compose_file()
+        else:
+            open(self.existing_docker_compose, mode='a').close()

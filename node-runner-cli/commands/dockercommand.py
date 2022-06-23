@@ -148,43 +148,34 @@ def config(args):
     argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true"),
 ])
 def setup(args):
-    release = latest_release()
     autoapprove = args.autoapprove
-
-    docker_config = DockerConfig(release)
-    docker_config.loadConfig(args.configfile)
-
-    yaml.add_representer(type(None), Helpers.represent_none)
-
-    with open(args.configfile, 'r') as file:
-        all_config = yaml.safe_load(file)
+    all_config = Docker.load_all_config(args.configfile)
 
     all_config = Docker.check_set_passwords(all_config)
     Docker.check_run_local_postgress(all_config)
 
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
 
-    old_compose_file = Helpers.yaml_as_dict(f"{all_config['core_node']['existing_docker_compose']}")
-    print(dict(DeepDiff(old_compose_file, render_template)))
+    old_compose_file, old_compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    print(dict(DeepDiff(old_compose_file_yaml, render_template)))
 
     to_update = ""
     if autoapprove:
         print("In Auto mode - Updating file as suggested in above changes")
     else:
         to_update = input("\nOkay to update the file [Y/n]?:")
-    if Helpers.check_Yes(to_update) or autoapprove:
-        Docker.save_compose_file(docker_config.core_node_settings.existing_docker_compose, render_template)
 
-    run_shell_command(f"cat {docker_config.core_node_settings.existing_docker_compose}", shell=True)
+    if Helpers.check_Yes(to_update) or autoapprove:
+        Docker.save_compose_file(old_compose_file, render_template)
+
+    run_shell_command(f"cat {old_compose_file}", shell=True)
     should_start = ""
     if autoapprove:
         print("In Auto mode -  Updating the node as per above contents of docker file")
     else:
         should_start = input("\nOkay to start the containers [Y/n]?:")
     if Helpers.check_Yes(should_start) or autoapprove:
-        Docker.run_docker_compose_up(docker_config.core_node_settings.keydetails.keystore_password,
-                                     docker_config.core_node_settings.existing_docker_compose,
-                                     docker_config.core_node_settings.trusted_node)
+        Docker.run_docker_compose_up(old_compose_file)
 
 
 @dockercommand([
@@ -194,13 +185,11 @@ def setup(args):
              action="store"),
 ])
 def start(args):
-    release = latest_release()
-    docker_config = DockerConfig(release)
-    docker_config.loadConfig(args.configfile)
-    core_node_settings = docker_config.core_node_settings
-    Docker.run_docker_compose_up(core_node_settings.keydetails.keystore_password,
-                                 core_node_settings.existing_docker_compose,
-                                 core_node_settings.trusted_node)
+    all_config = Docker.load_all_config(args.configfile)
+    all_config = Docker.check_set_passwords(all_config)
+    Docker.check_run_local_postgress(all_config)
+    old_compose_file, old_compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    Docker.run_docker_compose_up(old_compose_file)
 
 
 @dockercommand([
@@ -216,11 +205,9 @@ def stop(args):
             """ 
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
-    release = latest_release()
-    docker_config = DockerConfig(release)
-    docker_config.loadConfig(args.configfile)
-    core_node_settings = docker_config.core_node_settings
-    Docker.run_docker_compose_down(core_node_settings.existing_docker_compose, args.removevolumes)
+    all_config = Docker.load_all_config(args.configfile)
+    old_compose_file, old_compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    Docker.run_docker_compose_down(old_compose_file, args.removevolumes)
 
 
 @dockercommand([])
