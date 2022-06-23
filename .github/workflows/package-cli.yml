@@ -114,6 +114,7 @@ jobs:
           name: ubuntu 20.04
       - name: Run configure command
         run: |
+          chmod +x ./radixnode
           ./radixnode docker configure
       - name: Setup config
         run: |
