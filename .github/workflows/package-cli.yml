@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-           fetch-depth: 0
+          fetch-depth: 0
       - name: Dump context
         uses: crazy-max/ghaction-dump-context@v1
       - name: Install build essentials
@@ -112,6 +112,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
+      - name: Run configure command
+        run: |
+          ./radixnode docker configure
       - name: Setup config
         run: |
           chmod +x ./radixnode

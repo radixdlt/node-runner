@@ -3,7 +3,7 @@ from pathlib import Path
 import requests
 import sys
 
-from utils.utils import run_shell_command, Helpers
+from utils.utils import run_shell_command, Helpers, bcolors
 import subprocess
 
 
@@ -37,9 +37,8 @@ class AnsibleRunner:
                 print(f"Pip is not installed. Installing pip now")
                 run_shell_command('sudo apt install python3-pip -y', shell=True)
             run_shell_command(f"pip install --user ansible==2.10.0", shell=True)
-            print("""
-                             ----------------------------------------------------------------------------------------
-                            Ansible installed successfully. You need exit shell and login back""")
+            print("----------------------------------------------------------------------------------------\n"
+                  f"{bcolors.WARNING}Ansible installed successfully. You need exit shell and login back{bcolors.ENDC}")
             if exit_cmd:
                 sys.exit()
         return
