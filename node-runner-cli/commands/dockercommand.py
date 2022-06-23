@@ -158,10 +158,11 @@ def setup(args):
 
     with open(args.configfile, 'r') as file:
         all_config = yaml.safe_load(file)
-    render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
 
     all_config = Docker.check_set_passwords(all_config)
     Docker.check_run_local_postgress(all_config)
+
+    render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
 
     old_compose_file = Helpers.yaml_as_dict(f"{all_config['core_node']['existing_docker_compose']}")
     print(dict(DeepDiff(old_compose_file, render_template)))
