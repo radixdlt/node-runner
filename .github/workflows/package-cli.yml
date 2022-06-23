@@ -122,7 +122,7 @@ jobs:
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker config -d $HOME/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -s CORE -n 2 -k $KEYSTORE_PASSWORD -nk
+          ./radixnode docker config -d $HOME/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 -k $KEYSTORE_PASSWORD -nk
         env:
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run CLI setup
@@ -186,7 +186,7 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           ./radixnode docker config -d $HOME/node-config \
             -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-            -s CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD
+            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD
           grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
           cat $HOME/node-config/config.yaml
         env:
@@ -205,6 +205,15 @@ jobs:
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
 
+          ./radixnode monitoring stop
+          ./radixnode monitoring config \
+              -m MONITOR_CORE MONITOR_GATEWAY \
+              -cm $NGINX_METRICS_PASSWORD  \
+              -gm $NGINX_METRICS_PASSWORD  \
+              -am $NGINX_METRICS_PASSWORD
+
+          ./radixnode monitoring setup -a
+
           export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
           export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a
@@ -212,23 +221,12 @@ jobs:
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://localhost/gateway
+          curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
+
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-      - name: Run Monitoring
-        run: |
-          export COMPOSE_HTTP_TIMEOUT=360
-          ./radixnode monitoring stop
-          ./radixnode monitoring config \
-              -s MONITOR_CORE MONITOR_GATEWAY \
-              -cm $NGINX_METRICS_PASSWORD  \
-              -gm $NGINX_METRICS_PASSWORD  \
-              -am $NGINX_METRICS_PASSWORD
 
-          ./radixnode monitoring setup -a
-          curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
-        env:
-          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
 
   test-full-stack-no-nginx:
     if: ${{ github.event_name == 'pull_request' }}
@@ -247,7 +245,7 @@ jobs:
           export DISABLE_VERSION_CHECK=true
           export COMPOSE_HTTP_TIMEOUT=360
           ./radixnode docker config -d $HOME/node-config -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
-            -s CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false
+            -m CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}

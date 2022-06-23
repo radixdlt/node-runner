@@ -29,7 +29,7 @@ def read_monitoring_config(args):
 
 
 @monitoringcommand([
-    argument("-s", "--setupmode", nargs="+",
+    argument("-m", "--setupmode", nargs="+",
              help="""Quick setup with assumed defaults. It supports three quick setup mode and a detailed setup mode.
               \n\nMONITOR_CORE: Use this value to monitor Core using defaults which assume core is run on same machine
                as monitoring.

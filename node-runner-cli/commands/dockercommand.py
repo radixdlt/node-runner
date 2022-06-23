@@ -56,7 +56,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
     argument("-xg", "--disablenginxforgateway", help="Set this to disable to nginx for gateway",
              action="store", default="", choices=["true", "false"]),
 
-    argument("-s", "--setupmode", nargs="+",
+    argument("-m", "--setupmode", nargs="+",
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
                   \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
