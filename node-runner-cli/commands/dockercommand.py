@@ -93,7 +93,7 @@ def config(args):
 
     configuration.common_settings.ask_network_id(args.networkid)
 
-    config_to_dump = {}
+    config_to_dump = {"version": "0.1"}
 
     if "CORE" in setupmode.mode:
         quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, args.trustednode,

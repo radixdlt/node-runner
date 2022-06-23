@@ -76,7 +76,10 @@ def config(args):
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
     monitoring_config: MonitoringSettings = MonitoringSettings({})
 
-    config_to_dump = {"common_config": dict(monitoring_config.common_settings)}
+    config_to_dump = {
+        "common_config": dict(monitoring_config.common_settings),
+        "version": "0.1"
+    }
 
     if "MONITOR_CORE" in setupmode.mode:
         monitoring_config.configure_core_target(coremetricspassword)
@@ -120,7 +123,7 @@ def setup(args):
     all_config = read_monitoring_config(args)
 
     monitoring_config_dir = all_config["common_config"]["config_dir"]
-    Monitoring.template_prometheus_yml(all_config,monitoring_config_dir)
+    Monitoring.template_prometheus_yml(all_config, monitoring_config_dir)
     Monitoring.template_datasource(monitoring_config_dir)
     Monitoring.template_dashboards(["dashboard.yml", "sample-node-dashboard.json", "network-gateway-dashboard.json"],
                                    monitoring_config_dir)
