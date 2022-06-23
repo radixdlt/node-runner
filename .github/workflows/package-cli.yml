@@ -201,9 +201,9 @@ jobs:
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
 
-          export POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-          export RADIXDLT_NODE_KEY_PASSWORD=$RADIXDLT_NODE_KEY_PASSWORD
-          ./radixnode docker setup -f $HOME/node-config/config.yaml -a 2>&1
+          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
+          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
+          ./radixnode docker setup -f $HOME/node-config/config.yaml -a
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
@@ -211,8 +211,6 @@ jobs:
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
-          POSTGRES_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
-          RADIXDLT_NODE_KEY_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
       - name: Run Monitoring
         run: |
           export COMPOSE_HTTP_TIMEOUT=360
