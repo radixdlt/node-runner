@@ -89,10 +89,17 @@ class Docker(Base):
     @staticmethod
     def check_run_local_postgress(all_config):
         postgres_db = all_config.get('gateway', {}).get('postgres_db')
-        if PostGresSettings.check_post_db_local(all_config):
+        if Docker.check_post_db_local(all_config):
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
             AnsibleRunner(ansible_dir).run_setup_postgress(
                 postgres_db.get("password"),
                 postgres_db.get("user"),
                 postgres_db.get("dbname"),
                 'ansible/project/provision.yml')
+
+    @staticmethod
+    def check_post_db_local( all_config):
+        postgres_db = all_config.get('gateway', {}).get('postgres_db')
+        if postgres_db and postgres_db.get("setup", None) == "local":
+            return True
+        return False

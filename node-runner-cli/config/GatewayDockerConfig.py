@@ -25,12 +25,7 @@ class PostGresSettings(BaseConfig):
         else:
             self.password = postgress_password
 
-    @staticmethod
-    def check_post_db_local( all_config):
-        postgres_db = all_config.get('gateway', {}).get('postgres_db')
-        if postgres_db and postgres_db.get("setup", None) == "local":
-            return True
-        return False
+
 
 
 class CoreApiNode(BaseConfig):
