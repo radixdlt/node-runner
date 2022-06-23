@@ -222,6 +222,7 @@ jobs:
               -am $NGINX_METRICS_PASSWORD
 
           ./radixnode monitoring setup -a
+          curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
         env:
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
 
