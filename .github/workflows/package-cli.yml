@@ -200,7 +200,7 @@ jobs:
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          curl -k -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
+          curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://localhost/gateway
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
