@@ -4,6 +4,7 @@ import sys
 
 import yaml
 
+from config.BaseConfig import SetupMode
 from config.GatewayDockerConfig import PostGresSettings
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
 from setup.AnsibleRunner import AnsibleRunner
@@ -113,3 +114,8 @@ class Docker(Base):
     def get_existing_compose_file(all_config):
         compose_file = all_config['common_config']['existing_docker_compose']
         return compose_file, Helpers.yaml_as_dict(compose_file)
+
+    @staticmethod
+    def exit_on_missing_trustednode():
+        print("-t or --trustednode parameter is mandatory")
+        sys.exit(1)

@@ -28,8 +28,8 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 
 @dockercommand([
     argument("-t", "--trustednode",
-             required=True,
              help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
+             default="",
              action="store"),
     argument("-d", "--configdir",
              help="Path to node-config directory where config file will stored",
@@ -67,6 +67,8 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 def config(args):
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
+    if "CORE" in setupmode.mode and args.trustednode == "":
+        Docker.exit_on_missing_trustednode()
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
     nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
@@ -113,6 +115,8 @@ def config(args):
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
+            if args.trustednode == "":
+                Docker.exit_on_missing_trustednode()
             detailed_node_settings = CoreDockerSettings({}).create_config(release, args.trustednode, keystore_password,
                                                                           new_keystore)
             configuration.core_node_settings = detailed_node_settings
