@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 
 from config.Renderer import Renderer
-from env_vars import NODE_END_POINT, NODE_HOST_IP_OR_NAME
+from env_vars import NODE_END_POINT, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT
 from utils.utils import Helpers, run_shell_command
 
 
@@ -38,7 +38,7 @@ class Monitoring:
             yaml.dump(prometheus_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
     @staticmethod
-    def template_prometheus_yml(monitoring_config,monitoring_config_dir):
+    def template_prometheus_yml(monitoring_config, monitoring_config_dir):
         render_template = Renderer().load_file_based_template("prometheus.yml.j2").render(monitoring_config).to_yaml()
 
         yaml.add_representer(type(None), Helpers.represent_none)
@@ -109,7 +109,7 @@ class Monitoring:
         for file in files:
             render_template = Renderer().load_file_based_template(f"{file}.j2").render({}).to_yaml()
             file_location = f"{monitoring_config_dir}/grafana/provisioning/dashboards/{file}"
-            if file.endswith('.yml') or file.endswith('.yaml') :
+            if file.endswith('.yml') or file.endswith('.yaml'):
                 Helpers.dump_rendered_template(render_template, file_location, quiet=True)
             if file.endswith('.json'):
                 import json
@@ -149,7 +149,10 @@ class Monitoring:
             start_monitoring_answer = input(
                 f"Do you want to start monitoring using file {composefile} [Y/n]?")
         if Helpers.check_Yes(start_monitoring_answer) or auto_approve:
-            run_shell_command(f'docker-compose -f {composefile} up -d', shell=True)
+            run_shell_command(f'docker-compose -f {composefile} up -d',
+                              env={
+                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                              }, shell=True)
         else:
             print(f"""Exiting the command ..
                      Once you verified the file {composefile}, you can start the monitoring by running
