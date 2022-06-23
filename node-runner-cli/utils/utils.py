@@ -132,9 +132,13 @@ class Helpers:
         command = ['docker-compose', '-f', composefile, 'down']
         if remove_volumes:
             command.append('-v')
-        run_shell_command(command, env={
+        result = run_shell_command(command, env={
             COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-        })
+        }, fail_on_error=False)
+        if result.returncode != 0:
+            run_shell_command(command, env={
+                COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+            })
 
     @staticmethod
     def get_public_ip():

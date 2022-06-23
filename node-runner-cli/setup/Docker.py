@@ -45,10 +45,15 @@ class Docker(Base):
     @staticmethod
     def run_docker_compose_up(composefile):
         docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
-        run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
+        result = run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
                           env={
                               COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                          })
+                          },fail_on_error=False)
+        if result.returncode !=0 :
+            run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
+                                       env={
+                                           COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                                       }, fail_on_error=True)
 
     @staticmethod
     def save_compose_file(existing_docker_compose, composefile_yaml):
