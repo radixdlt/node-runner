@@ -194,17 +194,18 @@ jobs:
           #Below PATH require when ansible is installed as part of pip
           export PATH="$PATH:/home/ubuntu/.local/bin"
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+
           ./radixnode docker setup -f $HOME/node-config/config.yaml -a 2>&1
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          #curl -k -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
+          curl -k -f -u 'admin:$NGINX_ADMIN_PASSWORD' https://localhost/gateway
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
       - name: Run Monitoring
-        if: false
         run: |
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
           ./radixnode monitoring stop
           ./radixnode monitoring config \
               -s MONITOR_CORE MONITOR_GATEWAY \
