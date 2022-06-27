@@ -147,6 +147,16 @@ def mempool_transaction(args):
 
 @corecommand()
 def update_validator_config(args):
+    """
+    Utility command that helps a node runner to
+
+    * register
+    * unregister
+    * set validator metadata such as name/url
+    * Add or change validator fee
+    * Setup delegation or change owner id
+    
+    """
     health = DefaultApiHelper(verify_ssl=False).check_health()
     core_api_helper = CoreApiHelper(verify_ssl=False)
 

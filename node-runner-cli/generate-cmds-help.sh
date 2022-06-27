@@ -82,8 +82,23 @@ cat <<EOT >> "$filename"
 === Setup monitoring using CLI
 Using CLI , one can setup monitoring of the node or gateway.
 EOT
-declare -a monitoringcommands=("config" "setup" "start" "stop")
-for subcommand in "${monitoringcommands[@]}"
+declare -a othercommands=("config" "setup" "start" "stop")
+for subcommand in "${othercommands[@]}"
 do
   command_help_doc "monitoring" "$subcommand" "$filename"
 done
+
+cat <<EOT >> "$filename"
+=== Other commands supported by CLI
+List of other commands supported by cli are to check the version of CLI being used and optimise-node
+to setup some of the OS tweaks on ubuntu
+EOT
+
+declare -a othercommands=("version" "optimise-node")
+for subcommand in "${othercommands[@]}"
+do
+  export DISABLE_VERSION_CHECK="true"
+  command_help_doc "$subcommand" "" "$filename"
+done
+
+
