@@ -5,7 +5,8 @@ from api.DefaultApiHelper import DefaultApiHelper
 from commands.subcommand import get_decorator
 
 systemapicli = ArgumentParser(
-    description='systemapi commands')
+    description='Subcommand to aid interaction with system api of core node',
+    usage="radixnode api system ")
 systemapi_parser = systemapicli.add_subparsers(dest="systemapicommand")
 
 

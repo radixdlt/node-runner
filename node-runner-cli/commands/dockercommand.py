@@ -18,7 +18,9 @@ from utils.Prompts import Prompts
 from utils.utils import Helpers, run_shell_command, bcolors
 
 dockercli = ArgumentParser(
-    description='Docker commands', formatter_class=RawTextHelpFormatter)
+    description='Subcommand to help setup CORE or GATEWAY using Docker containers',
+    usage="radixnode docker ",
+    formatter_class=RawTextHelpFormatter)
 docker_parser = dockercli.add_subparsers(dest="dockercommand")
 
 

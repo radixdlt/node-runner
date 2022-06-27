@@ -18,7 +18,9 @@ from utils.utils import Helpers, bcolors
 from utils.utils import print_vote_and_fork_info
 
 corecli = ArgumentParser(
-    description='Core Api comands')
+    description='Subcommand to aid interaction with core api',
+    usage="radixnode api core "
+)
 core_parser = corecli.add_subparsers(dest="corecommand")
 
 

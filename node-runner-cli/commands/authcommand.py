@@ -4,7 +4,10 @@ from commands.subcommand import get_decorator, argument
 from setup import Docker, SystemD
 
 authcli = ArgumentParser(
-    description='API command')
+    description='Subcommand to aid creation of nginx basic auth users',
+    usage="radixnode auth "
+    )
+
 auth_parser = authcli.add_subparsers(dest="authcommand")
 
 
@@ -21,6 +24,10 @@ def authcommand(args=[], parent=auth_parser):
 
     ])
 def set_admin_password(args):
+    """
+    This sets up admin password on nginx basic auth. Refer this link for all the path.
+    https://docs.radixdlt.com/main/node-and-gateway/port-reference.html#_endpoint_usage
+    """
     password = args.password if args.password != "" else None
 
     set_auth(args, usertype="admin",password=password)

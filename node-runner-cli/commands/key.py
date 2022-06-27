@@ -5,7 +5,9 @@ from key_interaction.KeyInteraction import KeyInteraction
 
 # Setup key subcommand parser
 keycli = ArgumentParser(
-    description='Key interaction commands')
+    description='Subcommand to aid interaction with key',
+    usage="radixnode key "
+)
 key_parser = keycli.add_subparsers(dest="keycommand")
 
 
@@ -25,7 +27,6 @@ def info(args):
     key = KeyInteraction(keystore_password=str.encode(args.password), keystore_path=args.filelocation)
     print(f"Validator Address {key.get_validator_address()}")
     print(f"Validator hex public key  {key.get_validator_hex_public_key()}")
-
 
 # @keycommand([
 #     argument("-p", "--password", required=True,

@@ -9,7 +9,8 @@ from setup import SystemD, Base
 from utils.utils import Helpers
 
 systemdcli = ArgumentParser(
-    description='Systemd commands')
+    description='Subcommand to help setup CORE using systemD service',
+    usage="radixnode systemd ")
 systemd_parser = systemdcli.add_subparsers(dest="systemdcommand")
 
 
@@ -30,6 +31,8 @@ def systemdcommand(systemdcommand_args=[], parent=systemd_parser):
 
 ])
 def setup(args):
+    """This sets up the systemd service for the core node."""
+
     if not args.release:
         release = latest_release()
     else:

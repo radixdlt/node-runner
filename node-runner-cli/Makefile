@@ -12,3 +12,7 @@ output-ubuntu-focal: install
 .PHONY: local
 local: install
 	pip install -r requirements.txt
+
+.PHONEY: cmds-reference
+cmds-reference: local
+	./generate-cmds-help.sh
