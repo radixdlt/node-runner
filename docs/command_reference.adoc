@@ -258,6 +258,10 @@ optional arguments:
 ----
 usage: radixnode api core update-validator-config [-h]
 
+Utility command that helps a node runner to * register * unregister * set
+validator metadata such as name/url * Add or change validator fee * Setup
+delegation or change owner id
+
 optional arguments:
   -h, --help  show this help message and exit
 ----
@@ -358,4 +362,29 @@ optional arguments:
                         Path to config file. Default is
                         '/Users/shambu/monitoring/monitoring_config.yaml'
   -v, --removevolumes   Remove the volumes
+----
+=== Other commands supported by CLI
+List of other commands supported by cli are to check the version of CLI being used and optimise-node
+to setup some of the OS tweaks on ubuntu
+
+=== version 
+[source, bash]
+----
+usage: radixnode.py version [-h]
+
+optional arguments:
+  -h, --help  show this help message and exit
+----
+
+=== optimise-node 
+[source, bash]
+----
+usage: radixnode.py optimise-node [-h]
+
+Run this command to setup ulimits and swap size on the fresh ubuntu machine .
+Prompts asking to setup limits . Prompts asking to setup swap and size of swap
+in GB
+
+optional arguments:
+  -h, --help  show this help message and exit
 ----

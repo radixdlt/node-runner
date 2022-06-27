@@ -7,11 +7,13 @@ from argparse import ArgumentParser
 import urllib3
 
 from api.DefaultApiHelper import DefaultApiHelper
+from commands import othercommands
 from commands.authcommand import authcli
 from commands.coreapi import handle_core
 from commands.dockercommand import dockercli
 from commands.key import keycli
 from commands.monitoring import monitoringcli
+from commands.othercommands import other_command_cli
 from commands.systemapi import handle_systemapi
 from commands.systemdcommand import systemdcli
 from env_vars import DISABLE_VERSION_CHECK
@@ -31,14 +33,6 @@ api_parser = apicli.add_argument(dest="apicommand",
                                  choices=["system", "core"])
 
 cwd = os.getcwd()
-
-
-def print_cli_version():
-    print(f"Cli - Version : {Helpers.cli_version()}")
-
-
-def optimise_node():
-    Base.setup_node_optimisation_config(Helpers.cli_version())
 
 
 def check_latest_cli():
@@ -115,9 +109,11 @@ if __name__ == "__main__":
             keycli.print_help()
         else:
             keycli_args.func(keycli_args)
-    elif args.subcommand == "version":
-        print_cli_version()
-    elif args.subcommand == "optimise-node":
-        optimise_node()
+    elif args.subcommand in ["version", "optimise-node"]:
+        other_command_cli_args = other_command_cli.parse_args(sys.argv[1:])
+        if sys.argv[2:] == "-h":
+            other_command_cli.print_help()
+        other_command_cli_args.func(other_command_cli_args)
+
     else:
         print(f"Invalid subcommand {args.subcommand}")
