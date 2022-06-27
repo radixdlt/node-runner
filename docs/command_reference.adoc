@@ -1,4 +1,6 @@
 
+=== Core node or Gateway setup using docker
+Below are the list of commands that can be used with cli to setup a core node or gateway.
 
 === docker configure
 [source, bash]
@@ -84,6 +86,8 @@ optional arguments:
                         Path to config file
   -v, --removevolumes   Remove the volumes
 ----
+=== Radix node CLI command reference
+This document is to list all the commands and features that radixnode CLI supports.
 
 === systemd configure
 [source, bash]
@@ -143,6 +147,8 @@ optional arguments:
                         Name of the service either to be stopped. Valid values
                         nginx or radixdlt-node
 ----
+=== Set passwords for the Nginx server
+This will set up the admin user and password for access to the general system endpoints.
 
 === auth set-admin-password
 [source, bash]
@@ -195,6 +201,8 @@ optional arguments:
   -p PASSWORD, --password PASSWORD
                         Password of metrics user
 ----
+=== Accessing core endpoints using CLI
+Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
 === core entity
 [source, bash]
 ----
@@ -277,6 +285,8 @@ usage: radixnode api system version [-h]
 optional arguments:
   -h, --help  show this help message and exit
 ----
+=== Setup monitoring using CLI
+Using CLI , one can setup monitoring of the node or gateway.
 
 === monitoring config
 [source, bash]

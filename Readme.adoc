@@ -18,7 +18,10 @@ The main purpose of this cli is to enable node runners
 
 . To interact with node using common API calls
 . To setup node quickly on a fresh ubuntu machine using docker compose or systemd
-. To setup monitoring for the node. Currently supports monitoring the API exposed by the node.
+. To setup gateway on a fresh ubuntu machine using docker-compose
+. To setup monitoring for the node or gateway.
+
+For complete command reference refer document xref:node-runner-cli/command_reference.adoc[Command reference]
 
 == Interaction with node on api endpoints
 
