@@ -14,7 +14,8 @@ radixnode <sub command>
 
 To download the cli, following instructions from [here](https://docs.radixdlt.com/main/node-and-gateway/cli-install.html)
 
-The main purpose of this cli is to enable node runners
+The command line interface (CLI) provides a collection of tools for below tasks.
+It is organized in a hierarchy of subcommands, and each level comes with its own built-in documentation of command syntax and options.
 
 . To interact with node using common API calls
 . To setup node quickly on a fresh ubuntu machine using docker compose or systemd
@@ -94,14 +95,3 @@ optional arguments:
 
 ----
 
-== Other commands
-[cols="2,1,5,5"]
-|===
-| **Sub Commands** | **Arguments** | **Prompts** | **Comments**
-| optimise-node |
-a|
-. Prompts asking to setup limits
-. Prompts asking to setup swap and size of swap in GB
-|-
-|version |-|-|Prints out the version of cli
-|===
