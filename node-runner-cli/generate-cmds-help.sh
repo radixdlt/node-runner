@@ -6,7 +6,7 @@ command_help_doc()
   #$3 filename
   echo $1 $2 $3
   echo "" >> $3
-	echo "=== $1 $2" >> $3
+	echo "==== radixnode $1 $2" >> $3
 	echo "[source, bash]" >> $3
 	echo "----" >> $3
 	./radixnode.py $1 $2 -h >> $3
@@ -19,7 +19,8 @@ command_api_help_doc()
   #$2 subcommand
   #$3 filename
   echo $1 $2 $3
-	echo "=== $1 $2" >> $3
+  echo "" >> $3
+	echo "==== radixnode $1 $2" >> $3
 	echo "[source, bash]" >> $3
 	echo "----" >> $3
 	./radixnode.py "api" $1 $2 -h >> $3
@@ -27,6 +28,7 @@ command_api_help_doc()
 }
 
 echo "" > "$filename"
+echo ":sectnums:" > "$filename"
 
 cat <<EOT >> "$filename"
 === Core node or Gateway setup using docker
@@ -42,7 +44,7 @@ done
 
 cat <<EOT >> "$filename"
 === Radix node CLI command reference
-This document is to list all the commands and features that radixnode CLI supports.
+Below are the list of commands supported in cli to setup a core node process as a systemd process
 EOT
 declare -a systemdsubcommands=("configure" "setup" "restart" "stop")
 for subcommand in "${systemdsubcommands[@]}"
