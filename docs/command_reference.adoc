@@ -363,6 +363,21 @@ optional arguments:
                         '/Users/shambu/monitoring/monitoring_config.yaml'
   -v, --removevolumes   Remove the volumes
 ----
+=== CLI helper commands to interact with keystore
+Using CLI, for a key file, you can print out the validator address. This feature is in beta and currently only below commands supported.
+
+=== key info
+[source, bash]
+----
+usage: radixnode key info [-h] -p PASSWORD -f FILELOCATION
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PASSWORD, --password PASSWORD
+                        Password of the keystore
+  -f FILELOCATION, --filelocation FILELOCATION
+                        Location of keystore on the disk
+----
 === Other commands supported by CLI
 List of other commands supported by cli are to check the version of CLI being used and optimise-node
 to setup some of the OS tweaks on ubuntu

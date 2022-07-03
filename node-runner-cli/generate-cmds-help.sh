@@ -89,6 +89,18 @@ do
 done
 
 cat <<EOT >> "$filename"
+=== CLI helper commands to interact with keystore
+Using CLI, for a key file, you can print out the validator address. This feature is in beta and currently only below commands supported.
+EOT
+
+declare -a keyCommands=("info" )
+for subcommand in "${keyCommands[@]}"
+do
+  command_help_doc "key" "$subcommand" "$filename"
+done
+
+
+cat <<EOT >> "$filename"
 === Other commands supported by CLI
 List of other commands supported by cli are to check the version of CLI being used and optimise-node
 to setup some of the OS tweaks on ubuntu
