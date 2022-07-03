@@ -30,7 +30,9 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 
 @dockercommand([
     argument("-t", "--trustednode",
-             help="Trusted node on radix network. Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3",
+             help="Trusted node on radix network."
+                  "Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3. "
+                  "This is required only if you are creating config for CORE NODE",
              default="",
              action="store"),
     argument("-d", "--configdir",
@@ -59,6 +61,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              action="store", default="", choices=["true", "false"]),
 
     argument("-m", "--setupmode", nargs="+",
+             required=True,
              help="""Quick config mode with assumed defaults. It supports two quick modes and a detailed config mode.
                   \n\nCORE: Use this value to setup CORE using defaults.
                   \n\nGATEWAY: Use this value to setup GATEWAY using defaults.

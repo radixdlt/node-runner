@@ -17,14 +17,27 @@ optional arguments:
 usage: radixnode docker config [-h] [-t TRUSTEDNODE] [-d CONFIGDIR]
                                [-n NETWORKID] [-p POSTGRESPASSWORD]
                                [-k KEYSTOREPASSWORD] [-nk] [-xc {true,false}]
-                               [-xg {true,false}]
-                               [-m {CORE,GATEWAY,DETAILED} [{CORE,GATEWAY,DETAILED} ...]]
+                               [-xg {true,false}] -m {CORE,GATEWAY,DETAILED}
+                               [{CORE,GATEWAY,DETAILED} ...]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+required arguments:
+  -m {CORE,GATEWAY,DETAILED} [{CORE,GATEWAY,DETAILED} ...], --setupmode {CORE,GATEWAY,DETAILED} [{CORE,GATEWAY,DETAILED} ...]
+                        Quick config mode with assumed defaults. It supports
+                        two quick modes and a detailed config mode. CORE: Use
+                        this value to setup CORE using defaults. GATEWAY: Use
+                        this value to setup GATEWAY using defaults. DETAILED:
+                        Default value if not provided. This mode takes your
+                        through series of questions.
+
+optional arguments:
   -t TRUSTEDNODE, --trustednode TRUSTEDNODE
-                        Trusted node on radix network. Example format:
-                        radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3
+                        Trusted node on radix network.Example format:
+                        radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3.
+                        This is required only if you are creating config for
+                        CORE NODE
   -d CONFIGDIR, --configdir CONFIGDIR
                         Path to node-config directory where config file will
                         stored
@@ -43,13 +56,6 @@ optional arguments:
                         Set this to disable to nginx for core
   -xg {true,false}, --disablenginxforgateway {true,false}
                         Set this to disable to nginx for gateway
-  -m {CORE,GATEWAY,DETAILED} [{CORE,GATEWAY,DETAILED} ...], --setupmode {CORE,GATEWAY,DETAILED} [{CORE,GATEWAY,DETAILED} ...]
-                        Quick config mode with assumed defaults. It supports
-                        two quick modes and a detailed config mode. CORE: Use
-                        this value to setup CORE using defaults. GATEWAY: Use
-                        this value to setup GATEWAY using defaults. DETAILED:
-                        Default value if not provided. This mode takes your
-                        through series of questions.
 ----
 
 ==== radixnode docker setup
@@ -59,6 +65,8 @@ usage: radixnode docker setup [-h] [-f CONFIGFILE] [-a]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -f CONFIGFILE, --configfile CONFIGFILE
                         Path to config file
   -a, --autoapprove     Set this to true to run without any prompts
@@ -71,6 +79,8 @@ usage: radixnode docker start [-h] [-f CONFIGFILE]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -f CONFIGFILE, --configfile CONFIGFILE
                         Path to config file
 ----
@@ -82,6 +92,8 @@ usage: radixnode docker stop [-h] [-f CONFIGFILE] [-v]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -f CONFIGFILE, --configfile CONFIGFILE
                         Path to config file
   -v, --removevolumes   Remove the volumes
@@ -109,16 +121,20 @@ This sets up the systemd service for the core node.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -r RELEASE, --release RELEASE
-                        Version of node software to install
-  -x NGINXRELEASE, --nginxrelease NGINXRELEASE
-                        Version of radixdlt nginx release
+
+required arguments:
   -t TRUSTEDNODE, --trustednode TRUSTEDNODE
                         Trusted node on radix network
   -n {fullnode,archivenode}, --nodetype {fullnode,archivenode}
                         Type of node fullnode or archivenode
   -i HOSTIP, --hostip HOSTIP
                         Static Public IP of the node
+
+optional arguments:
+  -r RELEASE, --release RELEASE
+                        Version of node software to install
+  -x NGINXRELEASE, --nginxrelease NGINXRELEASE
+                        Version of radixdlt nginx release
   -ts, --enabletransactions
                         Enable transaction stream api
   -u, --update          Update the node to new version of node
@@ -131,6 +147,8 @@ usage: radixnode systemd restart [-h] [-s {all,nginx,radixdlt-node}]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -s {all,nginx,radixdlt-node}, --services {all,nginx,radixdlt-node}
                         Name of the service either to be started. Valid values
                         nginx or radixdlt-node
@@ -143,6 +161,8 @@ usage: radixnode systemd stop [-h] [-s {all,nginx,radixdlt-node}]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -s {all,nginx,radixdlt-node}, --services {all,nginx,radixdlt-node}
                         Name of the service either to be stopped. Valid values
                         nginx or radixdlt-node
@@ -162,8 +182,12 @@ reference.html#_endpoint_usage
 
 optional arguments:
   -h, --help            show this help message and exit
+
+required arguments:
   -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
                         Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
   -u USERNAME, --username USERNAME
                         Name of admin user
   -p PASSWORD, --password PASSWORD
@@ -178,8 +202,12 @@ usage: radixnode auth set-superadmin-password [-h] -m {DOCKER,SYSTEMD}
 
 optional arguments:
   -h, --help            show this help message and exit
+
+required arguments:
   -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
                         Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
   -u USERNAME, --username USERNAME
                         Name of superadmin user
   -p PASSWORD, --password PASSWORD
@@ -194,8 +222,12 @@ usage: radixnode auth set-metrics-password [-h] -m {DOCKER,SYSTEMD}
 
 optional arguments:
   -h, --help            show this help message and exit
+
+required arguments:
   -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
                         Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
   -u USERNAME, --username USERNAME
                         Name of metrics user
   -p PASSWORD, --password PASSWORD
@@ -211,6 +243,8 @@ usage: radixnode api core entity [-h] [-v] [-a] [-p] [-sy] [-ss] [-su] [-se]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -v, --validator       Display entity details of validator address
   -a, --address         Display entity details of validator account address
   -p, --p2p             Display entity details of validator peer to peer
@@ -254,6 +288,8 @@ usage: radixnode api core mempool-transaction [-h] -t TRANSACTIONID
 
 optional arguments:
   -h, --help            show this help message and exit
+
+required arguments:
   -t TRANSACTIONID, --transactionId TRANSACTIONID
                         transaction Id to be searched on mempool
 ----
@@ -312,6 +348,8 @@ usage: radixnode monitoring config [-h]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -m {MONITOR_CORE,MONITOR_GATEWAY,DETAILED} [{MONITOR_CORE,MONITOR_GATEWAY,DETAILED} ...], --setupmode {MONITOR_CORE,MONITOR_GATEWAY,DETAILED} [{MONITOR_CORE,MONITOR_GATEWAY,DETAILED} ...]
                         Quick setup with assumed defaults. It supports three
                         quick setup mode and a detailed setup mode.
@@ -340,6 +378,8 @@ usage: radixnode monitoring setup [-h] [-f MONITORINGCONFIGFILE] [-a]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -f MONITORINGCONFIGFILE, --monitoringconfigfile MONITORINGCONFIGFILE
                         Path to config file. Default is
                         '/Users/shambu/monitoring/monitoring_config.yaml'
@@ -353,6 +393,8 @@ usage: radixnode monitoring start [-h] [-f MONITORINGCONFIGFILE] [-a]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -f MONITORINGCONFIGFILE, --monitoringconfigfile MONITORINGCONFIGFILE
                         Path to config file. Default is
                         '/Users/shambu/monitoring/monitoring_config.yaml'
@@ -366,6 +408,8 @@ usage: radixnode monitoring stop [-h] [-f MONITORINGCONFIGFILE] [-v]
 
 optional arguments:
   -h, --help            show this help message and exit
+
+optional arguments:
   -f MONITORINGCONFIGFILE, --monitoringconfigfile MONITORINGCONFIGFILE
                         Path to config file. Default is
                         '/Users/shambu/monitoring/monitoring_config.yaml'
@@ -381,6 +425,8 @@ usage: radixnode key info [-h] -p PASSWORD -f FILELOCATION
 
 optional arguments:
   -h, --help            show this help message and exit
+
+required arguments:
   -p PASSWORD, --password PASSWORD
                         Password of the keystore
   -f FILELOCATION, --filelocation FILELOCATION
