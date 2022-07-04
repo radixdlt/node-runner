@@ -205,6 +205,7 @@ def setup(args):
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
 
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
+
     print(dict(DeepDiff(compose_file_yaml, render_template)))
 
     to_update = ""
