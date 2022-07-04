@@ -117,7 +117,7 @@ services:
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.Enabled or 'true'}}"
 {% endif %}
 volumes:
- {% if core_node.data_directory is defined %}
+ {% if core_node is defined and core_node.data_directory is defined %}
   core_ledger:
     driver: local
     driver_opts:

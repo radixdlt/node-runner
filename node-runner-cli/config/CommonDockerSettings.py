@@ -18,7 +18,7 @@ class CommonDockerSettings(BaseConfig):
     network_name: str = None
     genesis_json_location: str = None
     nginx_settings: NginxConfig = NginxConfig({})
-    existing_docker_compose: str = f"{Helpers.get_home_dir()}/radix-fullnode-compose.yml"
+    existing_docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
 
     def __init__(self, settings: dict):
         super().__init__(settings)
