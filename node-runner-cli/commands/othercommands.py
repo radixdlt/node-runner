@@ -15,6 +15,9 @@ def othercommands(args=[], parent=other_command_parser):
 
 @othercommands()
 def version(args):
+    """
+    Run this command td display the version of CLI been used.
+    """
     print(f"Cli - Version : {Helpers.cli_version()}")
 
 

@@ -79,8 +79,8 @@ def config(args):
     """
     This commands allows node-runners and gateway admins to create a config file, which can persist their custom settings.
     Thus it allows is to decouple the updates from configuration.
-    Config is created only once as such and then updated by doing a migration to version
-    if there is a version change in the config file
+    Config is created only once as such and if there is a version change in the config file,
+    then it updated by doing a migration to newer version
     """
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode

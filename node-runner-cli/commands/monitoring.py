@@ -1,7 +1,6 @@
-from pathlib import Path
-
 import sys
 from argparse import ArgumentParser
+from pathlib import Path
 
 import yaml
 
@@ -57,6 +56,12 @@ def read_monitoring_config(args):
              default=f"{Helpers.get_default_monitoring_config_dir()}")
 ])
 def config(args):
+    """
+    This commands allows to create a config file, which can persist custom settings for monitoring.
+    Thus it allows is to decouple the updates from configuration.
+    Config is created only once as such and if there is a version change in the config file,
+    then it updated by doing a migration to newer version
+    """
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
     coremetricspassword = args.coremetricspassword if args.coremetricspassword != "" else None
@@ -119,6 +124,10 @@ def config(args):
         argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true")
     ])
 def setup(args):
+    """
+    This commands setups up the software and deploys it based on what is stored in the config.yaml file.
+    To update software versions, most of the time it is required to update the versions in config file and run this command
+    """
     monitor_url_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/monitoring'
     print(f"Downloading artifacts from {monitor_url_dir}\n==")
     autoapprove = args.autoapprove
@@ -146,6 +155,10 @@ def setup(args):
     ]
 )
 def start(args):
+    """
+    This commands starts the docker containers based on what is stored in the config.yaml file.
+    If you have modified the config file, it is advised to use setup command.
+    """
     all_config = read_monitoring_config(args)
     autoapprove = args.autoapprove
     monitoring_config_dir = all_config["common_config"]["config_dir"]
@@ -161,6 +174,9 @@ def start(args):
              action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
     argument("-v", "--removevolumes", help="Remove the volumes ", action="store_true")])
 def stop(args):
+    """
+    This commands stops the docker containers
+    """
     all_config = read_monitoring_config(args)
     monitoring_config_dir = all_config["common_config"]["config_dir"]
     monitoring_file_location = f"{monitoring_config_dir}/node-monitoring.yml"
