@@ -168,7 +168,7 @@ def config(args):
     print(f"\n{yaml.dump(config_to_dump)}")
 
     old_config = yaml.safe_load(config_file)
-    print(json.dumps(dict(DeepDiff(old_config, config_to_dump)), sort_keys=True, indent=4))
+    print(dict(DeepDiff(old_config, config_to_dump)))
 
     to_update = ""
     if autoapprove:
@@ -205,7 +205,7 @@ def setup(args):
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
 
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
-    print(json.dumps(dict(DeepDiff(compose_file_yaml, render_template)), sort_keys=True, indent=4))
+    print(dict(DeepDiff(compose_file_yaml, render_template)))
 
     to_update = ""
     if autoapprove:
