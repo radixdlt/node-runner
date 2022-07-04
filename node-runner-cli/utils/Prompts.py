@@ -1,5 +1,6 @@
 import os
 
+from env_vars import SUPPRESS_API_COMMAND_WARN
 from utils.utils import Helpers, run_shell_command, bcolors
 
 
@@ -270,3 +271,14 @@ class Prompts:
                 ("Enter swap size in GB. Example - 1G or 3G or 8G ?:")
             return setup_swap, ask_swap_size
         return setup_swap, ask_swap_size
+
+    @staticmethod
+    def warn_slow_command():
+        if os.getenv(SUPPRESS_API_COMMAND_WARN, "False").lower() not in ("true", "yes"):
+            ask = input("This might slow down your node, do you want to continue?[Y/n]:")
+            if Helpers.check_Yes(ask):
+                return True
+            else:
+                return False
+        else:
+            return True

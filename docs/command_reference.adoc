@@ -223,7 +223,7 @@ usage: radixnode auth set-admin-password [-h] -m {DOCKER,SYSTEMD}
                                          [-u USERNAME] [-p PASSWORD]
 
 This sets up admin password on nginx basic auth. Refer this link for all the
-path. https://docs.radixdlt.com/main/node-and-gateway/port-
+paths. https://docs.radixdlt.com/main/node-and-gateway/port-
 reference.html#_endpoint_usage
 
 optional arguments:
@@ -235,7 +235,7 @@ required arguments:
 
 optional arguments:
   -u USERNAME, --username USERNAME
-                        Name of admin user
+                        Name of admin user. Default value is `admin`
   -p PASSWORD, --password PASSWORD
                         Password of admin user
 ----
@@ -246,6 +246,10 @@ optional arguments:
 usage: radixnode auth set-superadmin-password [-h] -m {DOCKER,SYSTEMD}
                                               [-u USERNAME] [-p PASSWORD]
 
+This sets up superadmin password on nginx basic auth. Refer this link for all
+the paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -255,7 +259,7 @@ required arguments:
 
 optional arguments:
   -u USERNAME, --username USERNAME
-                        Name of superadmin user
+                        Name of superadmin user. Default value is `superadmin`
   -p PASSWORD, --password PASSWORD
                         Password of superadmin user
 ----
@@ -266,6 +270,10 @@ optional arguments:
 usage: radixnode auth set-metrics-password [-h] -m {DOCKER,SYSTEMD}
                                            [-u USERNAME] [-p PASSWORD]
 
+This sets up metrics password on nginx basic auth. Refer this link for all the
+paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -275,7 +283,7 @@ required arguments:
 
 optional arguments:
   -u USERNAME, --username USERNAME
-                        Name of metrics user
+                        Name of metrics user. Default value is `metrics`
   -p PASSWORD, --password PASSWORD
                         Password of metrics user
 ----
@@ -286,6 +294,9 @@ Once the nginx basic auth passwords for admin, superadmin, metrics users are set
 [source, bash]
 ----
 usage: radixnode api core entity [-h] [-v] [-a] [-p] [-sy] [-ss] [-su] [-se]
+
+This command helps to retrieve information about an entity. CAUTION - Running
+these commands on a validator node may slow down you node.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -314,6 +325,9 @@ optional arguments:
 ----
 usage: radixnode api core key-list [-h]
 
+This command helps to list the details of the validator keystore on a running
+node using node's CORE API
+
 optional arguments:
   -h, --help  show this help message and exit
 ----
@@ -323,6 +337,8 @@ optional arguments:
 ----
 usage: radixnode api core mempool [-h]
 
+This command helps to fetch transactions in mempool
+
 optional arguments:
   -h, --help  show this help message and exit
 ----
@@ -331,6 +347,9 @@ optional arguments:
 [source, bash]
 ----
 usage: radixnode api core mempool-transaction [-h] -t TRANSACTIONID
+
+This command helps to fetch transaction in mempool of the node by transaction
+Id
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -345,9 +364,10 @@ required arguments:
 ----
 usage: radixnode api core update-validator-config [-h]
 
-Utility command that helps a node runner to * register * unregister * set
-validator metadata such as name/url * Add or change validator fee * Setup
-delegation or change owner id
+Utility command that helps a node runner to `register`or `unregister` or `set
+validator metadata such as name/url` or `Add or change validator fee` or
+`Setup delegation or change owner id` or ` Prompt for voting if ready for
+forking`
 
 optional arguments:
   -h, --help  show this help message and exit

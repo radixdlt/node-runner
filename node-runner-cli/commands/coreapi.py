@@ -14,6 +14,7 @@ from api.CoreApiHelper import CoreApiHelper
 from api.DefaultApiHelper import DefaultApiHelper
 from api.ValidatorConfig import ValidatorConfig
 from commands.subcommand import get_decorator, argument
+from utils.Prompts import Prompts
 from utils.utils import Helpers, bcolors
 from utils.utils import print_vote_and_fork_info
 
@@ -38,12 +39,18 @@ def handle_core():
 
 @corecommand()
 def network_configuration(args):
+    """
+    This command the network configuration of the network the node is connected to.
+    """
     core_api_helper = CoreApiHelper(False)
     core_api_helper.network_configuration(True)
 
 
 @corecommand()
 def network_status(args):
+    """
+    This command returns the current state and status of the node's copy of the ledger
+    """
     core_api_helper = CoreApiHelper(False)
     core_api_helper.network_status(True)
 
@@ -72,6 +79,16 @@ def network_status(args):
              action="store_true")
 ])
 def entity(args):
+    """
+    This command helps to retrieve information about an entity.
+    CAUTION - Running these commands on a validator node may slow down you node.
+    The command will prompt for you to continue or not.
+    For automation purpose, you can suppress the prompt exporting env variable named SUPPRESS_API_COMMAND_WARN=true
+    """
+
+    if not Prompts.warn_slow_command():
+        sys.exit(1)
+
     core_api_helper = CoreApiHelper(False)
     key_list_response: KeyListResponse = core_api_helper.key_list(False)
     validator_address = key_list_response.public_keys[0].identifiers.validator_entity_identifier.address
@@ -125,12 +142,18 @@ def entity(args):
 
 @corecommand()
 def key_list(args):
+    """
+    This command helps to list the details of the validator keystore on a running node using node's CORE API
+    """
     core_api_helper = CoreApiHelper(False)
     core_api_helper.key_list(True)
 
 
 @corecommand()
 def mempool(args):
+    """
+    This command helps to fetch transactions in mempool
+    """
     core_api_helper = CoreApiHelper(False)
     core_api_helper.mempool(True)
 
@@ -141,6 +164,9 @@ def mempool(args):
              action="store")
 ])
 def mempool_transaction(args):
+    """
+    This command helps to fetch transaction in mempool of the node by transaction Id
+    """
     core_api_helper = CoreApiHelper(False)
     core_api_helper.mempool_transaction(args.transactionId, True)
 
@@ -150,11 +176,8 @@ def update_validator_config(args):
     """
     Utility command that helps a node runner to
 
-    * register
-    * unregister
-    * set validator metadata such as name/url
-    * Add or change validator fee
-    * Setup delegation or change owner id
+    `register`or  `unregister` or `set validator metadata such as name/url` or `Add or change validator fee`
+    or `Setup delegation or change owner id` or ` Prompt for voting if ready for forking`
     
     """
     health = DefaultApiHelper(verify_ssl=False).check_health()
@@ -187,6 +210,9 @@ def update_validator_config(args):
 
 @corecommand()
 def signal_candidate_fork_readiness(args):
+    """
+    This command helps to signal readiness for forking if there is voting required
+    """
     core_api_helper = CoreApiHelper(False)
     health = DefaultApiHelper(False).health()
     if health['fork_vote_status'] == 'VOTE_REQUIRED':
@@ -205,6 +231,9 @@ def signal_candidate_fork_readiness(args):
 
 @corecommand()
 def retract_candidate_fork_readiness_signal(args):
+    """
+    This command helps to withdraw from voting for the fork
+    """
     core_api_helper = CoreApiHelper(False)
     should_vote = input(
         f"This action will retract your candidate fork readiness signal (if there was one), continue? [Y/n]{bcolors.ENDC}")

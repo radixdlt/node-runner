@@ -19,13 +19,14 @@ def authcommand(args=[], parent=auth_parser):
     [
         argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
                  choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="admin", help="Name of admin user", action="store"),
+        argument("-u", "--username", default="admin", help="Name of admin user. Default value is `admin` ",
+                 action="store"),
         argument("-p", "--password", default="", help="Password of admin user", action="store")
 
     ])
 def set_admin_password(args):
     """
-    This sets up admin password on nginx basic auth. Refer this link for all the path.
+    This sets up admin password on nginx basic auth. Refer this link for all the paths.
     https://docs.radixdlt.com/main/node-and-gateway/port-reference.html#_endpoint_usage
     """
     password = args.password if args.password != "" else None
@@ -37,24 +38,34 @@ def set_admin_password(args):
     [
         argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
                  choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="metrics", help="Name of metrics user", action="store"),
+        argument("-u", "--username", default="metrics", help="Name of metrics user. Default value is `metrics`",
+                 action="store"),
         argument("-p", "--password", default="", help="Password of metrics user", action="store")
     ])
 def set_metrics_password(args):
+    """
+    This sets up metrics password on nginx basic auth. Refer this link for all the paths.
+    https://docs.radixdlt.com/main/node-and-gateway/port-reference.html#_endpoint_usage
+    """
     password = args.password if args.password != "" else None
-    set_auth(args, usertype="metrics",password=password)
+    set_auth(args, usertype="metrics", password=password)
 
 
 @authcommand(
     [
         argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
                  choices=["DOCKER", "SYSTEMD"], action="store"),
-        argument("-u", "--username", default="superadmin", help="Name of superadmin user", action="store"),
+        argument("-u", "--username", default="superadmin",
+                 help="Name of superadmin user. Default value is `superadmin` ", action="store"),
         argument("-p", "--password", default="", help="Password of superadmin user", action="store")
     ])
 def set_superadmin_password(args):
+    """
+    This sets up superadmin password on nginx basic auth. Refer this link for all the paths.
+    https://docs.radixdlt.com/main/node-and-gateway/port-reference.html#_endpoint_usage
+    """
     password = args.password if args.password != "" else None
-    set_auth(args, usertype="superadmin",password=password)
+    set_auth(args, usertype="superadmin", password=password)
 
 
 def set_auth(args, usertype, password=None):
