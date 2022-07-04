@@ -26,8 +26,6 @@ class PostGresSettings(BaseConfig):
             self.password = postgress_password
 
 
-
-
 class CoreApiNode(BaseConfig):
     Name = "Core"
     CoreApiAddress = "http://core:3333"

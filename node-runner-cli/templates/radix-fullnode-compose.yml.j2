@@ -83,7 +83,7 @@ services:
       RADIX_NG_API__CoreApiNodes__0__Name: "{{gateway.gateway_api.coreApiNode.Name}}"
       RADIX_NG_API__CoreApiNodes__0__CoreApiAddress: "{{gateway.gateway_api.coreApiNode.CoreApiAddress}}"
       {% if gateway.gateway_api.coreApiNode.auth_header is defined %}
-      RADIX_NG_API__CoreApiNodes__0__CoreApiAuthorizationHeader: "Authorization: {{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
+      RADIX_NG_API__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
       {% endif %}
       RADIX_NG_API__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.RequestWeighting or '1'}}"
       RADIX_NG_API__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.Enabled or 'true'}}"
@@ -111,7 +111,7 @@ services:
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.CoreApiAddress}}"
       {% if gateway.data_aggregator.coreApiNode.auth_header is defined %}
-      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAuthorizationHeader: "Authorization: {{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
       {% endif %}
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.TrustWeighting or '1'}}"
       RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.Enabled or 'true'}}"

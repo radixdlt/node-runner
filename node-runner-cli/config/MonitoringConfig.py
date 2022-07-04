@@ -33,7 +33,7 @@ class PrometheusSettings(BaseConfig):
     def set_target_details(self, url, target_name):
         parsed_url = urlparse(url)
         self.scheme = parsed_url.scheme
-        self.metrics_target = f"{parsed_url.hostname}:{parsed_url.port}"
+        self.metrics_target = f"{parsed_url.hostname}:{parsed_url.port}" if parsed_url.port != "" else f"{parsed_url.hostname}"
         if parsed_url.scheme == "https":
             auth = Prompts.get_basic_auth(target_name, "metrics")
             self.basic_auth_password = auth["password"]
