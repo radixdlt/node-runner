@@ -144,6 +144,10 @@ Below are the list of commands supported in cli to setup a core node process as 
 ----
 usage: radixnode systemd configure [-h]
 
+This commands installs all necessary software on the Virtual Machine(VM). Run
+this command on fresh VM or on a existing VM as the command is tested to be
+idempotent
+
 optional arguments:
   -h, --help  show this help message and exit
 ----
@@ -183,6 +187,8 @@ optional arguments:
 ----
 usage: radixnode systemd restart [-h] [-s {all,nginx,radixdlt-node}]
 
+This restarts the CORE node systemd service.
+
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -196,6 +202,8 @@ optional arguments:
 [source, bash]
 ----
 usage: radixnode systemd stop [-h] [-s {all,nginx,radixdlt-node}]
+
+This stops the CORE node systemd service.
 
 optional arguments:
   -h, --help            show this help message and exit

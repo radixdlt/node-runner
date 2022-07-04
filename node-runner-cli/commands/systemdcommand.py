@@ -107,6 +107,7 @@ def setup(args):
              choices=["all", "nginx", "radixdlt-node"], action="store")
 ])
 def stop(args):
+    """This stops the CORE node systemd service."""
     if args.services == "all":
         SystemD.stop_nginx_service()
         SystemD.stop_node_service()
@@ -125,6 +126,7 @@ def stop(args):
              choices=["all", "nginx", "radixdlt-node"], action="store")
 ])
 def restart(args):
+    """This restarts the CORE node systemd service."""
     if args.services == "all":
         SystemD.restart_node_service()
         SystemD.restart_nginx_service()
@@ -139,6 +141,10 @@ def restart(args):
 
 @systemdcommand([])
 def configure(args):
+    """
+    This commands installs all necessary software on the Virtual Machine(VM).
+    Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
+    """
     Base.install_dependecies()
     SystemD.install_java()
     SystemD.setup_user()
