@@ -11,7 +11,7 @@ class Prompts:
         if answer == "":
             return default
         else:
-            return answer
+            return answer.strip()
 
     @staticmethod
     def ask_postgress_password() -> str:
