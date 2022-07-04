@@ -139,6 +139,9 @@ def config(args):
             configuration.core_node_settings = detailed_node_settings
             configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
             config_to_dump["core_node"] = dict(configuration.core_node_settings)
+        else:
+            configuration.common_settings.nginx_settings.protect_core = "false"
+
         run_gateway = Prompts.check_for_gateway()
         if run_gateway:
             detailed_gateway_settings: GatewayDockerSettings = GatewayDockerSettings({}).create_config(
@@ -146,6 +149,9 @@ def config(args):
             configuration.gateway_settings = detailed_gateway_settings
             configuration.common_settings.ask_enable_nginx_for_gateway(nginx_on_gateway)
             config_to_dump["gateway"] = dict(configuration.gateway_settings)
+        else:
+            configuration.common_settings.nginx_settings.protect_gateway = "false"
+
     if configuration.common_settings.check_nginx_required():
         configuration.common_settings.ask_nginx_release()
     else:

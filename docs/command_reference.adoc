@@ -26,9 +26,9 @@ usage: radixnode docker config [-h] [-t TRUSTEDNODE] [-d CONFIGDIR]
 
 This commands allows node-runners and gateway admins to create a config file,
 which can persist their custom settings. Thus it allows is to decouple the
-updates from configuration. Config is created only once as such and then
-updated by doing a migration to version if there is a version change in the
-config file
+updates from configuration. Config is created only once as such and if there
+is a version change in the config file, then it updated by doing a migration
+to newer version
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -296,7 +296,9 @@ Once the nginx basic auth passwords for admin, superadmin, metrics users are set
 usage: radixnode api core entity [-h] [-v] [-a] [-p] [-sy] [-ss] [-su] [-se]
 
 This command helps to retrieve information about an entity. CAUTION - Running
-these commands on a validator node may slow down you node.
+these commands on a validator node may slow down you node. The command will
+prompt for you to continue or not. For automation purpose, you can suppress
+the prompt exporting env variable named SUPPRESS_API_COMMAND_WARN=true
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -378,6 +380,9 @@ optional arguments:
 ----
 usage: radixnode api system metrics [-h]
 
+This command helps to list the metrics that are exposed from the metrics
+endpoint of the node
+
 optional arguments:
   -h, --help  show this help message and exit
 ----
@@ -387,6 +392,9 @@ optional arguments:
 ----
 usage: radixnode api system health [-h]
 
+This command displays the health of the node on whether it is syncing, or
+booting or up
+
 optional arguments:
   -h, --help  show this help message and exit
 ----
@@ -395,6 +403,8 @@ optional arguments:
 [source, bash]
 ----
 usage: radixnode api system version [-h]
+
+This command displays the version of node software that is currently running
 
 optional arguments:
   -h, --help  show this help message and exit
@@ -411,6 +421,12 @@ usage: radixnode monitoring config [-h]
                                    [-gm GATEWAYAPIMETRICSPASSWORD]
                                    [-am AGGREGATORMETRICSPASSWORD]
                                    [-d MONITORINGCONFIGDIR]
+
+This commands allows to create a config file, which can persist custom
+settings for monitoring. Thus it allows is to decouple the updates from
+configuration. Config is created only once as such and if there is a version
+change in the config file, then it updated by doing a migration to newer
+version
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -442,6 +458,10 @@ optional arguments:
 ----
 usage: radixnode monitoring setup [-h] [-f MONITORINGCONFIGFILE] [-a]
 
+This commands setups up the software and deploys it based on what is stored in
+the config.yaml file. To update software versions, most of the time it is
+required to update the versions in config file and run this command
+
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -457,6 +477,10 @@ optional arguments:
 ----
 usage: radixnode monitoring start [-h] [-f MONITORINGCONFIGFILE] [-a]
 
+This commands starts the docker containers based on what is stored in the
+config.yaml file. If you have modified the config file, it is advised to use
+setup command.
+
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -471,6 +495,8 @@ optional arguments:
 [source, bash]
 ----
 usage: radixnode monitoring stop [-h] [-f MONITORINGCONFIGFILE] [-v]
+
+This commands stops the docker containers
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -489,6 +515,9 @@ Using CLI, for a key file, you can print out the validator address. This feature
 ----
 usage: radixnode key info [-h] -p PASSWORD -f FILELOCATION
 
+Using CLI, for a key file, you can print out the validator address. This
+feature is in beta.
+
 optional arguments:
   -h, --help            show this help message and exit
 
@@ -506,6 +535,8 @@ to setup some of the OS tweaks on ubuntu
 [source, bash]
 ----
 usage: radixnode.py version [-h]
+
+Run this command to display the version of CLI been used.
 
 optional arguments:
   -h, --help  show this help message and exit

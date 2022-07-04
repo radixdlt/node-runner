@@ -15,7 +15,7 @@ class Prompts:
 
     @staticmethod
     def ask_postgress_password() -> str:
-        answer = Helpers.input_guestion("\nPOSTGRES USER PASSWORD: Type in Postgress database password:")
+        answer = Helpers.input_guestion("\nPOSTGRES USER PASSWORD: Type in Postgres database password:")
         return answer
 
     @staticmethod
@@ -23,7 +23,7 @@ class Prompts:
         print("\nPOSTGRES USER: This is super admin user which is setup or going to be created if it is local setup.")
         answer = Helpers.input_guestion(
             "Default value for Postgres user is `postgres`. Press Enter to accept default"
-            " or Type in Postgress username:")
+            " or Type in Postgres username:")
         return Prompts.check_default(answer, "postgres")
 
     @staticmethod
@@ -38,7 +38,7 @@ class Prompts:
             return "local", default_host
 
         else:
-            hostname = input("\nFor the remote managed postgres, Enter the host name of server hosting postgress:")
+            hostname = input("\nFor the remote managed postgres, Enter the host name of server hosting postgres:")
             port = input("\nEnter the port the postgres process is listening on the server:")
             return "remote", f"{hostname}:{port}"
 
@@ -49,7 +49,7 @@ class Prompts:
     @staticmethod
     def get_postgress_dbname() -> str:
         answer = Helpers.input_guestion("\nPOSTGRES DB: Default value is 'radix-ledger'. "
-                                        "Press Enter to accept default or type in Postgress database name:")
+                                        "Press Enter to accept default or type in Postgres database name:")
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
@@ -190,7 +190,7 @@ class Prompts:
     @staticmethod
     def ask_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
         Helpers.section_headline("NEW or EXISTING SETUP")
-        y_n = input(f"\n{bcolors.WARNING}Is this first time you running the node on this machine [Y/N]:{bcolors.ENDC}")
+        y_n = input(f"\n{bcolors.WARNING}Is this first time you running the config on this machine [Y/N]:{bcolors.ENDC}")
         if Helpers.check_Yes(y_n):
             return f"{os.getcwd()}/{default_compose_file}"
         else:
