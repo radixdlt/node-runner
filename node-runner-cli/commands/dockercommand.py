@@ -167,7 +167,7 @@ def config(args):
     Helpers.section_headline("CONFIG is Generated as below")
     print(f"\n{yaml.dump(config_to_dump)}")
 
-    old_config = yaml.safe_load(config_file)
+    old_config = Docker.load_all_config(config_file)
     print(dict(DeepDiff(old_config, config_to_dump)))
 
     to_update = ""
