@@ -275,7 +275,10 @@ class Prompts:
     @staticmethod
     def warn_slow_command():
         if os.getenv(SUPPRESS_API_COMMAND_WARN, "False").lower() not in ("true", "yes"):
-            ask = input("This might slow down your node, do you want to continue?[Y/n]:")
+            ask = input(
+                "This call may be slow, and contends for the same database the node uses to execute transactions."
+                "This may slow the node down, and if it's a validator, may possibly cause it to miss proposals."
+                "Do you wish to proceed? [Y/n]:")
             if Helpers.check_Yes(ask):
                 return True
             else:

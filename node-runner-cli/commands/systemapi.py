@@ -24,17 +24,26 @@ def systemapicommand(args=[], parent=systemapi_parser):
 
 @systemapicommand()
 def metrics(args):
+    """
+    This command helps to list the metrics that are exposed from the metrics endpoint of the node
+    """
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.metrics()
 
 
 @systemapicommand()
 def version(args):
+    """
+    This command displays the version of node software that is currently running
+    """
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.version()
 
 
 @systemapicommand()
 def health(args):
+    """
+    This command displays the health of the node on whether it is syncing, or booting or up
+    """
     defaultApiHelper = DefaultApiHelper(verify_ssl=False)
     defaultApiHelper.health(print_response=True)
