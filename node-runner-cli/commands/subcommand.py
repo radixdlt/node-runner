@@ -6,7 +6,7 @@ def get_decorator(args, parent):
 
         if len(args) > 0:
             for arg in args:
-                if "required" in arg[1] or "mandatory" in arg[1]:
+                if "required" in arg[1]:
                     required_args.add_argument(*arg[0], **arg[1])
                 else:
                     optional_args.add_argument(*arg[0], **arg[1])
