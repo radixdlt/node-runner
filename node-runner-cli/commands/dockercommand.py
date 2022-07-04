@@ -1,3 +1,4 @@
+import json
 import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
@@ -73,7 +74,10 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
                   \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
                   """,
-             choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store")
+             choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store"),
+    argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE or GATEWAY."
+                                         "Prompts still appear if you run in DETAILED mode "
+                                         "Use this for automation purpose only", action="store_true")
 ])
 def config(args):
     """
@@ -90,7 +94,7 @@ def config(args):
     postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
     nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
     nginx_on_core = args.disablenginxforcore if args.disablenginxforcore != "" else None
-
+    autoapprove = args.autoapprove
     new_keystore = args.newkeystore
 
     if "DETAILED" in setupmode.mode and len(setupmode.mode) > 1:
@@ -161,11 +165,21 @@ def config(args):
 
     yaml.add_representer(type(None), Helpers.represent_none)
     Helpers.section_headline("CONFIG is Generated as below")
-    print(f"\n{yaml.dump(config_to_dump)}"
-          f"\n\n Saving to file {config_file} ")
+    print(f"\n{yaml.dump(config_to_dump)}")
 
-    with open(config_file, 'w') as f:
-        yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+    old_config = yaml.safe_load(config_file)
+    print(json.dumps(dict(DeepDiff(old_config, config_to_dump)), sort_keys=True, indent=4))
+
+    to_update = ""
+    if autoapprove:
+        print("In Auto mode - Updating file as suggested in above changes")
+    else:
+        to_update = input("\nOkay to update the file [Y/n]?:")
+    if Helpers.check_Yes(to_update) or autoapprove:
+        print(f"\n\n Saving to file {config_file} ")
+
+        with open(config_file, 'w') as f:
+            yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
 
 @dockercommand([
@@ -190,26 +204,26 @@ def setup(args):
 
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
 
-    old_compose_file, old_compose_file_yaml = Docker.get_existing_compose_file(all_config)
-    print(dict(DeepDiff(old_compose_file_yaml, render_template)))
+    compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    print(json.dumps(dict(DeepDiff(compose_file_yaml, render_template)), sort_keys=True, indent=4))
 
     to_update = ""
     if autoapprove:
         print("In Auto mode - Updating file as suggested in above changes")
     else:
         to_update = input("\nOkay to update the file [Y/n]?:")
-
     if Helpers.check_Yes(to_update) or autoapprove:
-        Docker.save_compose_file(old_compose_file, render_template)
+        Docker.save_compose_file(compose_file, render_template)
 
-    run_shell_command(f"cat {old_compose_file}", shell=True)
+    run_shell_command(f"cat {compose_file}", shell=True)
+
     should_start = ""
     if autoapprove:
         print("In Auto mode -  Updating the node as per above contents of docker file")
     else:
         should_start = input("\nOkay to start the containers [Y/n]?:")
     if Helpers.check_Yes(should_start) or autoapprove:
-        Docker.run_docker_compose_up(old_compose_file)
+        Docker.run_docker_compose_up(compose_file)
 
 
 @dockercommand([
@@ -227,8 +241,8 @@ def start(args):
     all_config = Docker.load_all_config(args.configfile)
     all_config = Docker.check_set_passwords(all_config)
     Docker.check_run_local_postgress(all_config)
-    old_compose_file, old_compose_file_yaml = Docker.get_existing_compose_file(all_config)
-    Docker.run_docker_compose_up(old_compose_file)
+    compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    Docker.run_docker_compose_up(compose_file)
 
 
 @dockercommand([
@@ -249,8 +263,8 @@ def stop(args):
             Removing volumes including Nginx volume. Nginx password needs to be recreated again when you bring node up
             """)
     all_config = Docker.load_all_config(args.configfile)
-    old_compose_file, old_compose_file_yaml = Docker.get_existing_compose_file(all_config)
-    Docker.run_docker_compose_down(old_compose_file, args.removevolumes)
+    compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    Docker.run_docker_compose_down(compose_file, args.removevolumes)
 
 
 @dockercommand([])

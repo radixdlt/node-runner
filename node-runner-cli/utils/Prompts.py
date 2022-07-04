@@ -188,7 +188,7 @@ class Prompts:
               "\nType in the node you want to connect to")
 
     @staticmethod
-    def ask_existing_compose_file(default_compose_file="radix-fullnode-compose.yml"):
+    def ask_existing_compose_file(default_compose_file="docker-compose.yml"):
         Helpers.section_headline("NEW or EXISTING SETUP")
         y_n = input(f"\n{bcolors.WARNING}Is this first time you running the config on this machine [Y/N]:{bcolors.ENDC}")
         if Helpers.check_Yes(y_n):
@@ -226,7 +226,7 @@ class Prompts:
 
         answer = Helpers.input_guestion(
             f"This will the target host that prometheus has to scrape. Default settings uses {bcolors.OKBLUE}{default}{bcolors.ENDC} "
-            f"Press Enter to accept default or type the value in format of url like {bcolors.FAIL}'http(s)://host:port':{bcolors.ENDC}:")
+            f"Press Enter to accept default or type the value in format of url like {bcolors.FAIL}'http(s)://host:port'{bcolors.ENDC}:")
         return Prompts.check_default(answer, default)
 
     @staticmethod
