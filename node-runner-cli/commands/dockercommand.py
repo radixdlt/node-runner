@@ -168,7 +168,11 @@ def config(args):
     print(f"\n{yaml.dump(config_to_dump)}")
 
     old_config = Docker.load_all_config(config_file)
-    print(dict(DeepDiff(old_config, config_to_dump)))
+    print(f"""
+        {Helpers.section_headline("Differences")}
+        Difference between existing config file and new config that you are creating
+        {dict(DeepDiff(old_config, config_to_dump))}
+          """)
 
     to_update = ""
     if autoapprove:
@@ -188,8 +192,10 @@ def config(args):
                   f"The default value is `{Helpers.get_default_node_config_dir()}/config.yaml` if not provided",
              default=f"{Helpers.get_default_node_config_dir()}/config.yaml",
              action="store"),
-    argument("-a", "--autoapprove", help="Set this to true to run without any prompts. "
-                                         "Use this for automation purpose only", action="store_true")
+    argument("-a", "--autoapprove", help="Pass this option to run without any prompts. "
+                                         "Use this for automation purpose only", action="store_true"),
+    argument("-u", "--update", help="Pass this option to update the deployed softwares to latest version."
+                                    " CLI prompts to confirm the versions if '-a' is not passed",action="store_true")
 ])
 def setup(args):
     """
@@ -198,15 +204,21 @@ def setup(args):
     """
     autoapprove = args.autoapprove
     all_config = Docker.load_all_config(args.configfile)
+    update = args.update
 
-    all_config = Docker.check_set_passwords(all_config)
-    Docker.check_run_local_postgress(all_config)
+    new_config = Docker.update_versions(all_config, autoapprove) if update else all_config
 
-    render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(all_config).to_yaml()
+    new_config = Docker.check_set_passwords(new_config)
+    Docker.check_run_local_postgress(new_config)
 
-    compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
+    render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(new_config).to_yaml()
+    compose_file, compose_file_yaml = Docker.get_existing_compose_file(new_config)
 
-    print(dict(DeepDiff(compose_file_yaml, render_template)))
+    print(f"""
+        {Helpers.section_headline("Differences between existing compose file and new compose file")}
+        Difference between existing config file and new config that you are creating
+        {dict(DeepDiff(compose_file_yaml, render_template))}
+          """)
 
     to_update = ""
     if autoapprove:

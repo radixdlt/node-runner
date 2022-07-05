@@ -190,7 +190,8 @@ class Prompts:
     @staticmethod
     def ask_existing_compose_file(default_compose_file="docker-compose.yml"):
         Helpers.section_headline("NEW or EXISTING SETUP")
-        y_n = input(f"\n{bcolors.WARNING}Is this first time you running the config on this machine [Y/N]:{bcolors.ENDC}")
+        y_n = input(
+            f"\n{bcolors.WARNING}Is this first time you running the config on this machine [Y/N]:{bcolors.ENDC}")
         if Helpers.check_Yes(y_n):
             return f"{os.getcwd()}/{default_compose_file}"
         else:
@@ -285,3 +286,15 @@ class Prompts:
                 return False
         else:
             return True
+
+    @staticmethod
+    def confirm_version_updates(config_version, latest_version, software='CORE', autoapprove=False):
+        if autoapprove:
+            return latest_version
+        else:
+            print(
+                f"\nLatest version of {software} is {latest_version}. Your version in config file is {config_version}")
+            answer = Helpers.input_guestion(
+                f"Do you want to update to latest version {latest_version},"
+                f"Press ENTER to accept latest version or type in version you want to install:")
+            return Helpers.check_Yes(Prompts.check_default(answer, latest_version))

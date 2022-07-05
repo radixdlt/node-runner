@@ -7,8 +7,10 @@ import yaml
 from config.BaseConfig import SetupMode
 from config.GatewayDockerConfig import PostGresSettings
 from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
+from github import github
 from setup.AnsibleRunner import AnsibleRunner
 from setup.Base import Base
+from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers
 
 
@@ -46,14 +48,14 @@ class Docker(Base):
     def run_docker_compose_up(composefile):
         docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
         result = run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                          env={
-                              COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                          },fail_on_error=False)
-        if result.returncode !=0 :
+                                   env={
+                                       COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                                   }, fail_on_error=False)
+        if result.returncode != 0:
             run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
-                                       env={
-                                           COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
-                                       }, fail_on_error=True)
+                              env={
+                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                              }, fail_on_error=True)
 
     @staticmethod
     def save_compose_file(existing_docker_compose, composefile_yaml):
@@ -124,3 +126,36 @@ class Docker(Base):
     def exit_on_missing_trustednode():
         print("-t or --trustednode parameter is mandatory")
         sys.exit(1)
+
+    @staticmethod
+    def update_versions(all_config, autoapprove):
+        updated_config = dict(all_config)
+
+        if all_config.get('core_node'):
+            current_core_release = all_config['core_node']["core_release"]
+            latest_core_release = github.latest_release("radixdlt/radixdlt"), 'CORE'
+            updated_config['core_node']["core_release"] = Prompts.confirm_version_updates(current_core_release,
+                                                                                          latest_core_release, 'CORE',
+                                                                                          autoapprove)
+        if all_config.get("gateway"):
+            latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+            current_gateway_release = all_config['gateway']["data_aggregator"]["release"]
+
+            if all_config.get('gateway', {}).get('data_aggregator'):
+                updated_config['gateway']["data_aggregator"]["release"] = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'AGGREGATOR', autoapprove)
+
+            if all_config.get('gateway', {}).get('gateway_api'):
+                updated_config['gateway']["gateway_api"]["release"] = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'GATEWAY', autoapprove)
+
+        if all_config.get("common_config").get("nginx_settings"):
+            latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+            current_nginx_release = all_config['common_config']["nginx_settings"]["release"]
+            updated_config['common_config']["nginx_settings"]["release"] = Prompts.confirm_version_updates(
+                current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
+            )
+
+        return updated_config
