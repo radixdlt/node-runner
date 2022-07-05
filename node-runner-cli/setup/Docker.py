@@ -133,7 +133,7 @@ class Docker(Base):
 
         if all_config.get('core_node'):
             current_core_release = all_config['core_node']["core_release"]
-            latest_core_release = github.latest_release("radixdlt/radixdlt"), 'CORE'
+            latest_core_release = github.latest_release("radixdlt/radixdlt")
             updated_config['core_node']["core_release"] = Prompts.confirm_version_updates(current_core_release,
                                                                                           latest_core_release, 'CORE',
                                                                                           autoapprove)
