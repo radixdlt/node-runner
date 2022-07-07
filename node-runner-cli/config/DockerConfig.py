@@ -80,7 +80,8 @@ class CoreDockerSettings(BaseConfig):
             self.enable_transaction = "true"
 
     def set_trusted_node(self, trusted_node):
-        # Prompts.ask_trusted_node()
+        if not trusted_node:
+            trusted_node = Prompts.ask_trusted_node()
         self.trusted_node = trusted_node
 
     def create_config(self, release, trustednode, ks_password, new_keystore):

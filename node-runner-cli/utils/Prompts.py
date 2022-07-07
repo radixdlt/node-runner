@@ -182,10 +182,15 @@ class Prompts:
 
     @staticmethod
     def ask_trusted_node() -> str:
-        input("Fullnode needs details another node to connect to network. "
-              "\nTo connect to MAINNET details on these node can be found here "
-              "- https://docs.radixdlt.com/main/node-and-gateway/cli-install-node-docker.html#_install_the_node"
-              "\nType in the node you want to connect to")
+
+        value = input("Fullnode requires another node to connect to network. "
+                      "\nTo connect to MAINNET details on these node can be found here "
+                      "- https://docs.radixdlt.com/main/node-and-gateway/cli-install-node-docker.html#_install_the_node"
+                      "\nType in the node you want to connect to in format radix//<node-peer-2-peer-address>@<ip>"
+                      "\n OR press Enter to accept default "
+                      "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177:")
+        return Prompts.check_default(value,
+                                     "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177")
 
     @staticmethod
     def ask_existing_compose_file(default_compose_file="docker-compose.yml"):

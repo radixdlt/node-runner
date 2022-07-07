@@ -44,8 +44,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
              help="Network id of network you want to connect.For stokenet it is 2 and for mainnet it is 1."
                   "If not provided you will be prompted to enter a value ",
              action="store",
-             type=int,
-             default=0),
+             default=""),
     argument("-p", "--postgrespassword",
              help="Network Gateway uses Postgres as datastore. This is password for the user `postgres`.",
              action="store",
@@ -88,8 +87,8 @@ def config(args):
     """
     setupmode = SetupMode.instance()
     setupmode.mode = args.setupmode
-    if "CORE" in setupmode.mode and args.trustednode == "":
-        Docker.exit_on_missing_trustednode()
+    trustednode = args.trustednode if args.trustednode != "" else None
+    networkid = args.networkid if args.networkid != "" else None
     keystore_password = args.keystorepassword if args.keystorepassword != "" else None
     postgrespassword = args.postgrespassword if args.postgrespassword != "" else None
     nginx_on_gateway = args.disablenginxforgateway if args.disablenginxforgateway != "" else None
@@ -114,13 +113,13 @@ def config(args):
         "\nCreating config file using the answers from the questions that would be asked in next steps."
         f"\nLocation of the config file: {bcolors.OKBLUE}{config_file}{bcolors.ENDC}")
 
-    configuration.common_settings.ask_network_id(args.networkid)
+    configuration.common_settings.ask_network_id(networkid)
     configuration.common_settings.ask_existing_docker_compose_file()
 
     config_to_dump = {"version": "0.1"}
 
     if "CORE" in setupmode.mode:
-        quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, args.trustednode,
+        quick_node_settings: CoreDockerSettings = CoreDockerSettings({}).create_config(release, trustednode,
                                                                                        keystore_password, new_keystore)
         configuration.core_node_settings = quick_node_settings
         configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
@@ -136,9 +135,7 @@ def config(args):
     if "DETAILED" in setupmode.mode:
         run_fullnode = Prompts.check_for_fullnode()
         if run_fullnode:
-            if args.trustednode == "":
-                Docker.exit_on_missing_trustednode()
-            detailed_node_settings = CoreDockerSettings({}).create_config(release, args.trustednode, keystore_password,
+            detailed_node_settings = CoreDockerSettings({}).create_config(release, trustednode, keystore_password,
                                                                           new_keystore)
             configuration.core_node_settings = detailed_node_settings
             configuration.common_settings.ask_enable_nginx_for_core(nginx_on_core)
