@@ -22,7 +22,7 @@ usage: radixnode docker config [-h] [-t TRUSTEDNODE] [-d CONFIGDIR]
                                [-n NETWORKID] [-p POSTGRESPASSWORD]
                                [-k KEYSTOREPASSWORD] [-nk] [-xc {true,false}]
                                [-xg {true,false}] -m {CORE,GATEWAY,DETAILED}
-                               [{CORE,GATEWAY,DETAILED} ...]
+                               [{CORE,GATEWAY,DETAILED} ...] [-a]
 
 This commands allows node-runners and gateway admins to create a config file,
 which can persist their custom settings. Thus it allows is to decouple the
@@ -47,7 +47,8 @@ optional arguments:
                         Trusted node on radix network.Example format:
                         radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3.
                         This is required only if you are creating config to
-                        run a CORE node
+                        run a CORE node and if not provided you will be
+                        prompted to enter a value
   -d CONFIGDIR, --configdir CONFIGDIR
                         Path to node-config directory where config file will
                         stored. Default value is /Users/shambu/node-config
@@ -74,12 +75,15 @@ optional arguments:
   -xg {true,false}, --disablenginxforgateway {true,false}
                         GateWay API's end points are protected by Basic auth
                         settings. Set this to disable to nginx for gateway
+  -a, --autoapprove     Set this to true to run without any prompts and in
+                        mode CORE or GATEWAY.Prompts still appear if you run
+                        in DETAILED mode Use this for automation purpose only
 ----
 
 ==== radixnode docker setup
 [source, bash]
 ----
-usage: radixnode docker setup [-h] [-f CONFIGFILE] [-a]
+usage: radixnode docker setup [-h] [-f CONFIGFILE] [-a] [-u]
 
 This commands setups up the software and deploys it based on what is stored in
 the config.yaml file. To update software versions, most of the time it is
@@ -94,8 +98,11 @@ optional arguments:
                         `radixnode docker config`The default value is
                         `/Users/shambu/node-config/config.yaml` if not
                         provided
-  -a, --autoapprove     Set this to true to run without any prompts. Use this
+  -a, --autoapprove     Pass this option to run without any prompts. Use this
                         for automation purpose only
+  -u, --update          Pass this option to update the deployed softwares to
+                        latest version. CLI prompts to confirm the versions if
+                        '-a' is not passed
 ----
 
 ==== radixnode docker start
@@ -296,9 +303,10 @@ Once the nginx basic auth passwords for admin, superadmin, metrics users are set
 usage: radixnode api core entity [-h] [-v] [-a] [-p] [-sy] [-ss] [-su] [-se]
 
 This command helps to retrieve information about an entity. CAUTION - Running
-these commands on a validator node may slow down you node. The command will
-prompt for you to continue or not. For automation purpose, you can suppress
-the prompt exporting env variable named SUPPRESS_API_COMMAND_WARN=true
+these commands on any node will slow down your node. If you're a validator,
+you may miss proposals. The command will prompt for you to continue or not.
+For automation purpose, you can suppress the prompt exporting env variable
+named SUPPRESS_API_COMMAND_WARN=true
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -536,7 +544,7 @@ to setup some of the OS tweaks on ubuntu
 ----
 usage: radixnode.py version [-h]
 
-Run this command to display the version of CLI been used.
+Run this command td display the version of CLI been used.
 
 optional arguments:
   -h, --help  show this help message and exit

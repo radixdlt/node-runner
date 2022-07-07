@@ -33,7 +33,8 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
     argument("-t", "--trustednode",
              help="Trusted node on radix network."
                   "Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3. "
-                  "This is required only if you are creating config to run a CORE node",
+                  "This is required only if you are creating config to run a CORE node and "
+                  "if not provided you will be prompted to enter a value",
              default="",
              action="store"),
     argument("-d", "--configdir",
