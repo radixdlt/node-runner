@@ -81,7 +81,7 @@ def network_status(args):
 def entity(args):
     """
     This command helps to retrieve information about an entity.
-    CAUTION - Running these commands on a validator node may slow down you node.
+    CAUTION - Running these commands on any node will slow down your node. If you're a validator, you may miss proposals.
     The command will prompt for you to continue or not.
     For automation purpose, you can suppress the prompt exporting env variable named SUPPRESS_API_COMMAND_WARN=true
     """
