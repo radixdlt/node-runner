@@ -312,6 +312,10 @@ class Helpers:
         with open(file_location, 'w') as f:
             yaml.dump(render_template, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
+    @staticmethod
+    def backup_file(source: str, dest: str):
+        import shutil
+        shutil.copy2(source, dest)
 
 class bcolors:
     HEADER = '\033[95m'

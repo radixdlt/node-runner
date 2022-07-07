@@ -178,8 +178,8 @@ def config(args):
     else:
         to_update = input("\nOkay to update the file [Y/n]?:")
     if Helpers.check_Yes(to_update) or autoapprove:
+        Helpers.backup_file(config_file, f"{Helpers.get_current_date_time()}_{config_file}")
         print(f"\n\n Saving to file {config_file} ")
-
         with open(config_file, 'w') as f:
             yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
@@ -223,7 +223,9 @@ def setup(args):
         print("In Auto mode - Updating file as suggested in above changes")
     else:
         to_update = input("\nOkay to update the file [Y/n]?:")
+
     if Helpers.check_Yes(to_update) or autoapprove:
+        Helpers.backup_file(compose_file,f"{Helpers.get_current_date_time()}_{compose_file}")
         Docker.save_compose_file(compose_file, render_template)
 
     run_shell_command(f"cat {compose_file}", shell=True)

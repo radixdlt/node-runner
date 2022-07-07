@@ -58,7 +58,7 @@ class Docker(Base):
                               }, fail_on_error=True)
 
     @staticmethod
-    def save_compose_file(existing_docker_compose, composefile_yaml):
+    def save_compose_file(existing_docker_compose: str, composefile_yaml: dict):
         with open(existing_docker_compose, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
 
