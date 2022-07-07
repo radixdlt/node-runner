@@ -7,7 +7,7 @@ command_help_doc()
   echo $1 $2 $3
   echo "" >> $3
 	echo "==== radixnode $1 $2" >> $3
-	echo "[source, bash]" >> $3
+	echo '[source, bash,subs="+quotes, +attributes" ]' >> $3
 	echo "----" >> $3
 	./radixnode.py $1 $2 -h >> $3
 	echo "----" >> $3
@@ -21,7 +21,7 @@ command_api_help_doc()
   echo $1 $2 $3
   echo "" >> $3
 	echo "==== radixnode $1 $2" >> $3
-	echo "[source, bash]" >> $3
+	echo '[source, bash,subs="+quotes, +attributes" ]' >> $3
 	echo "----" >> $3
 	./radixnode.py "api" $1 $2 -h >> $3
 	echo "----" >> $3

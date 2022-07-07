@@ -32,7 +32,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
 @dockercommand([
     argument("-t", "--trustednode",
              help="Trusted node on radix network."
-                  "Example format: radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3. "
+                  "Example format: 'radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177'."
                   "This is required only if you are creating config to run a CORE node and "
                   "if not provided you will be prompted to enter a value",
              default="",
@@ -193,7 +193,7 @@ def config(args):
     argument("-a", "--autoapprove", help="Pass this option to run without any prompts. "
                                          "Use this for automation purpose only", action="store_true"),
     argument("-u", "--update", help="Pass this option to update the deployed softwares to latest version."
-                                    " CLI prompts to confirm the versions if '-a' is not passed",action="store_true")
+                                    " CLI prompts to confirm the versions if '-a' is not passed", action="store_true")
 ])
 def setup(args):
     """
@@ -225,7 +225,7 @@ def setup(args):
         to_update = input("\nOkay to update the file [Y/n]?:")
 
     if Helpers.check_Yes(to_update) or autoapprove:
-        Helpers.backup_file(compose_file,f"{compose_file}_{Helpers.get_current_date_time()}")
+        Helpers.backup_file(compose_file, f"{compose_file}_{Helpers.get_current_date_time()}")
         Docker.save_compose_file(compose_file, render_template)
 
     run_shell_command(f"cat {compose_file}", shell=True)

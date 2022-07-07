@@ -3,7 +3,7 @@
 Below are the list of commands that can be used with cli to setup a core node or gateway.
 
 ==== radixnode docker configure
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode docker configure [-h]
 
@@ -16,7 +16,7 @@ optional arguments:
 ----
 
 ==== radixnode docker config
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode docker config [-h] [-t TRUSTEDNODE] [-d CONFIGDIR]
                                [-n NETWORKID] [-p POSTGRESPASSWORD]
@@ -44,11 +44,11 @@ required arguments:
 
 optional arguments:
   -t TRUSTEDNODE, --trustednode TRUSTEDNODE
-                        Trusted node on radix network.Example format:
-                        radix//brn1q0mgwag0g9f0sv9fz396mw9rgdall@10.1.2.3.
-                        This is required only if you are creating config to
-                        run a CORE node and if not provided you will be
-                        prompted to enter a value
+                        Trusted node on radix network.Example format: 'radix:/
+                        /rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvn
+                        wnst6derj@54.216.99.177'.This is required only if you
+                        are creating config to run a CORE node and if not
+                        provided you will be prompted to enter a value
   -d CONFIGDIR, --configdir CONFIGDIR
                         Path to node-config directory where config file will
                         stored. Default value is /Users/shambu/node-config
@@ -81,7 +81,7 @@ optional arguments:
 ----
 
 ==== radixnode docker setup
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode docker setup [-h] [-f CONFIGFILE] [-a] [-u]
 
@@ -106,7 +106,7 @@ optional arguments:
 ----
 
 ==== radixnode docker start
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode docker start [-h] [-f CONFIGFILE]
 
@@ -126,7 +126,7 @@ optional arguments:
 ----
 
 ==== radixnode docker stop
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode docker stop [-h] [-f CONFIGFILE] [-v]
 
@@ -147,7 +147,7 @@ optional arguments:
 Below are the list of commands supported in cli to setup a core node process as a systemd process
 
 ==== radixnode systemd configure
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode systemd configure [-h]
 
@@ -160,7 +160,7 @@ optional arguments:
 ----
 
 ==== radixnode systemd setup
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode systemd setup [-h] [-r RELEASE] [-x NGINXRELEASE] -t
                                TRUSTEDNODE -n {fullnode,archivenode} -i HOSTIP
@@ -190,7 +190,7 @@ optional arguments:
 ----
 
 ==== radixnode systemd restart
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode systemd restart [-h] [-s {all,nginx,radixdlt-node}]
 
@@ -206,7 +206,7 @@ optional arguments:
 ----
 
 ==== radixnode systemd stop
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode systemd stop [-h] [-s {all,nginx,radixdlt-node}]
 
@@ -224,7 +224,7 @@ optional arguments:
 This will set up the admin user and password for access to the general system endpoints.
 
 ==== radixnode auth set-admin-password
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode auth set-admin-password [-h] -m {DOCKER,SYSTEMD}
                                          [-u USERNAME] [-p PASSWORD]
@@ -248,7 +248,7 @@ optional arguments:
 ----
 
 ==== radixnode auth set-superadmin-password
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode auth set-superadmin-password [-h] -m {DOCKER,SYSTEMD}
                                               [-u USERNAME] [-p PASSWORD]
@@ -272,7 +272,7 @@ optional arguments:
 ----
 
 ==== radixnode auth set-metrics-password
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode auth set-metrics-password [-h] -m {DOCKER,SYSTEMD}
                                            [-u USERNAME] [-p PASSWORD]
@@ -298,7 +298,7 @@ optional arguments:
 Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
 
 ==== radixnode core entity
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api core entity [-h] [-v] [-a] [-p] [-sy] [-ss] [-su] [-se]
 
@@ -331,7 +331,7 @@ optional arguments:
 ----
 
 ==== radixnode core key-list
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api core key-list [-h]
 
@@ -343,7 +343,7 @@ optional arguments:
 ----
 
 ==== radixnode core mempool
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api core mempool [-h]
 
@@ -354,7 +354,7 @@ optional arguments:
 ----
 
 ==== radixnode core mempool-transaction
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api core mempool-transaction [-h] -t TRANSACTIONID
 
@@ -370,7 +370,7 @@ required arguments:
 ----
 
 ==== radixnode core update-validator-config
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api core update-validator-config [-h]
 
@@ -384,7 +384,7 @@ optional arguments:
 ----
 
 ==== radixnode system metrics
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api system metrics [-h]
 
@@ -396,7 +396,7 @@ optional arguments:
 ----
 
 ==== radixnode system health
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api system health [-h]
 
@@ -408,7 +408,7 @@ optional arguments:
 ----
 
 ==== radixnode system version
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode api system version [-h]
 
@@ -421,7 +421,7 @@ optional arguments:
 Using CLI , one can setup monitoring of the node or gateway.
 
 ==== radixnode monitoring config
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode monitoring config [-h]
                                    [-m {MONITOR_CORE,MONITOR_GATEWAY,DETAILED} [{MONITOR_CORE,MONITOR_GATEWAY,DETAILED} ...]]
@@ -462,7 +462,7 @@ optional arguments:
 ----
 
 ==== radixnode monitoring setup
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode monitoring setup [-h] [-f MONITORINGCONFIGFILE] [-a]
 
@@ -481,7 +481,7 @@ optional arguments:
 ----
 
 ==== radixnode monitoring start
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode monitoring start [-h] [-f MONITORINGCONFIGFILE] [-a]
 
@@ -500,7 +500,7 @@ optional arguments:
 ----
 
 ==== radixnode monitoring stop
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode monitoring stop [-h] [-f MONITORINGCONFIGFILE] [-v]
 
@@ -519,7 +519,7 @@ optional arguments:
 Using CLI, for a key file, you can print out the validator address. This feature is in beta and currently only below commands supported.
 
 ==== radixnode key info
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode key info [-h] -p PASSWORD -f FILELOCATION
 
@@ -540,7 +540,7 @@ List of other commands supported by cli are to check the version of CLI being us
 to setup some of the OS tweaks on ubuntu
 
 ==== radixnode version 
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode.py version [-h]
 
@@ -551,7 +551,7 @@ optional arguments:
 ----
 
 ==== radixnode optimise-node 
-[source, bash]
+[source, bash,subs="+quotes, +attributes" ]
 ----
 usage: radixnode.py optimise-node [-h]
 
