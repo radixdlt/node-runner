@@ -81,7 +81,8 @@ def network_status(args):
 def entity(args):
     """
     This command helps to retrieve information about an entity.
-    CAUTION - Running these commands on any node will slow down your node. If you're a validator, you may miss proposals.
+    CAUTION - Running these commands on any node will slow down your node. If you are running a validator,
+    it may miss proposals.
     The command will prompt for you to continue or not.
     For automation purpose, you can suppress the prompt exporting env variable named SUPPRESS_API_COMMAND_WARN=true
     """
@@ -176,8 +177,8 @@ def update_validator_config(args):
     """
     Utility command that helps a node runner to
 
-    `register`or  `unregister` or `set validator metadata such as name/url` or `Add or change validator fee`
-    or `Setup delegation or change owner id` or ` Prompt for voting if ready for forking`
+    'register ' or  'unregister' or 'set validator metadata such as name/url' or 'Add or change validator fee'
+    or 'Setup delegation or change owner id' or 'Prompt for voting if ready for forking'
     
     """
     health = DefaultApiHelper(verify_ssl=False).check_health()
