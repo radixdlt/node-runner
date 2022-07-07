@@ -103,7 +103,6 @@ jobs:
         if: ${{ github.event_name == 'release' }}
 
   test-core-only-node:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: [node-only]
     needs:
       - package_ubuntu_cli
@@ -144,7 +143,6 @@ jobs:
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
   test-core-api:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: [node-only]
     needs:
       - test-core-only-node
@@ -172,7 +170,6 @@ jobs:
           NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
 
   test-full-stack:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: [node-cli-full-stack]
     needs:
       - package_ubuntu_cli
@@ -231,7 +228,6 @@ jobs:
 
 
   test-full-stack-no-nginx:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: [node-cli-without-nginx]
     needs:
       - package_ubuntu_cli
