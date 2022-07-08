@@ -281,7 +281,7 @@ def stop(args):
 
 
 @dockercommand([])
-def configure(args):
+def install_dependecies(args):
     """
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent

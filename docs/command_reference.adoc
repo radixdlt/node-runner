@@ -5,14 +5,6 @@ Below are the list of commands that can be used with cli to setup a core node or
 ==== radixnode docker configure
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode docker configure [-h]
-
-This commands installs all necessary software on the Virtual Machine(VM). Run
-this command on fresh VM or on a existing VM as the command is tested to be
-idempotent
-
-optional arguments:
-  -h, --help  show this help message and exit
 ----
 
 ==== radixnode docker config
@@ -149,14 +141,6 @@ Below are the list of commands supported in cli to setup a core node process as 
 ==== radixnode systemd configure
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode systemd configure [-h]
-
-This commands installs all necessary software on the Virtual Machine(VM). Run
-this command on fresh VM or on a existing VM as the command is tested to be
-idempotent
-
-optional arguments:
-  -h, --help  show this help message and exit
 ----
 
 ==== radixnode systemd setup

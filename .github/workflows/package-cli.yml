@@ -114,7 +114,7 @@ jobs:
       - name: Run configure command
         run: |
           chmod +x ./radixnode
-          ./radixnode docker configure
+          ./radixnode docker install_dependecies
       - name: Setup config
         run: |
           chmod +x ./radixnode
