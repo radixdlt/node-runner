@@ -74,7 +74,7 @@ def dockercommand(dockercommand_args=[], parent=docker_parser):
                   \n\nGATEWAY: Use this value to setup GATEWAY using defaults.
                   \n\nDETAILED: Default value if not provided. This mode takes your through series of questions.
                   """,
-             choices=["CORE", "GATEWAY", "DETAILED"], default="DETAILED", action="store"),
+             choices=["CORE", "GATEWAY", "DETAILED"], action="store"),
     argument("-a", "--autoapprove", help="Set this to true to run without any prompts and in mode CORE or GATEWAY."
                                          "Prompts still appear if you run in DETAILED mode "
                                          "Use this for automation purpose only", action="store_true")
