@@ -123,7 +123,7 @@ def config(args):
                  action="store", default=f"{Helpers.get_default_monitoring_config_dir()}/monitoring_config.yaml"),
         argument("-a", "--autoapprove", help="Set this to true to run without any prompts", action="store_true")
     ])
-def setup(args):
+def install(args):
     """
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command

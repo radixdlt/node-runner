@@ -130,7 +130,7 @@ jobs:
         run: |
           export DISABLE_VERSION_CHECK=true
           export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
-          ./radixnode docker setup -f $HOME/node-config/config.yaml -a
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a
           sleep 60
           export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
           ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
@@ -211,11 +211,11 @@ jobs:
               -gm $NGINX_METRICS_PASSWORD  \
               -am $NGINX_METRICS_PASSWORD
 
-          ./radixnode monitoring setup -a
+          ./radixnode monitoring install -a
 
           export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
           export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
-          ./radixnode docker setup -f $HOME/node-config/config.yaml -a -u
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
@@ -256,7 +256,7 @@ jobs:
 
           #Below PATH require when ansible is installed as part of pip
           export PATH="$PATH:/home/ubuntu/.local/bin"
-          ./radixnode docker setup -f $HOME/node-config/config.yaml -a -u
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
           sleep 60
           NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
           curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207

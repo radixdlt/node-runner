@@ -461,10 +461,10 @@ optional arguments:
                         stored
 ----
 
-==== radixnode monitoring setup
+==== radixnode monitoring install
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode monitoring setup [-h] [-f MONITORINGCONFIGFILE] [-a]
+usage: radixnode monitoring install [-h] [-f MONITORINGCONFIGFILE] [-a]
 
 This commands setups up the software and deploys it based on what is stored in
 the config.yaml file. To update software versions, most of the time it is

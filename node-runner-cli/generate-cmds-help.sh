@@ -84,7 +84,7 @@ cat <<EOT >> "$filename"
 === Setup monitoring using CLI
 Using CLI , one can setup monitoring of the node or gateway.
 EOT
-declare -a othercommands=("config" "setup" "start" "stop")
+declare -a othercommands=("config" "install" "start" "stop")
 for subcommand in "${othercommands[@]}"
 do
   command_help_doc "monitoring" "$subcommand" "$filename"
