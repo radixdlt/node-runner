@@ -12,7 +12,7 @@ from utils.utils import run_shell_command, Helpers, bcolors
 
 class Base:
     @staticmethod
-    def install_dependecies():
+    def dependencies():
         run_shell_command('sudo apt update', shell=True)
         run_shell_command('sudo apt install -y  docker.io wget unzip docker-compose rng-tools', shell=True)
         run_shell_command('sudo rngd -r /dev/random', shell=True)

@@ -140,12 +140,12 @@ def restart(args):
 
 
 @systemdcommand([])
-def install_dependecies(args):
+def dependencies(args):
     """
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
-    Base.install_dependecies()
+    Base.dependencies()
     SystemD.install_java()
     SystemD.setup_user()
     SystemD.make_etc_directory()

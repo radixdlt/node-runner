@@ -2,10 +2,10 @@
 === Core node or Gateway setup using docker
 Below are the list of commands that can be used with cli to setup a core node or gateway.
 
-==== radixnode docker install-dependecies
+==== radixnode docker dependencies
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode docker install-dependecies [-h]
+usage: radixnode docker dependencies [-h]
 
 This commands installs all necessary software on the Virtual Machine(VM). Run
 this command on fresh VM or on a existing VM as the command is tested to be
@@ -80,10 +80,10 @@ optional arguments:
                         in DETAILED mode Use this for automation purpose only
 ----
 
-==== radixnode docker setup
+==== radixnode docker install
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode docker setup [-h] [-f CONFIGFILE] [-a] [-u]
+usage: radixnode docker install [-h] [-f CONFIGFILE] [-a] [-u]
 
 This commands setups up the software and deploys it based on what is stored in
 the config.yaml file. To update software versions, most of the time it is
@@ -146,10 +146,10 @@ optional arguments:
 === Radix node CLI command reference
 Below are the list of commands supported in cli to setup a core node process as a systemd process
 
-==== radixnode systemd install-dependecies
+==== radixnode systemd dependencies
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode systemd install-dependecies [-h]
+usage: radixnode systemd dependencies [-h]
 
 This commands installs all necessary software on the Virtual Machine(VM). Run
 this command on fresh VM or on a existing VM as the command is tested to be

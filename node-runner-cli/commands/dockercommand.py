@@ -195,7 +195,7 @@ def config(args):
     argument("-u", "--update", help="Pass this option to update the deployed softwares to latest version."
                                     " CLI prompts to confirm the versions if '-a' is not passed", action="store_true")
 ])
-def setup(args):
+def install(args):
     """
     This commands setups up the software and deploys it based on what is stored in the config.yaml file.
     To update software versions, most of the time it is required to update the versions in config file and run this command
@@ -281,12 +281,12 @@ def stop(args):
 
 
 @dockercommand([])
-def install_dependecies(args):
+def dependencies(args):
     """
     This commands installs all necessary software on the Virtual Machine(VM).
     Run this command on fresh VM or on a existing VM  as the command is tested to be idempotent
     """
-    Base.install_dependecies()
+    Base.dependencies()
     ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
     AnsibleRunner(ansible_dir).check_install_ansible(False)
     Base.add_user_docker_group()

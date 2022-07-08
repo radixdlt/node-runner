@@ -35,7 +35,7 @@ cat <<EOT >> "$filename"
 Below are the list of commands that can be used with cli to setup a core node or gateway.
 EOT
 
-declare -a dockersubcommands=("install-dependecies" "config" "setup" "start" "stop")
+declare -a dockersubcommands=("dependencies" "config" "install" "start" "stop")
 for subcommand in "${dockersubcommands[@]}"
 do
   command_help_doc "docker" "$subcommand" "$filename"
@@ -46,7 +46,7 @@ cat <<EOT >> "$filename"
 === Radix node CLI command reference
 Below are the list of commands supported in cli to setup a core node process as a systemd process
 EOT
-declare -a systemdsubcommands=("install-dependecies" "setup" "restart" "stop")
+declare -a systemdsubcommands=("dependencies" "setup" "restart" "stop")
 for subcommand in "${systemdsubcommands[@]}"
 do
   command_help_doc "systemd" "$subcommand" "$filename"
