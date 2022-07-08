@@ -93,7 +93,7 @@ class Docker(Base):
         return all_config
 
     @staticmethod
-    def check_run_local_postgresSQL(all_config):
+    def check_run_local_postgreSQL(all_config):
         postgres_db = all_config.get('gateway', {}).get('postgres_db')
         if Docker.check_post_db_local(all_config):
             ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'

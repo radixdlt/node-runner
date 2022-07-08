@@ -207,7 +207,7 @@ def setup(args):
     new_config = Docker.update_versions(all_config, autoapprove) if update else all_config
 
     new_config = Docker.check_set_passwords(new_config)
-    Docker.check_run_local_postgresSQL(new_config)
+    Docker.check_run_local_postgreSQL(new_config)
 
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(new_config).to_yaml()
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(new_config)
@@ -253,7 +253,7 @@ def start(args):
     """
     all_config = Docker.load_all_config(args.configfile)
     all_config = Docker.check_set_passwords(all_config)
-    Docker.check_run_local_postgresSQL(all_config)
+    Docker.check_run_local_postgreSQL(all_config)
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(all_config)
     Docker.run_docker_compose_up(compose_file)
 

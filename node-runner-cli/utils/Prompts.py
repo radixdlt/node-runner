@@ -186,7 +186,7 @@ class Prompts:
         value = input("Fullnode requires another node to connect to network. "
                       "\nTo connect to MAINNET details on these node can be found here "
                       "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
-                      "\nType in the node you want to connect to in format radix//<node-peer-2-peer-address>@<ip>"
+                      "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
                       "\n OR press Enter to accept default "
                       "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177:")
         return Prompts.check_default(value,
