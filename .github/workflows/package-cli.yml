@@ -186,6 +186,7 @@ jobs:
           ./radixnode docker config -d $HOME/node-config \
             -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
             -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
+          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
           cat $HOME/node-config/config.yaml
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
@@ -218,7 +219,7 @@ jobs:
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" https://localhost/gateway
+          curl -f  --request POST --insecure --user "admin:$NGINX_ADMIN_PASSWORD" https://localhost/gateway
           curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
 
         env:
