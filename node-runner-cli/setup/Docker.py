@@ -159,3 +159,16 @@ class Docker(Base):
             )
 
         return updated_config
+
+    @staticmethod
+    def backup_save_config(config_file,new_config, autoapprove,backup_time):
+        to_update = ""
+        if autoapprove:
+            print("In Auto mode - Updating the file as suggested in above changes")
+        else:
+            to_update = input("\nOkay to update the file [Y/n]?:")
+        if Helpers.check_Yes(to_update) or autoapprove:
+            Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
+            print(f"\n\n Saving to file {config_file} ")
+            with open(config_file, 'w') as f:
+                yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

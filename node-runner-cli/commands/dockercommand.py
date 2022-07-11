@@ -172,16 +172,7 @@ def config(args):
         {dict(DeepDiff(old_config, config_to_dump))}
           """)
 
-    to_update = ""
-    if autoapprove:
-        print("In Auto mode - Updating file as suggested in above changes")
-    else:
-        to_update = input("\nOkay to update the file [Y/n]?:")
-    if Helpers.check_Yes(to_update) or autoapprove:
-        Helpers.backup_file(config_file, f"{args.configdir}/{Helpers.get_current_date_time()}_config.yaml")
-        print(f"\n\n Saving to file {config_file} ")
-        with open(config_file, 'w') as f:
-            yaml.dump(config_to_dump, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+    Docker.backup_save_config(config_file, config_to_dump, autoapprove, Helpers.get_current_date_time())
 
 
 @dockercommand([
@@ -201,7 +192,8 @@ def install(args):
     To update software versions, most of the time it is required to update the versions in config file and run this command
     """
     autoapprove = args.autoapprove
-    all_config = Docker.load_all_config(args.configfile)
+    config_file = args.configfile
+    all_config = Docker.load_all_config(config_file)
     update = args.update
 
     new_config = Docker.update_versions(all_config, autoapprove) if update else all_config
@@ -210,6 +202,15 @@ def install(args):
     Docker.check_run_local_postgreSQL(new_config)
 
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(new_config).to_yaml()
+    print(f"""
+          {Helpers.section_headline("Differences in config file with updated software versions")}
+          Difference between existing config file and new config that you are creating
+          {dict(DeepDiff(all_config, new_config))}
+            """)
+
+    backup_time = Helpers.get_current_date_time()
+    Docker.backup_save_config(config_file, new_config, autoapprove, backup_time)
+
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(new_config)
 
     print(f"""
@@ -225,7 +226,7 @@ def install(args):
         to_update = input("\nOkay to update the file [Y/n]?:")
 
     if Helpers.check_Yes(to_update) or autoapprove:
-        Helpers.backup_file(compose_file, f"{compose_file}_{Helpers.get_current_date_time()}")
+        Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
         Docker.save_compose_file(compose_file, render_template)
 
     run_shell_command(f"cat {compose_file}", shell=True)
