@@ -196,7 +196,7 @@ def install(args):
     all_config = Docker.load_all_config(config_file)
     update = args.update
 
-    new_config = Docker.update_versions(all_config, autoapprove) if update else all_config
+    new_config = Docker.update_versions(all_config, autoapprove) if update else dict(all_config)
 
     new_config = Docker.check_set_passwords(new_config)
     Docker.check_run_local_postgreSQL(new_config)

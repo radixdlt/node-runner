@@ -216,7 +216,7 @@ jobs:
 
           export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
           export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
-          ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
