@@ -30,7 +30,7 @@ def systemdcommand(systemdcommand_args=[], parent=systemd_parser):
     argument("-u", "--update", help="Update the node to new version of node", action="store_false"),
 
 ])
-def setup(args):
+def install(args):
     """This sets up the systemd service for the core node."""
 
     if not args.release:

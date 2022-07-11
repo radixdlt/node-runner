@@ -159,12 +159,12 @@ optional arguments:
   -h, --help  show this help message and exit
 ----
 
-==== radixnode systemd setup
+==== radixnode systemd install
 [source, bash,subs="+quotes, +attributes" ]
 ----
-usage: radixnode systemd setup [-h] [-r RELEASE] [-x NGINXRELEASE] -t
-                               TRUSTEDNODE -n {fullnode,archivenode} -i HOSTIP
-                               [-ts] [-u]
+usage: radixnode systemd install [-h] [-r RELEASE] [-x NGINXRELEASE] -t
+                                 TRUSTEDNODE -n {fullnode,archivenode} -i
+                                 HOSTIP [-ts] [-u]
 
 This sets up the systemd service for the core node.
 
@@ -378,6 +378,28 @@ Utility command that helps a node runner to 'register ' or 'unregister' or
 'set validator metadata such as name/url' or 'Add or change validator fee' or
 'Setup delegation or change owner id' or 'Prompt for voting if ready for
 forking'
+
+optional arguments:
+  -h, --help  show this help message and exit
+----
+
+==== radixnode core signal-protocol-update-readiness
+[source, bash,subs="+quotes, +attributes" ]
+----
+usage: radixnode api core signal-protocol-update-readiness [-h]
+
+This command helps to signal readiness for forking if there is voting required
+
+optional arguments:
+  -h, --help  show this help message and exit
+----
+
+==== radixnode core retract-protocol-update-readiness
+[source, bash,subs="+quotes, +attributes" ]
+----
+usage: radixnode api core retract-protocol-update-readiness [-h]
+
+This command helps to withdraw from voting for the fork
 
 optional arguments:
   -h, --help  show this help message and exit

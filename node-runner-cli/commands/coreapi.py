@@ -210,7 +210,7 @@ def update_validator_config(args):
 
 
 @corecommand()
-def signal_candidate_fork_readiness(args):
+def signal_protocol_update_readiness(args):
     """
     This command helps to signal readiness for forking if there is voting required
     """
@@ -231,7 +231,7 @@ def signal_candidate_fork_readiness(args):
 
 
 @corecommand()
-def retract_candidate_fork_readiness_signal(args):
+def retract_protocol_update_readiness(args):
     """
     This command helps to withdraw from voting for the fork
     """
