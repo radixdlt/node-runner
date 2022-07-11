@@ -294,6 +294,30 @@ optional arguments:
   -p PASSWORD, --password PASSWORD
                         Password of metrics user
 ----
+
+==== radixnode auth set-gateway-password
+[source, bash,subs="+quotes, +attributes" ]
+----
+usage: radixnode auth set-gateway-password [-h] -m {DOCKER,SYSTEMD}
+                                           [-u USERNAME] [-p PASSWORD]
+
+This sets up gateway password on nginx basic auth. Refer this link for all the
+paths. https://docs.radixdlt.com/main/node-and-gateway/port-
+reference.html#_endpoint_usage
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+required arguments:
+  -m {DOCKER,SYSTEMD}, --setupmode {DOCKER,SYSTEMD}
+                        Setup type whether it is DOCKER or SYSTEMD
+
+optional arguments:
+  -u USERNAME, --username USERNAME
+                        Name of gateway user. Default value is `gateway`
+  -p PASSWORD, --password PASSWORD
+                        Password of gateway user
+----
 === Accessing core endpoints using CLI
 Once the nginx basic auth passwords for admin, superadmin, metrics users are setup , radixnode cli can be used to access the node endpoints
 

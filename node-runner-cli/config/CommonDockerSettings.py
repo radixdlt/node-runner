@@ -61,7 +61,7 @@ class CommonDockerSettings(BaseConfig):
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
-        self.nginx_settings.release = "DO-574-setup-and-config-command-updates-a9029d5"
+        self.nginx_settings.release = "task-nginx-gateway-user-47ba1ce"
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
 

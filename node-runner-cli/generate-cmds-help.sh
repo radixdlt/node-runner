@@ -56,7 +56,7 @@ cat <<EOT >> "$filename"
 === Set passwords for the Nginx server
 This will set up the admin user and password for access to the general system endpoints.
 EOT
-declare -a authcommands=("set-admin-password" "set-superadmin-password" "set-metrics-password")
+declare -a authcommands=("set-admin-password" "set-superadmin-password" "set-metrics-password" "set-gateway-password" )
 for subcommand in "${authcommands[@]}"
 do
   command_help_doc "auth" "$subcommand" "$filename"

@@ -6,7 +6,7 @@ from setup import Docker, SystemD
 authcli = ArgumentParser(
     description='Subcommand to aid creation of nginx basic auth users',
     usage="radixnode auth "
-    )
+)
 
 auth_parser = authcli.add_subparsers(dest="authcommand")
 
@@ -31,7 +31,7 @@ def set_admin_password(args):
     """
     password = args.password if args.password != "" else None
 
-    set_auth(args, usertype="admin",password=password)
+    set_auth(args, usertype="admin", password=password)
 
 
 @authcommand(
@@ -68,9 +68,26 @@ def set_superadmin_password(args):
     set_auth(args, usertype="superadmin", password=password)
 
 
+@authcommand(
+    [
+        argument("-m", "--setupmode", required=True, help="Setup type whether it is DOCKER or SYSTEMD",
+                 choices=["DOCKER", "SYSTEMD"], action="store"),
+        argument("-u", "--username", default="gateway",
+                 help="Name of gateway user. Default value is `gateway` ", action="store"),
+        argument("-p", "--password", default="", help="Password of gateway user", action="store")
+    ])
+def set_gateway_password(args):
+    """
+    This sets up gateway password on nginx basic auth. Refer this link for all the paths.
+    https://docs.radixdlt.com/main/node-and-gateway/port-reference.html#_endpoint_usage
+    """
+    password = args.password if args.password != "" else None
+    set_auth(args, usertype="gateway", password=password)
+
+
 def set_auth(args, usertype, password=None):
     if args.setupmode == "DOCKER":
-        Docker.setup_nginx_Password(usertype, args.username,password)
+        Docker.setup_nginx_Password(usertype, args.username, password)
     elif args.setupmode == "SYSTEMD":
         SystemD.checkUser()
         SystemD.install_nginx()

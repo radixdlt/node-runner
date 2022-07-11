@@ -203,6 +203,7 @@ jobs:
 
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set_gateway_password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
 
           ./radixnode monitoring stop
           ./radixnode monitoring config \
@@ -219,12 +220,13 @@ jobs:
           sleep 60
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
-          curl -f  --request POST --insecure --user "admin:$NGINX_ADMIN_PASSWORD" https://localhost/gateway
+          curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
           curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
 
         env:
           NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
           NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
 
 
   test-full-stack-no-nginx:
