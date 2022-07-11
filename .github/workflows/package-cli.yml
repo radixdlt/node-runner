@@ -221,6 +221,7 @@ jobs:
 
           NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
           curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
+          curl -f --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
           curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
 
         env:
