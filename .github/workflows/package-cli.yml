@@ -203,7 +203,7 @@ jobs:
 
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
           DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
-          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set_gateway_password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
 
           ./radixnode monitoring stop
           ./radixnode monitoring config \
