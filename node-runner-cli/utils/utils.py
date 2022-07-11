@@ -235,7 +235,7 @@ class Helpers:
     @staticmethod
     def handleApiException(e: ApiException):
         print(f"Exception-reason:{e.reason},status:{e.status}.body:{e.body}")
-        sys.exit()
+        sys.exit(1)
 
     @staticmethod
     def archivenode_deprecate_message():
