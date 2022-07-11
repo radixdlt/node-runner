@@ -186,7 +186,7 @@ jobs:
           ./radixnode docker config -d $HOME/node-config \
             -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
             -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
-          grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
+          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
           cat $HOME/node-config/config.yaml
         env:
           POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
