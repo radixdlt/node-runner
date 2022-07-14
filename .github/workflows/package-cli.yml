@@ -112,6 +112,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
@@ -125,6 +127,39 @@ jobs:
           echo "HOME=$HOME"
           echo "PATH=$PWD"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: corenode-01
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: corenode-02
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: gateway-remote-core-local-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: gateway-remote-core-remote-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
           ./radixnode docker config -m DETAILED \
            -k $KEYSTORE_PASSWORD -nk -a
         env:
