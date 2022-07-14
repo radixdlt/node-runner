@@ -4,9 +4,9 @@
 - setup_fullnode: Y
 - input_seednode: "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177"
 - have_keystore_file: Y
-- input_path_keystore: "/Users/shambu/node-config"
+- input_path_keystore: "/home/ubuntu/node-config"
 - enter_keystore_name: "node-keystore.ks"
-- input_ledger_path: "/Users/shambu/data"
+- input_ledger_path: "/home/ubuntu/data"
 - input_transaction_api: "true"
 - core_nginx_setup: "true"
 - setup_gateway: Y

@@ -1,7 +1,7 @@
 ---
 - select_network: S
 - first_time_config: N
-- have_existing_compose: "/Users/shambu/project/node-runner/node-runner-cli/docker-compose.yml"
+- have_existing_compose: "/home/ubuntu/docker-compose.yml"
 - setup_fullnode: N
 - setup_gateway: Y
 - input_core_api_address: https://test
