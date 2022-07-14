@@ -171,7 +171,7 @@ class Docker(Base):
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")
         else:
-            to_update = input("\nOkay to update the file [Y/n]?:")
+            to_update = input("\nOkay to update the config file [Y/n]?:")
         if Helpers.check_Yes(to_update) or autoapprove:
             if os.path.exists(config_file):
                 Helpers.backup_file(config_file, f"{config_file}_{backup_time}")

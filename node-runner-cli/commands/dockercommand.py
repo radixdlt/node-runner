@@ -204,33 +204,35 @@ def install(args):
     Docker.check_run_local_postgreSQL(new_config)
 
     render_template = Renderer().load_file_based_template("radix-fullnode-compose.yml.j2").render(new_config).to_yaml()
-    print(f"""
-          {Helpers.section_headline("Differences in config file with updated software versions")}
-          Difference between existing config file and new config that you are creating
-          {dict(DeepDiff(all_config, new_config))}
-            """)
-
+    config_differences = dict(DeepDiff(all_config, new_config))
     backup_time = Helpers.get_current_date_time()
-    Docker.backup_save_config(config_file, new_config, autoapprove, backup_time)
+
+    if len(config_differences) !=0:
+        print(f"""
+              {Helpers.section_headline("Differences in config file with updated software versions")}
+              Difference between existing config file and new config that you are creating
+              {config_differences}
+                """)
+        Docker.backup_save_config(config_file, new_config, autoapprove, backup_time)
 
     compose_file, compose_file_yaml = Docker.get_existing_compose_file(new_config)
+    compose_file_difference = dict(DeepDiff(compose_file_yaml, render_template))
+    if len(compose_file_difference) != 0:
+        print(f"""
+            {Helpers.section_headline("Differences between existing compose file and new compose file")}
+            Difference between existing config file and new config that you are creating
+            {compose_file_difference}
+              """)
+        to_update = ""
+        if autoapprove:
+            print("In Auto mode - Updating file as suggested in above changes")
+        else:
+            to_update = input("\nOkay to update the file [Y/n]?:")
 
-    print(f"""
-        {Helpers.section_headline("Differences between existing compose file and new compose file")}
-        Difference between existing config file and new config that you are creating
-        {dict(DeepDiff(compose_file_yaml, render_template))}
-          """)
-
-    to_update = ""
-    if autoapprove:
-        print("In Auto mode - Updating file as suggested in above changes")
-    else:
-        to_update = input("\nOkay to update the file [Y/n]?:")
-
-    if Helpers.check_Yes(to_update) or autoapprove:
-        if os.path.exists(compose_file):
-            Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
-        Docker.save_compose_file(compose_file, render_template)
+        if Helpers.check_Yes(to_update) or autoapprove:
+            if os.path.exists(compose_file):
+                Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
+            Docker.save_compose_file(compose_file, render_template)
 
     run_shell_command(f"cat {compose_file}", shell=True)
 
