@@ -72,7 +72,6 @@ services:
 {% endif %}
     environment:
       ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
-      RADIX_NG_API__PrometheusMetricsPort: "{{gateway.gateway_api.prometheus_metrics_port}}"
       RADIX_NG_API__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
       RADIX_NG_API__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
       RADIX_NG_API__NetworkName: "{{common_config.network_name}}"
