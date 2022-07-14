@@ -6,7 +6,6 @@
 - have_keystore_file: Y
 - input_path_keystore: "/home/ubuntu/node-config"
 - enter_keystore_name: "node-keystore.ks"
-
 - input_ledger_path: "/home/runner/data"
 - input_transaction_api: "true"
 - core_nginx_setup: "true"
