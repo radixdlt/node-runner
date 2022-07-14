@@ -113,9 +113,14 @@ class Docker(Base):
     @staticmethod
     def load_all_config(configfile):
         yaml.add_representer(type(None), Helpers.represent_none)
-        with open(configfile, 'r') as file:
-            all_config = yaml.safe_load(file)
-            return all_config
+
+        if os.path.exists(configfile):
+            with open(configfile, 'r') as file:
+                all_config = yaml.safe_load(file)
+                return all_config
+        else:
+            print(f"Config file '{configfile}' doesn't exist");
+            return {}
 
     @staticmethod
     def get_existing_compose_file(all_config):
