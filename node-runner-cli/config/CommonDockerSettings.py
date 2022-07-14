@@ -18,7 +18,7 @@ class CommonDockerSettings(BaseConfig):
     network_name: str = None
     genesis_json_location: str = None
     nginx_settings: NginxConfig = NginxConfig({})
-    existing_docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
+    docker_compose: str = f"{Helpers.get_home_dir()}/docker-compose.yml"
 
     def __init__(self, settings: dict):
         super().__init__(settings)
@@ -86,6 +86,6 @@ class CommonDockerSettings(BaseConfig):
 
     def ask_existing_docker_compose_file(self):
         if "DETAILED" in SetupMode.instance().mode:
-            self.existing_docker_compose = Prompts.ask_existing_compose_file()
+            self.docker_compose = Prompts.ask_existing_compose_file()
         else:
-            open(self.existing_docker_compose, mode='a').close()
+            open(self.docker_compose, mode='a').close()

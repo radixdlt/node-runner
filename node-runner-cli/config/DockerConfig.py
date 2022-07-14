@@ -119,4 +119,4 @@ class DockerConfig:
                 {"network_id": common_settings.get("network_id", "1")})
             self.core_node_settings.keydetails = KeyDetails(core_node.get("keydetails", None))
             self.core_node_settings.trusted_node = core_node.get("trusted_node", None)
-            self.core_node_settings.existing_docker_compose = core_node.get("existing_docker_compose", None)
+            self.core_node_settings.existing_docker_compose = core_node.get("docker_compose", None)

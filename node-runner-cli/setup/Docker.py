@@ -119,7 +119,7 @@ class Docker(Base):
 
     @staticmethod
     def get_existing_compose_file(all_config):
-        compose_file = all_config['common_config']['existing_docker_compose']
+        compose_file = all_config['common_config']['docker_compose']
         return compose_file, Helpers.yaml_as_dict(compose_file)
 
     @staticmethod
