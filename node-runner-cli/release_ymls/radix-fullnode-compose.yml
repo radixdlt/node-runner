@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   core:
-    image: radixdlt/radixdlt-core:1.1.1
+    image: radixdlt/radixdlt-core:1.3.1
     init: true
     ulimits:
       nofile:
@@ -31,7 +31,7 @@ services:
 #      - "core_ledger:/home/radixdlt/RADIXDB"
       - "./node-keystore.ks:/home/radixdlt/node-keystore.ks"
   nginx:
-    image: radixdlt/radixdlt-nginx:1.1.1
+    image: radixdlt/radixdlt-nginx:1.3.1
     restart: unless-stopped
     ulimits:
       nofile:
