@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter
@@ -166,11 +167,12 @@ def config(args):
     print(f"\n{yaml.dump(config_to_dump)}")
 
     old_config = Docker.load_all_config(config_file)
-    print(f"""
-        {Helpers.section_headline("Differences")}
-        Difference between existing config file and new config that you are creating
-        {dict(DeepDiff(old_config, config_to_dump))}
-          """)
+    if len(old_config) != 0:
+        print(f"""
+            {Helpers.section_headline("Differences")}
+            Difference between existing config file and new config that you are creating
+            {dict(DeepDiff(old_config, config_to_dump))}
+              """)
 
     Docker.backup_save_config(config_file, config_to_dump, autoapprove, Helpers.get_current_date_time())
 
@@ -226,7 +228,8 @@ def install(args):
         to_update = input("\nOkay to update the file [Y/n]?:")
 
     if Helpers.check_Yes(to_update) or autoapprove:
-        Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
+        if os.path.exists(compose_file):
+            Helpers.backup_file(compose_file, f"{compose_file}_{backup_time}")
         Docker.save_compose_file(compose_file, render_template)
 
     run_shell_command(f"cat {compose_file}", shell=True)

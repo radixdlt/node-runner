@@ -185,6 +185,7 @@ jobs:
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
           export DISABLE_VERSION_CHECK=true
+          rm -rf $HOME/node-config
           ./radixnode docker config -d $HOME/node-config \
             -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
             -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a

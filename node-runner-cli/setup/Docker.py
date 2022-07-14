@@ -173,7 +173,8 @@ class Docker(Base):
         else:
             to_update = input("\nOkay to update the file [Y/n]?:")
         if Helpers.check_Yes(to_update) or autoapprove:
-            Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
+            if os.path.exists(config_file):
+                Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
             print(f"\n\n Saving to file {config_file} ")
             with open(config_file, 'w') as f:
                 yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

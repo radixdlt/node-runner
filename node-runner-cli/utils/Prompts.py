@@ -197,7 +197,7 @@ class Prompts:
         Helpers.section_headline("NEW or EXISTING SETUP")
         y_n = input(
             f"\n{bcolors.WARNING}Is this first time you running the config on this machine [Y/N]:{bcolors.ENDC}")
-        if Helpers.check_Yes(y_n):
+        if not Helpers.check_Yes(Prompts.check_default(y_n, "Y")):
             return f"{os.getcwd()}/{default_compose_file}"
         else:
             prompt_answer = input(
