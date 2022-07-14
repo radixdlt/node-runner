@@ -11,6 +11,7 @@ class NginxConfig(BaseConfig):
     gateway_behind_auth: str = "true"
     protect_core: str = "true"
     release = None
+    repo = "radixdlt/radixdlt-nginx"
 
 
 class CommonDockerSettings(BaseConfig):

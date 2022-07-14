@@ -25,6 +25,7 @@ class CoreDockerSettings(BaseConfig):
     composefileurl: str = None
     keydetails: KeyDetails = KeyDetails({})
     core_release: str = None
+    repo: str = "radixdlt/radixdlt-core"
     data_directory: str = f"{Helpers.get_home_dir()}/data"
     enable_transaction: str = "false"
     trusted_node: str = None

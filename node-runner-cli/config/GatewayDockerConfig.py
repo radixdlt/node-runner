@@ -28,14 +28,14 @@ class PostGresSettings(BaseConfig):
 
 class CoreApiNode(BaseConfig):
     Name = "Core"
-    CoreApiAddress = "http://core:3333"
-    TrustWeighting = 1
-    RequestWeighting = 1
-    Enabled = "true"
+    core_api_address = "http://core:3333"
+    trust_weighting = 1
+    request_weighting = 1
+    enabled = "true"
     basic_auth_user = None
     basic_auth_password = None
     auth_header = None
-    DisableCoreApiHttpsCertificateChecks: str = None
+    disable_core_api_https_certificate_checks: str = None
 
     def __iter__(self):
         class_variables = {key: value
@@ -52,15 +52,13 @@ class CoreApiNode(BaseConfig):
                 yield attr, self.__getattribute__(attr)
 
     def ask_disablehttpsVerify(self):
-        self.DisableCoreApiHttpsCertificateChecks = Prompts.get_disablehttpsVerfiy()
+        self.disable_core_api_https_certificate_checks = Prompts.get_disablehttpsVerfiy()
 
 
 class DataAggregatorSetting:
     release: str = None
     repo: str = "radixdlt/ng-data-aggregator"
-    docker_image: str = None
     restart: str = "unless-stopped"
-    prometheusMetricsPort: str = "1234"
     NetworkName: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
 
@@ -73,12 +71,11 @@ class DataAggregatorSetting:
         self.release = latest_gateway_release
         if "DETAILED" in SetupMode.instance().mode:
             self.release = Prompts.get_gateway_release("data_aggregator", latest_gateway_release)
-        self.docker_image = f"{self.repo}:{self.release}"
 
     def ask_core_api_node_settings(self):
         if "DETAILED" in SetupMode.instance().mode:
-            self.coreApiNode.CoreApiAddress = Prompts.get_CoreApiAddress(self.coreApiNode.CoreApiAddress)
-            self.set_basic_auth(self.coreApiNode.CoreApiAddress)
+            self.coreApiNode.core_api_address = Prompts.get_CoreApiAddress(self.coreApiNode.core_api_address)
+            self.set_basic_auth(self.coreApiNode.core_api_address)
             self.coreApiNode.Name = Prompts.get_CopeAPINodeName(self.coreApiNode.Name)
             self.coreApiNode = self.coreApiNode
 
@@ -104,19 +101,16 @@ class DataAggregatorSetting:
 class GatewayAPIDockerSettings(BaseConfig):
     release: str = None
     repo: str = "radixdlt/ng-gateway-api"
-    docker_image: str = None
     coreApiNode: CoreApiNode = CoreApiNode({})
     restart = "unless-stopped"
-    prometheusMetricsPort = "1234"
-    enableSwagger = "true"
-    maxPageSize = "30"
+    enable_swagger = "true"
+    max_page_size = "30"
 
     def ask_gateway_release(self):
         latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
         self.release = latest_gateway_release
         if "DETAILED" in SetupMode.instance().mode:
             self.release = Prompts.get_gateway_release("gateway_api", latest_gateway_release)
-        self.docker_image = f"{self.repo}:{self.release}"
 
     def set_core_api_node_setings(self, coreApiNode: CoreApiNode):
         self.coreApiNode = coreApiNode

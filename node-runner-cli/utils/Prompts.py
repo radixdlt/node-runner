@@ -80,7 +80,7 @@ class Prompts:
     @staticmethod
     def get_RequestWeighting():
         answer = input(
-            "Type in RequestWeighting settings.This is used by gateway_api."
+            "Type in request_weighting settings.This is used by gateway_api."
             "\nDefault is 1, press 'ENTER' to accept default:")
         return Prompts.check_default(answer, 1)
 
