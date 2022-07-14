@@ -122,6 +122,8 @@ jobs:
           ls -a
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
           ./radixnode docker config -m DETAILED \
            -k $KEYSTORE_PASSWORD -nk -a
