@@ -104,6 +104,27 @@ jobs:
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
 
+  test-config-command:
+    runs-on: [ubuntu]
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: core-gateway-all-local
+        run: |
+          chmod +x ./radixnode
+          mkdir -p $HOME/node-config
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+
   test-core-only-node:
     runs-on: [node-only]
     needs:

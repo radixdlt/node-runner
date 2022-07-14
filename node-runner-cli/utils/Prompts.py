@@ -1,6 +1,7 @@
 import os
 
 from env_vars import SUPPRESS_API_COMMAND_WARN
+from utils.PromptFeeder import QuestionKeys
 from utils.utils import Helpers, run_shell_command, bcolors
 
 
@@ -15,7 +16,8 @@ class Prompts:
 
     @staticmethod
     def ask_postgress_password() -> str:
-        answer = Helpers.input_guestion("\nPOSTGRES USER PASSWORD: Type in Postgres database password:")
+        answer = Helpers.input_guestion("\nPOSTGRES USER PASSWORD: Type in Postgres database password:",
+                                        QuestionKeys.postgres_db_password)
         return answer
 
     @staticmethod
@@ -23,7 +25,7 @@ class Prompts:
         print("\nPOSTGRES USER: This is super admin user which is setup or going to be created if it is local setup.")
         answer = Helpers.input_guestion(
             "Default value for Postgres user is `postgres`. Press Enter to accept default"
-            " or Type in Postgres username:")
+            " or Type in Postgres username:", QuestionKeys.postgres_db_user)
         return Prompts.check_default(answer, "postgres")
 
     @staticmethod
@@ -31,15 +33,18 @@ class Prompts:
         print("\nGateway uses POSTGRES as a datastore. \nIt can be run a systemd process on same machine "
               "as a local setup or use a remote managed POSTGRES.")
         answer = Helpers.input_guestion(
-            "\nPress ENTER to use default value 'local' setup or type in 'remote': ")
+            "\nPress ENTER to use default value 'local' setup or type in 'remote': ", QuestionKeys.postgres_location)
 
         local_or_remote = Prompts.check_default(answer, 'local')
         if local_or_remote == "local":
             return "local", default_host
 
         else:
-            hostname = input("\nFor the remote managed postgres, Enter the host name of server hosting postgres:")
-            port = input("\nEnter the port the postgres process is listening on the server:")
+            hostname = Helpers.input_guestion(
+                "\nFor the remote managed postgres, Enter the host name of server hosting postgres:",
+                QuestionKeys.postgres_db_host)
+            port = Helpers.input_guestion("\nEnter the port the postgres process is listening on the server:",
+                                          QuestionKeys.postgres_db_port)
             return "remote", f"{hostname}:{port}"
 
     @staticmethod
@@ -49,7 +54,8 @@ class Prompts:
     @staticmethod
     def get_postgress_dbname() -> str:
         answer = Helpers.input_guestion("\nPOSTGRES DB: Default value is 'radix-ledger'. "
-                                        "Press Enter to accept default or type in Postgres database name:")
+                                        "Press Enter to accept default or type in Postgres database name:",
+                                        QuestionKeys.postgres_db_name)
         return Prompts.check_default(answer, "radix-ledger")
 
     @staticmethod
@@ -60,14 +66,16 @@ class Prompts:
             f"\nCORE API ADDRESS: Default settings use local node  and the default value is {bcolors.OKBLUE}{default}{bcolors.ENDC} ")
         answer = Helpers.input_guestion(
             "Press ENTER to accept default Or Type in remote CoreApi "
-            f"address in format of url like {bcolors.FAIL}http(s)://<host and port>:{bcolors.ENDC}")
+            f"address in format of url like {bcolors.FAIL}http(s)://<host and port>:{bcolors.ENDC}",
+            QuestionKeys.input_core_api_address)
         return Prompts.check_default(answer, default)
 
     @staticmethod
     def get_CopeAPINodeName(default) -> str:
         print("\nNODE NAME: This can be any string and logs would refer this name on related info/errors")
         answer = Helpers.input_guestion(
-            f"Default value is '{default}'. Press ENTER to accept default value or type in new name':")
+            f"Default value is '{default}'. Press ENTER to accept default value or type in new name':",
+            QuestionKeys.core_api_node_name)
         return Prompts.check_default(answer, default)
 
     @staticmethod
@@ -95,17 +103,17 @@ class Prompts:
         print(
             f"{target} is setup on different machine or behind https protected by basic auth."
             f" It would require Nginx {user_type} user and password.")
-        username = input(
-            f"Type in the username. Press 'ENTER' for default value '{user_type}':")
-        password = input(
-            "Type in the password:")
+        username = Helpers.input_guestion(
+            f"Type in the username. Press 'ENTER' for default value '{user_type}':", QuestionKeys.basic_auth_user)
+        password = Helpers.input_guestion(
+            "Type in the password:", QuestionKeys.basic_auth_password)
         return {"name": Prompts.check_default(username, user_type), "password": password}
 
     @staticmethod
     def get_disablehttpsVerfiy() -> str:
-        answer = input(
+        answer = Helpers.input_guestion(
             "If the core api node has self signed certificate, Press 'ENTER' to accept 'true'. otherwise type 'false' "
-            "[true/false]:")
+            "[true/false]:", QuestionKeys.core_api_disable_https_verify)
         return Prompts.check_default(answer, "true").lower()
 
     @staticmethod
@@ -114,8 +122,9 @@ class Prompts:
         Helpers.section_headline("GATEWAY RELEASE")
 
         print(f"Latest release for {gateway_or_aggregator} is {latest_gateway_release}")
-        answer = input(
-            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:")
+        question_key = QuestionKeys.gateway_release if gateway_or_aggregator == "gateway_api" else QuestionKeys.aggregator_release
+        answer = Helpers.input_guestion(
+            f"Press Enter to accept the latest or  type in {gateway_or_aggregator} release tag:",question_key)
         return Prompts.check_default(answer, latest_gateway_release)
 
     @staticmethod
@@ -125,7 +134,8 @@ class Prompts:
             "\nFor more info on NETWORK GATEWAY refer https://docs.radixdlt.com/main/node-and-gateway/network-gateway.html"
             "\nDo you want to setup NETWORK GATEWAY on this machine? ")
 
-        answer = Helpers.input_guestion("Default is No[N], Press ENTER to accept default or type in [Y/N]")
+        answer = Helpers.input_guestion("Default is No[N], Press ENTER to accept default or type in [Y/N]",
+                                        QuestionKeys.setup_gateway)
         return Helpers.check_Yes(Prompts.check_default(answer, "N"))
 
     @staticmethod
@@ -135,7 +145,8 @@ class Prompts:
             f"\nDo you want to setup a fullnode or a validator? For more information refer "
             "https://docs.radixdlt.com/main/node-and-gateway/node-introduction.html#_what_is_a_radix_node")
         answer = Helpers.input_guestion(
-            "Default is Y to setup fullnode , Press ENTER to accept default or type in [Y/N]:")
+            "Default is Y to setup fullnode , Press ENTER to accept default or type in [Y/N]:",
+            QuestionKeys.setup_fullnode)
         return Helpers.check_Yes(Prompts.check_default(answer, "Y"))
 
     @staticmethod
@@ -144,7 +155,8 @@ class Prompts:
         print(
             "\nTransactions API on fullnodes are disabled. For it act as node that can stream transactions to a Gateway, it needs to be enabled."
             "\nTo enable this, it requires to be set to true,")
-        answer = Helpers.input_guestion("\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:")
+        answer = Helpers.input_guestion("\nPress 'ENTER' to accept 'false'. otherwise type 'true' [true/false]:",
+                                        QuestionKeys.input_transaction_api)
         return Prompts.check_default(answer, "false").lower()
 
     @staticmethod
@@ -154,16 +166,19 @@ class Prompts:
             f"\nThe keystore file is the identity of the node and a very important file."
             f"\nIf you are planning to run a validator,  make sure you definitely backup this keystore file"
         )
-        y_n = Helpers.input_guestion("\nDo you have a keystore file that you want to use [Y/N]?")
+        y_n = Helpers.input_guestion("\nDo you have a keystore file that you want to use [Y/N]?",
+                                     QuestionKeys.have_keystore_file)
         if Helpers.check_Yes(Prompts.check_default(y_n, "N")):
-            return input(
-                f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}")
+            return Helpers.input_guestion(
+                f"{bcolors.WARNING}Enter the absolute path of the folder, just the folder, where the keystore file is located:{bcolors.ENDC}",
+                QuestionKeys.input_path_keystore)
         else:
             radixnode_dir = f"{Helpers.get_default_node_config_dir()}"
             print(
                 f"\nDefault folder location for Keystore file will be: {bcolors.OKBLUE}{radixnode_dir}{bcolors.ENDC}")
             answer = Helpers.input_guestion(
-                'Press ENTER to accept default. otherwise enter the absolute path of the new folder:')
+                'Press ENTER to accept default. otherwise enter the absolute path of the new folder:',
+                QuestionKeys.input_path_keystore)
             # TODO this needs to moved out of init
             run_shell_command(f'mkdir -p {radixnode_dir}', shell=True, quite=True)
             return Prompts.check_default(answer, radixnode_dir)
@@ -171,8 +186,9 @@ class Prompts:
     @staticmethod
     def ask_keyfile_name() -> str:
         default_keyfile_name = "node-keystore.ks"
-        value = input(
-            f"\n{bcolors.WARNING}Type in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':{bcolors.ENDC}").strip()
+        value = Helpers.input_guestion(
+            f"\n{bcolors.WARNING}Type in name of keystore file. Otherwise press 'Enter' to use default value '{default_keyfile_name}':{bcolors.ENDC}",
+            QuestionKeys.enter_keystore_name).strip()
         if value != "":
             keyfile_name = value
         else:
@@ -183,26 +199,29 @@ class Prompts:
     @staticmethod
     def ask_trusted_node() -> str:
 
-        value = input("Fullnode requires another node to connect to network. "
-                      "\nTo connect to MAINNET or STOKENET details on these node can be found here "
-                      "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
-                      "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
-                      "\n OR press Enter to accept default "
-                      "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177:")
-        return Prompts.check_default(value,
-                                     "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177")
+        value = Helpers.input_guestion("Fullnode requires another node to connect to network. "
+                                       "\nTo connect to MAINNET or STOKENET details on these node can be found here "
+                                       "- https://docs.radixdlt.com/main/node-and-gateway/seed-nodes.html"
+                                       "\nType in the node you want to connect to in format radix://<node-peer-2-peer-address>@<ip>"
+                                       "\n OR press Enter to accept default "
+                                       "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177:",
+                                       QuestionKeys.input_seednode)
+        trustednode = Prompts.check_default(value,
+                                            "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177")
+        Helpers.parse_trustednode(trustednode)
+        return trustednode
 
     @staticmethod
     def ask_existing_compose_file(default_compose_file="docker-compose.yml"):
         Helpers.section_headline("NEW or EXISTING SETUP")
-        y_n = input(
-            f"\n{bcolors.WARNING}Is this first time you running the config on this machine [Y/N]:{bcolors.ENDC}")
-        if not Helpers.check_Yes(Prompts.check_default(y_n, "Y")):
+        y_n = Helpers.input_guestion(
+            f"\nIs this first time you running the config on this machine [Y/N]:", QuestionKeys.first_time_config)
+        if Helpers.check_Yes(Prompts.check_default(y_n, "Y")):
             return f"{os.getcwd()}/{default_compose_file}"
         else:
-            prompt_answer = input(
+            prompt_answer = Helpers.input_guestion(
                 f"\nSo you have existing docker compose file. Is it in location '{bcolors.OKBLUE}{os.getcwd()}/{default_compose_file}{bcolors.ENDC}'?"
-                f"\nIf so, press 'ENTER' or type in absolute path to file:")
+                f"\nIf so, press 'ENTER' or type in absolute path to file:", QuestionKeys.have_existing_compose)
             if prompt_answer == "":
                 return f"{os.getcwd()}/{default_compose_file}"
             else:
@@ -212,9 +231,15 @@ class Prompts:
     def ask_enable_nginx(service='CORE') -> str:
         Helpers.section_headline(f"NGINX SETUP FOR {service} NODE")
         print(f"\n {service} API can be protected by running Nginx infront of it.")
+        question_key = None
+        if service == "CORE":
+            question_key = QuestionKeys.core_nginx_setup
+        elif service == "GATEWAY":
+            question_key = QuestionKeys.gateway_nginx_setup
         answer = Helpers.input_guestion(
             "Default value is 'true' to enable it. "
-            "Press Enter to accept default or type to choose [true/false]:")
+            "Press Enter to accept default or type to choose [true/false]:",
+            question_key)
         return Prompts.check_default(answer, "true")
 
     @staticmethod
@@ -223,7 +248,8 @@ class Prompts:
         Helpers.section_headline("NGINX CONFIG")
         print(f"Latest release of radixdlt-nginx is {bcolors.OKBLUE}{latest_nginx_release}{bcolors.ENDC}.")
         answer = Helpers.input_guestion(
-            f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:")
+            f"\nPress Enter to accept default or Type in radixdlt/radixdlt-nginx release tag:",
+            QuestionKeys.input_nginx_release)
         return Prompts.check_default(answer, latest_nginx_release)
 
     @staticmethod

@@ -125,7 +125,10 @@ class Docker(Base):
     @staticmethod
     def get_existing_compose_file(all_config):
         compose_file = all_config['common_config']['docker_compose']
-        return compose_file, Helpers.yaml_as_dict(compose_file)
+        if os.path.exists(compose_file):
+            return compose_file, Helpers.yaml_as_dict(compose_file)
+        else:
+            return compose_file, {}
 
     @staticmethod
     def exit_on_missing_trustednode():
@@ -166,7 +169,7 @@ class Docker(Base):
         return updated_config
 
     @staticmethod
-    def backup_save_config(config_file,new_config, autoapprove,backup_time):
+    def backup_save_config(config_file, new_config, autoapprove, backup_time):
         to_update = ""
         if autoapprove:
             print("In Auto mode - Updating the file as suggested in above changes")

@@ -207,7 +207,7 @@ def install(args):
     config_differences = dict(DeepDiff(all_config, new_config))
     backup_time = Helpers.get_current_date_time()
 
-    if len(config_differences) !=0:
+    if len(config_differences) != 0:
         print(f"""
               {Helpers.section_headline("Differences in config file with updated software versions")}
               Difference between existing config file and new config that you are creating

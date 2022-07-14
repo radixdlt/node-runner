@@ -6,6 +6,7 @@ from pathlib import Path
 import requests
 
 from setup.AnsibleRunner import AnsibleRunner
+from utils.PromptFeeder import QuestionKeys
 from utils.Prompts import Prompts
 from utils.utils import run_shell_command, Helpers, bcolors
 
@@ -79,12 +80,12 @@ class Base:
     @staticmethod
     def get_data_dir(create_dir=True):
         Helpers.section_headline("LEDGER LOCATION")
-        data_dir_path = input(
+        data_dir_path = Helpers.input_guestion(
             f"\nRadix node stores all the ledger data on a folder. "
             f"Mounting this location as a docker volume, "
             f"will allow to restart the node without a need to download ledger"
             f"\n{bcolors.WARNING}Press Enter to store ledger on \"{Helpers.get_home_dir()}/data\" directory OR "
-            f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}")
+            f"Type the absolute path of existing ledger data folder:{bcolors.ENDC}", QuestionKeys.input_ledger_path)
         if data_dir_path == "":
             data_dir_path = f"{Helpers.get_home_dir()}/data"
         if create_dir:
@@ -95,7 +96,8 @@ class Base:
     def get_network_id():
         # Network id
         network_prompt = Helpers.input_guestion(
-            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:")
+            "Select the network you want to connect [S]Stokenet or [M]Mainnet or network_id:",
+            QuestionKeys.select_network)
         if network_prompt.lower() in ["s", "stokenet"]:
             network_id = 2
         elif network_prompt.lower() in ["m", "mainnet"]:

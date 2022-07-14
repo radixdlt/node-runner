@@ -10,6 +10,7 @@ import yaml
 from system_client import ApiException
 
 from env_vars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT
+from utils.PromptFeeder import PromptFeeder
 from version import __version__
 
 
@@ -280,8 +281,17 @@ class Helpers:
         print(f"{bcolors.BOLD}--------------{title}----------------------{bcolors.ENDC}")
 
     @staticmethod
-    def input_guestion(question):
-        return input(f"\n{bcolors.WARNING}{question}{bcolors.ENDC}")
+    def input_guestion(question, question_key=None):
+        prompt_feed = None
+        if question_key:
+            prompt_feed = PromptFeeder.instance().get_answer(question_key)
+        if not prompt_feed:
+            return input(f"\n{bcolors.WARNING}{question}{bcolors.ENDC}")
+        else:
+            print("Got from promptfeeder")
+            print(f"Question is {question}")
+            print(f"Answer is {prompt_feed}")
+            return prompt_feed
 
     @staticmethod
     def print_info(info):
@@ -316,6 +326,7 @@ class Helpers:
     def backup_file(source: str, dest: str):
         import shutil
         shutil.copy2(source, dest)
+
 
 class bcolors:
     HEADER = '\033[95m'
