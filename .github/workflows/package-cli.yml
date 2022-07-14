@@ -110,14 +110,16 @@ jobs:
     needs:
       - package_ubuntu_cli
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
-      - name: Checkout
-        uses: actions/checkout@v2
+
       - name: core-gateway-all-local
         run: |
+          ls -a
           chmod +x ./radixnode
           mkdir -p $HOME/node-config
           export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
