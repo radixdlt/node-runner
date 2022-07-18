@@ -9,7 +9,7 @@ from utils.Prompts import Prompts, Helpers
 class NginxConfig(BaseConfig):
     protect_gateway: str = "true"
     gateway_behind_auth: str = "true"
-    enable_gateway_api_for_core = "true"
+    enable_transaction_api = "false"
     protect_core: str = "true"
     release = None
     repo = "radixdlt/radixdlt-nginx"
