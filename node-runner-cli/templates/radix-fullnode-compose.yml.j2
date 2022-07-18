@@ -44,7 +44,9 @@ services:
  {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}
   nginx:
     environment:
+    {% if core_node is defined %}
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
+    {% endif %}
       RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
       RADIXDLT_GATEWAY_BEHIND_AUTH: '{{common_config.nginx_settings.gateway_behind_auth or 'false'}}'
     image: {{common_config.nginx_settings.repo}}:{{common_config.nginx_settings.release}}
