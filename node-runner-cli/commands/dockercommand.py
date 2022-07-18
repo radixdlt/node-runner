@@ -157,6 +157,11 @@ def config(args):
 
     if configuration.common_settings.check_nginx_required():
         configuration.common_settings.ask_nginx_release()
+        if configuration.core_node_settings.enable_transaction == "true":
+            configuration.common_settings.nginx_settings.enable_gateway_api_for_core = "true"
+        else:
+            configuration.common_settings.nginx_settings.enable_gateway_api_for_core = "false"
+
     else:
         configuration.common_settings.nginx_settings = None
 
