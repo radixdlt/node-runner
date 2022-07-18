@@ -41,7 +41,7 @@ services:
     - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis.json"
     {% endif %}
  {% endif %}
- {% if common_config.nginx_settings is defined  and  (common_config.nginx_settings.protect_core | lower | trim) == "true" %}
+ {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" || (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}
   nginx:
     environment:
       RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
