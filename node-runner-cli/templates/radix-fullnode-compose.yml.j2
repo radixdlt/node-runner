@@ -50,7 +50,7 @@ services:
     {% if core_node is not defined %}
       RADIXDLT_ENABLE_TCP_CORE_PROXY: 'false'
     {% endif %}
-      RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
+      RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.enable_gateway_api_for_core or 'false'}}'
       RADIXDLT_GATEWAY_BEHIND_AUTH: '{{common_config.nginx_settings.gateway_behind_auth or 'false'}}'
     image: {{common_config.nginx_settings.repo}}:{{common_config.nginx_settings.release}}
     ports:
