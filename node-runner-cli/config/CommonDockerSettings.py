@@ -63,8 +63,7 @@ class CommonDockerSettings(BaseConfig):
 
     def ask_nginx_release(self):
         latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
-        # self.nginx_settings.release = latest_nginx_release
-        self.nginx_settings.release = "make-tcp-server-conditional-2c1cbec"
+        self.nginx_settings.release = latest_nginx_release
         if "DETAILED" in SetupMode.instance().mode:
             self.nginx_settings.release = Prompts.get_nginx_release(latest_nginx_release)
 
