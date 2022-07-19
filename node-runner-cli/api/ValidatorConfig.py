@@ -1,7 +1,8 @@
 import json
-import sys
 from typing import List
+
 from core_client.model.entity_response import EntityResponse
+
 from api.Action import Action
 from utils.utils import bcolors, Helpers
 

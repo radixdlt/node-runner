@@ -1,0 +1,21 @@
+---
+- select_network: S
+- first_time_config: N
+- have_existing_compose: "/home/ubuntu/docker-compose.yml"
+- setup_fullnode: N
+- setup_gateway: Y
+- input_core_api_address: https://test
+- basic_auth_user: admin
+- basic_auth_password: admin
+- core_api_disable_https_verify: "true"
+- core_api_node_name: "core"
+- postgres_location: "local"
+- postgres_db_user: "postgres"
+- postgres_db_name: "radix-ledger"
+- postgres_db_password: "testpassword"
+- aggregator_release: "1.1.7"
+- gateway_release: "1.1.7"
+- gateway_nginx_setup: "true"
+- input_nginx_release: "1.3.1"
+
+

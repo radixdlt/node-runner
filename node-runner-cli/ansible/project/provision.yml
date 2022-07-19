@@ -8,7 +8,9 @@
     swap_size: 8G
     setup_swap: false
     setup_limits: false
-
+    postgresql_version: 12
+    postgresql_user: postgres
+    postgresql_db_name: radixdlt_ledger
   tasks:
     - block:
         - name: Run whoami without become.
@@ -60,3 +62,52 @@
 
       become: true
       when: setup_swap | bool
+
+    - block:
+        - name: install PostgreSQL
+          ansible.builtin.package:
+            name:
+              - postgresql-{{ postgresql_version }}
+              - postgresql-client-{{ postgresql_version }}
+              - postgresql-contrib-{{ postgresql_version }}
+              - acl
+            state: present
+
+        - name: Install psycopg2-binary python package
+          ansible.builtin.pip:
+            name: psycopg2-binary
+
+        - name: change postgress password
+          become: yes
+          become_method: sudo
+          become_user: "{{ postgresql_user }}"
+          community.postgresql.postgresql_user:
+            name: "{{ postgresql_user }}"
+            password: "{{postgress_password}}"
+
+        - name: Grant
+          community.postgresql.postgresql_pg_hba:
+            dest: /etc/postgresql/12/main/pg_hba.conf
+            contype: host
+            users: all
+            source: 0.0.0.0/0
+            databases: all
+            method: md5
+
+        - name: Configure PostgreSQL. Set listen_addresses.
+          lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp="listen_addresses =" line="listen_addresses = '*'" state=present
+
+        - name: Configure PostgreSQL. Set checkpoint timeout.
+          lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp="checkpoint_timeout =" line="checkpoint_timeout = 15min" state=present
+
+        - name: Configure PostgreSQL. Set max_wal_size timeout.
+          lineinfile: dest=/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf
+            regexp="max_wal_size =" line="max_wal_size = 10GB" state=present
+
+        - name: restart postgresql
+          service: name=postgresql state=restarted enabled=yes
+
+      become: true
+      when: postgres_local | bool

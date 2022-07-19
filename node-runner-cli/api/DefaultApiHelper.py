@@ -1,8 +1,8 @@
 import sys
-import system_client as system_api
-from system_client import ApiException, Configuration, ApiClient
-from system_client.api import default_api
 
+import system_client as system_api
+from system_client import ApiException, Configuration
+from system_client.api import default_api
 
 from api.Api import API
 from utils.utils import Helpers, bcolors

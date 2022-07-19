@@ -1,11 +1,18 @@
 import json
+import os
 import subprocess
+import sys
 from datetime import datetime
-import requests
-import sys, os
 from pathlib import Path
+
+import requests
+import yaml
 from system_client import ApiException
-from env_vars import PRINT_REQUEST
+
+from env_vars import PRINT_REQUEST, NODE_HOST_IP_OR_NAME, COMPOSE_HTTP_TIMEOUT
+from utils.PromptFeeder import PromptFeeder
+from version import __version__
+
 
 def printCommand(cmd):
     print('-----------------------------')
@@ -18,42 +25,51 @@ def printCommand(cmd):
 
 
 def run_shell_command(cmd, env=None, shell=False, fail_on_error=True, quite=False):
-    printCommand(cmd)
+    if not quite:
+        printCommand(cmd)
     if env:
         result = subprocess.run(cmd, env=env, shell=shell)
     else:
         result = subprocess.run(cmd, shell=shell)
+    if result.returncode != 0:
+        print(result)
     if fail_on_error and result.returncode != 0:
         print("""
             Command failed. Exiting...
         """)
-        sys.exit()
+        sys.exit(1)
     return result
-        
-def print_vote_and_fork_info(health, engine_configuration):    
+
+
+def print_vote_and_fork_info(health, engine_configuration):
     newest_fork = engine_configuration['forks'][-1]
     newest_fork_name = newest_fork['name']
     is_candidate = newest_fork['is_candidate']
 
     if health['current_fork_name'] == newest_fork_name:
-        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration") 
+        print(
+            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}, which is the newest fork in its configuration")
         print(f"{bcolors.WARNING}No action is needed{bcolors.ENDC}")
         return
 
     if not is_candidate:
-        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})") 
+        print(
+            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer fixed epoch fork ({newest_fork_name})")
         print(f"{bcolors.WARNING}This newer fork is not a candidate fork, so no action is needed{bcolors.ENDC}")
         return
 
     node_says_vote_required = health['fork_vote_status'] == 'VOTE_REQUIRED'
     if not node_says_vote_required:
-        print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
-        print(f"{bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{bcolors.ENDC}")
+        print(
+            f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+        print(
+            f"{bcolors.WARNING}The node has already signalled the readiness for this candidate fork, so no action is needed{bcolors.ENDC}")
         return
 
-    print(f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
+    print(
+        f"The node is currently running fork {bcolors.BOLD}{health['current_fork_name']}{bcolors.ENDC}. The node is aware of a newer candidate fork ({newest_fork_name})")
     print(f"{bcolors.WARNING}The node has not yet signalled the readiness for this fork{bcolors.ENDC}")
-    
+
 
 class Helpers:
     @staticmethod
@@ -100,6 +116,8 @@ class Helpers:
             Setup NGINX_{usertype.upper()}_PASSWORD environment variable using below command . Replace the string 'nginx_password_of_your_choice' with your password
 
             echo 'export NGINX_{usertype.upper()}_PASSWORD="nginx_password_of_your_choice"' >> ~/.bashrc
+            If you not running nginx, then export below environment variable
+                export NGINX=false
             """)
             sys.exit()
         else:
@@ -115,7 +133,13 @@ class Helpers:
         command = ['docker-compose', '-f', composefile, 'down']
         if remove_volumes:
             command.append('-v')
-        run_shell_command(command)
+        result = run_shell_command(command, env={
+            COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+        }, fail_on_error=False)
+        if result.returncode != 0:
+            run_shell_command(command, env={
+                COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+            })
 
     @staticmethod
     def get_public_ip():
@@ -200,13 +224,6 @@ class Helpers:
             return f"{color}{text}{bcolors.ENDC}"
 
     @staticmethod
-    def get_keyfile_path():
-        radixnode_dir = f"{Path.home()}/node-config"
-        print(f"Path to keyfile is {radixnode_dir}")
-        run_shell_command(f'mkdir -p {radixnode_dir}', shell=True)
-        return str(radixnode_dir)
-
-    @staticmethod
     def get_basic_auth_header(user):
         import base64
         data = f"{user['name']}:{user['password']}"
@@ -219,12 +236,12 @@ class Helpers:
     @staticmethod
     def handleApiException(e: ApiException):
         print(f"Exception-reason:{e.reason},status:{e.status}.body:{e.body}")
-        sys.exit()
+        sys.exit(1)
 
     @staticmethod
     def archivenode_deprecate_message():
         print(
-            f"Archive node is no more supported for core releases from 1.1.0 onwards. Use cli versions older than 1.0.11 to run or maintain archive nodes")
+            "Archive node is no more supported for core releases from 1.1.0 onwards. Use cli versions older than 1.0.11 to run or maintain archive nodes")
         sys.exit()
 
     @staticmethod
@@ -232,6 +249,83 @@ class Helpers:
         if os.getenv(PRINT_REQUEST):
             print(f"----Body for {name}---")
             print(item)
+
+    @staticmethod
+    def cli_version():
+        return __version__
+
+    @staticmethod
+    def yaml_as_dict(my_file):
+        my_dict = {}
+        with open(my_file, 'r') as fp:
+            docs = yaml.safe_load_all(fp)
+            for doc in docs:
+                for key, value in doc.items():
+                    my_dict[key] = value
+        return my_dict
+
+    @staticmethod
+    def get_home_dir():
+        return Path.home()
+
+    @staticmethod
+    def get_default_node_config_dir():
+        return f"{Path.home()}/node-config"
+
+    @staticmethod
+    def get_default_monitoring_config_dir():
+        return f"{Path.home()}/monitoring"
+
+    @staticmethod
+    def section_headline(title):
+        print(f"{bcolors.BOLD}--------------{title}----------------------{bcolors.ENDC}")
+
+    @staticmethod
+    def input_guestion(question, question_key=None):
+        prompt_feed = None
+        if question_key:
+            prompt_feed = PromptFeeder.instance().get_answer(question_key)
+        if not prompt_feed:
+            return input(f"\n{bcolors.WARNING}{question}{bcolors.ENDC}")
+        else:
+            print("Got from promptfeeder")
+            print(f"Question is {question}")
+            print(f"Answer is {prompt_feed}")
+            return prompt_feed
+
+    @staticmethod
+    def print_info(info):
+        print(f"{bcolors.OKBLUE}{info}{bcolors.ENDC}")
+
+    @staticmethod
+    def represent_none(self, _):
+        return self.represent_scalar('tag:yaml.org,2002:null', '')
+
+    @staticmethod
+    def get_node_host_ip():
+        if os.environ.get('%s' % NODE_HOST_IP_OR_NAME) is None:
+            print(
+                f"{NODE_HOST_IP_OR_NAME} environment variable not setup. Fetching the IP of node assuming the monitoring is run on the same machine machine as "
+                "the node.")
+            ip = Helpers.get_public_ip()
+            node_endpoint = f"{ip}"
+        else:
+            node_endpoint = os.environ.get(NODE_HOST_IP_OR_NAME)
+        return node_endpoint
+
+    @staticmethod
+    def dump_rendered_template(render_template, file_location, quiet=False):
+        yaml.add_representer(type(None), Helpers.represent_none)
+        if not quiet:
+            print(f"\n{yaml.dump(render_template)}")
+        print(f"\n\n Saving to file {file_location} ")
+        with open(file_location, 'w') as f:
+            yaml.dump(render_template, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
+
+    @staticmethod
+    def backup_file(source: str, dest: str):
+        import shutil
+        shutil.copy2(source, dest)
 
 
 class bcolors:
@@ -244,4 +338,3 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-    

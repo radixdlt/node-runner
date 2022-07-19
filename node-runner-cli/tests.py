@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 from core_client.model.construction_build_response import ConstructionBuildResponse
 from core_client.model.entity_response import EntityResponse
@@ -11,7 +12,6 @@ from core_client.model.network_status_response import NetworkStatusResponse
 from api.Action import Action
 from api.CoreApiHelper import CoreApiHelper
 from github.github import latest_release
-import warnings
 
 
 class GitHubTests(unittest.TestCase):
@@ -54,6 +54,7 @@ class ApiTests(unittest.TestCase):
                                                True)
         self.assertIsInstance(response, EntityResponse)
 
+    @unittest.skip("Needs enough balance")
     def test_construction_build(self):
         key_list_response: KeyListResponse = self.core_api_helper.key_list()
         validator_info: EntityResponse = self.core_api_helper.entity(
@@ -62,6 +63,7 @@ class ApiTests(unittest.TestCase):
         response = self.core_api_helper.construction_build(actions)
         self.assertIsInstance(response, ConstructionBuildResponse)
 
+    @unittest.skip("Needs enough balance")
     def test_key_sign(self):
         key_list_response: KeyListResponse = self.core_api_helper.key_list()
         validator_info: EntityResponse = self.core_api_helper.entity(

@@ -1,0 +1,62 @@
+global:
+  scrape_interval:     5s
+  evaluation_interval: 15s
+
+scrape_configs:
+{% if (monitor_core is defined ) %}
+  - job_name: mynode
+    metrics_path: {{monitor_core.metrics_path}}
+    static_configs:
+      - targets:
+          - {{monitor_core.metrics_target}}
+        labels:
+          network: mynode
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: "([^:]+):\\d+" # remove the port number
+        target_label: public_ip
+{% if (monitor_core.scheme == "https") %}
+    scheme: https
+    tls_config:
+        insecure_skip_verify: true
+    basic_auth:
+        password: {{monitor_core.basic_auth_password}}
+        username: {{monitor_core.basic_auth_user}}
+{% endif %}
+{% endif %}
+{% if (monitor_gateway_api is defined ) %}
+  - job_name: gateway
+    metrics_path: {{monitor_gateway_api.metrics_path}}
+    static_configs:
+      - targets:
+          - {{monitor_gateway_api.metrics_target}}
+        labels:
+          network: mynode
+          container: gateway-api
+{% if (monitor_gateway_api.scheme == "https") %}
+    scheme: https
+    tls_config:
+        insecure_skip_verify: true
+    basic_auth:
+        password: {{monitor_gateway_api.basic_auth_password}}
+        username: {{monitor_gateway_api.basic_auth_user}}
+{% endif %}
+{% endif %}
+{% if (monitor_aggregator is defined ) %}
+  - job_name: aggregator
+    metrics_path: {{monitor_aggregator.metrics_path}}
+    static_configs:
+      - targets:
+          - {{monitor_aggregator.metrics_target}}
+        labels:
+          network: mynode
+          container: data-aggregator
+{% if (monitor_aggregator.scheme == "https") %}
+    scheme: https
+    tls_config:
+        insecure_skip_verify: true
+    basic_auth:
+        password: {{monitor_aggregator.basic_auth_password}}
+        username: {{monitor_aggregator.basic_auth_user}}
+{% endif %}
+{% endif %}

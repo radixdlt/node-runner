@@ -2,24 +2,31 @@ import getpass
 import os
 import sys
 
-import requests
-
-from env_vars import IMAGE_OVERRIDE
-from setup.Base import Base
-from utils.utils import run_shell_command, Helpers
 import yaml
-from deepmerge import always_merger
+
+from config.BaseConfig import SetupMode
+from config.GatewayDockerConfig import PostGresSettings
+from env_vars import DOCKER_COMPOSE_FOLDER_PREFIX, COMPOSE_HTTP_TIMEOUT, RADIXDLT_NODE_KEY_PASSWORD, POSTGRES_PASSWORD
+from github import github
+from setup.AnsibleRunner import AnsibleRunner
+from setup.Base import Base
+from utils.Prompts import Prompts
+from utils.utils import run_shell_command, Helpers
 
 
 class Docker(Base):
 
     @staticmethod
-    def setup_nginx_Password(usertype, username):
+    def setup_nginx_Password(usertype, username, password=None):
         print('-----------------------------')
         print(f'Setting up nginx user of type {usertype} with username {username}')
-        nginx_password = getpass.getpass(f"Enter your nginx the password: ")
+        if not password:
+            nginx_password = getpass.getpass(f"Enter your nginx the password: ")
+        else:
+            nginx_password = password
+        docker_compose_folder_prefix = os.getenv(DOCKER_COMPOSE_FOLDER_PREFIX, os.getcwd().rsplit('/', 1)[-1])
         run_shell_command(['docker', 'run', '--rm', '-v',
-                           os.getcwd().rsplit('/', 1)[-1] + '_nginx_secrets:/secrets',
+                           docker_compose_folder_prefix + '_nginx_secrets:/secrets',
                            'radixdlt/htpasswd:v1.0.0',
                            'htpasswd', '-bc', f'/secrets/htpasswd.{usertype}', username, nginx_password])
 
@@ -38,140 +45,139 @@ class Docker(Base):
         return nginx_password
 
     @staticmethod
-    def run_docker_compose_up(keystore_password, composefile, trustednode):
-        run_shell_command(['docker-compose', '-f', composefile, 'up', '-d'],
-                          env={
-                              "RADIXDLT_NETWORK_NODE": trustednode,
-                              "RADIXDLT_NODE_KEY_PASSWORD": keystore_password
-                          })
+    def run_docker_compose_up(composefile):
+        docker_compose_binary = os.getenv("DOCKER_COMPOSE_LOCATION", 'docker-compose')
+        result = run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
+                                   env={
+                                       COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                                   }, fail_on_error=False)
+        if result.returncode != 0:
+            run_shell_command([docker_compose_binary, '-f', composefile, 'up', '-d'],
+                              env={
+                                  COMPOSE_HTTP_TIMEOUT: os.getenv(COMPOSE_HTTP_TIMEOUT, "200")
+                              }, fail_on_error=True)
 
     @staticmethod
-    def setup_compose_file(composefileurl, file_location, enable_transactions=False):
-        compose_file_name = composefileurl.rsplit('/', 1)[-1]
-        if os.path.isfile(compose_file_name):
-            backup_file_name = f"{Helpers.get_current_date_time()}_{compose_file_name}"
-            print(f"Docker compose file {compose_file_name} exists. Backing it up as {backup_file_name}")
-            run_shell_command(f"cp {compose_file_name} {backup_file_name}", shell=True)
-        print(f"Downloading new compose file from {composefileurl}")
-
-        req = requests.Request('GET', f'{composefileurl}')
-        prepared = req.prepare()
-        resp = Helpers.send_request(prepared, print_response=False)
-
-        if not resp.ok:
-            print(f" Errored downloading file {composefileurl}. Exitting ... ")
-            sys.exit()
-
-        composefile_yaml = yaml.safe_load(resp.content)
-
-        # TODO AutoApprove
-        prompt_external_db = input("Do you want to configure data directory for the ledger [Y/n]?:")
-        if Helpers.check_Yes(prompt_external_db):
-            composefile_yaml = Docker.merge_external_db_config(composefile_yaml)
-
-        def represent_none(self, _):
-            return self.represent_scalar('tag:yaml.org,2002:null', '')
-
-        yaml.add_representer(type(None), represent_none)
-
-        network_id = Base.get_network_id()
-        genesis_json_location = Base.path_to_genesis_json(network_id)
-
-        composefile_yaml = Docker.merge_network_info(composefile_yaml, network_id, genesis_json_location)
-        composefile_yaml = Docker.merge_keyfile_path(composefile_yaml, file_location)
-        composefile_yaml = Docker.merge_transactions_env_var(composefile_yaml,
-                                                             "true" if enable_transactions else "false")
-        if os.getenv(IMAGE_OVERRIDE, "False") in ("true", "yes"):
-            composefile_yaml = Docker.merge_image_overrides(composefile_yaml)
-
-        with open(compose_file_name, 'w') as f:
+    def save_compose_file(existing_docker_compose: str, composefile_yaml: dict):
+        with open(existing_docker_compose, 'w') as f:
             yaml.dump(composefile_yaml, f, default_flow_style=False, explicit_start=True, allow_unicode=True)
-
-    @staticmethod
-    def merge_external_db_config(composefile_yaml, keyfile_name="node-keystore.ks"):
-        data_dir_path = Base.get_data_dir()
-
-        # TODO fix the issue where volumes array gets merged correctly
-        external_data_yaml = yaml.safe_load(f"""
-        services:
-          core:
-            volumes:
-              - "core_ledger:/home/radixdlt/RADIXDB"
-        volumes:
-          core_ledger:
-            driver: local
-            driver_opts:
-              o: bind
-              type: none
-              device: {data_dir_path}
-        """)
-        final_conf = always_merger.merge(composefile_yaml, external_data_yaml)
-        return final_conf
 
     @staticmethod
     def run_docker_compose_down(composefile, removevolumes=False):
         Helpers.docker_compose_down(composefile, removevolumes)
 
     @staticmethod
-    def merge_keyfile_path(composefile_yaml, keyfile_location):
-        key_yaml = yaml.safe_load(f"""
-        services:
-          core:
-            volumes:
-             - "{keyfile_location}:/home/radixdlt/node-keystore.ks"
-        """)
-        final_conf = always_merger.merge(composefile_yaml, key_yaml)
-        return final_conf
+    def check_set_passwords(all_config):
+        keystore_password = all_config.get('core_node', {}).get('keydetails', {}).get("keystore_password")
+        if all_config.get('core_node') and not keystore_password:
+            keystore_password_from_env = os.getenv(RADIXDLT_NODE_KEY_PASSWORD, None)
+            if not keystore_password_from_env:
+                print(
+                    "Cannot find Keystore password either in config "
+                    "or as environment variable RADIXDLT_NODE_KEY_PASSWORD")
+                sys.exit(1)
+            else:
+                all_config['core_node']["keydetails"]["keystore_password"] = keystore_password_from_env
+
+        postgres_password = all_config.get('gateway', {}).get('postgres_db', {}).get("password")
+        if all_config.get('gateway') and not postgres_password:
+            postgres_password_from_env = os.getenv(POSTGRES_PASSWORD, None)
+
+            if not postgres_password_from_env:
+                print(
+                    "Cannot find POSTGRES_PASSWORD either in config"
+                    "or as environment variable POSTGRES_PASSWORD")
+                sys.exit(1)
+            else:
+                all_config['gateway']["postgres_db"]["password"] = postgres_password_from_env
+        return all_config
 
     @staticmethod
-    def merge_transactions_env_var(composefile_yaml, transactions_enable="false"):
-        transactions_enable_yml = yaml.safe_load(f"""
-                services:
-                  core:
-                    environment:
-                      RADIXDLT_TRANSACTIONS_API_ENABLE: '{transactions_enable}'
-                """)
-        return always_merger.merge(transactions_enable_yml, composefile_yaml)
+    def check_run_local_postgreSQL(all_config):
+        postgres_db = all_config.get('gateway', {}).get('postgres_db')
+        if Docker.check_post_db_local(all_config):
+            ansible_dir = f'https://raw.githubusercontent.com/radixdlt/node-runner/{Helpers.cli_version()}/node-runner-cli'
+            AnsibleRunner(ansible_dir).run_setup_postgress(
+                postgres_db.get("password"),
+                postgres_db.get("user"),
+                postgres_db.get("dbname"),
+                'ansible/project/provision.yml')
 
     @staticmethod
-    def merge_network_info(composefile_yaml, network_id, genesis_json=None):
-
-        network_info_yml = yaml.safe_load(f"""
-        services:
-          core:
-            environment:
-              RADIXDLT_NETWORK_ID: {network_id}
-        """)
-        if genesis_json:
-            genesis_info_yml = yaml.safe_load(f"""
-            services:
-              core:
-                environment:
-                  RADIXDLT_GENESIS_FILE: "/home/radixdlt/genesis.json"
-                volumes:
-                - "{genesis_json}:/home/radixdlt/genesis.json"
-            """)
-            # network_info_yml = Helpers.merge(genesis_info_yml, network_info_yml)
-            network_info_yml = always_merger.merge(network_info_yml, genesis_info_yml)
-        volumes = composefile_yaml["services"]["core"]["volumes"]
-        harcoded_key_volume = "./node-keystore.ks:/home/radixdlt/node-keystore.ks"
-        if "./node-keystore.ks:/home/radixdlt/node-keystore.ks" in volumes: volumes.remove(harcoded_key_volume)
-
-        composefile_yaml["services"]["core"]["environment"].pop("RADIXDLT_NETWORK_ID")
-        yml_to_return = always_merger.merge(network_info_yml, composefile_yaml)
-        return yml_to_return
+    def check_post_db_local(all_config):
+        postgres_db = all_config.get('gateway', {}).get('postgres_db')
+        if postgres_db and postgres_db.get("setup", None) == "local":
+            return True
+        return False
 
     @staticmethod
-    def merge_image_overrides(composefile_yaml):
-        prompt_core_image = input("Enter the core image along with repo:")
-        prompt_nginx_image = input("Enter the nginx image along with repo:")
-        images_yml = yaml.safe_load(f"""
-                    services:
-                      core:
-                       image: {prompt_core_image}
-                      nginx:
-                       image: {prompt_nginx_image}
-                    """)
+    def load_all_config(configfile):
+        yaml.add_representer(type(None), Helpers.represent_none)
 
-        final_conf = always_merger.merge(composefile_yaml, images_yml)
-        return final_conf
+        if os.path.exists(configfile):
+            with open(configfile, 'r') as file:
+                all_config = yaml.safe_load(file)
+                return all_config
+        else:
+            print(f"Config file '{configfile}' doesn't exist");
+            return {}
+
+    @staticmethod
+    def get_existing_compose_file(all_config):
+        compose_file = all_config['common_config']['docker_compose']
+        if os.path.exists(compose_file):
+            return compose_file, Helpers.yaml_as_dict(compose_file)
+        else:
+            return compose_file, {}
+
+    @staticmethod
+    def exit_on_missing_trustednode():
+        print("-t or --trustednode parameter is mandatory")
+        sys.exit(1)
+
+    @staticmethod
+    def update_versions(all_config, autoapprove):
+        updated_config = dict(all_config)
+
+        if all_config.get('core_node'):
+            current_core_release = all_config['core_node']["core_release"]
+            latest_core_release = github.latest_release("radixdlt/radixdlt")
+            updated_config['core_node']["core_release"] = Prompts.confirm_version_updates(current_core_release,
+                                                                                          latest_core_release, 'CORE',
+                                                                                          autoapprove)
+        if all_config.get("gateway"):
+            latest_gateway_release = github.latest_release("radixdlt/radixdlt-network-gateway")
+            current_gateway_release = all_config['gateway']["data_aggregator"]["release"]
+
+            if all_config.get('gateway', {}).get('data_aggregator'):
+                updated_config['gateway']["data_aggregator"]["release"] = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'AGGREGATOR', autoapprove)
+
+            if all_config.get('gateway', {}).get('gateway_api'):
+                updated_config['gateway']["gateway_api"]["release"] = Prompts.confirm_version_updates(
+                    current_gateway_release,
+                    latest_gateway_release, 'GATEWAY', autoapprove)
+
+        if all_config.get("common_config").get("nginx_settings"):
+            latest_nginx_release = github.latest_release("radixdlt/radixdlt-nginx")
+            current_nginx_release = all_config['common_config']["nginx_settings"]["release"]
+            updated_config['common_config']["nginx_settings"]["release"] = Prompts.confirm_version_updates(
+                current_nginx_release, latest_nginx_release, "RADIXDLT NGINX", autoapprove
+            )
+
+        return updated_config
+
+    @staticmethod
+    def backup_save_config(config_file, new_config, autoapprove, backup_time):
+        to_update = ""
+        if autoapprove:
+            print("In Auto mode - Updating the file as suggested in above changes")
+        else:
+            to_update = input("\nOkay to update the config file [Y/n]?:")
+        if Helpers.check_Yes(to_update) or autoapprove:
+            if os.path.exists(config_file):
+                Helpers.backup_file(config_file, f"{config_file}_{backup_time}")
+            print(f"\n\n Saving to file {config_file} ")
+            with open(config_file, 'w') as f:
+                yaml.dump(new_config, f, default_flow_style=False, explicit_start=True, allow_unicode=True)

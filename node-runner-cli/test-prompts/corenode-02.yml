@@ -1,0 +1,13 @@
+---
+- select_network: S
+- first_time_config: N
+- have_existing_compose: "/Users/shambu/project/node-runner/node-runner-cli/docker-compose.yml"
+- setup_fullnode: Y
+- input_seednode: "radix://rn1qthu8yn06k75dnwpkysyl8smtwn0v4xy29auzjlcrw7vgduxvnwnst6derj@54.216.99.177"
+- have_keystore_file: N
+- input_path_keystore: "/home/ubuntu/node-config"
+- enter_keystore_name: "node-keystore.ks"
+- input_ledger_path: "/home/runner/data"
+- input_transaction_api: "false"
+- core_nginx_setup: "false"
+- setup_gateway: "false"

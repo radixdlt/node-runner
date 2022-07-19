@@ -1,0 +1,132 @@
+version: '2.4'
+services:
+{% if core_node is defined %}
+  core:
+    cap_add:
+    - NET_ADMIN
+    environment:
+      JAVA_OPTS: {{core_node.java_opts or '--enable-preview -server -Xms8g -Xmx8g  -XX:MaxDirectMemorySize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseCompressedOops -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=jks -Djava.security.egd=file:/dev/urandom -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'}}
+      RADIXDLT_API_PORT: 3333
+      RADIXDLT_LOG_LEVEL: {{core_node.log_level or 'info'}}
+      RADIXDLT_NETWORK_ID: {{common_config.network_id}}
+      RADIXDLT_NETWORK_SEEDS_REMOTE: {{core_node.trusted_node}}
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
+      RADIXDLT_SIGN_ENABLE: 'true'
+      RADIXDLT_TRANSACTIONS_API_ENABLE: '{{core_node.enable_transaction}}'
+      RADIXDLT_VALIDATOR_KEY_LOCATION: /home/radixdlt/node-keystore.ks
+      RADIX_NODE_KEYSTORE_PASSWORD: {{core_node.keydetails.keystore_password}}
+      {% if common_config.genesis_json_location is defined %}
+      RADIXDLT_GENESIS_FILE: "{{common_config.genesis_json_location}}"
+      {% endif %}
+    image: {{core_node.repo}}:{{core_node.core_release}}
+    init: true
+    mem_limit: {{core_node.memory_limit or '12000m'}}
+    restart: unless-stopped
+    {% if common_config.nginx_settings is not defined or (common_config.nginx_settings.protect_core | lower | trim) == "false" %}
+    ports:
+       - "3333:3333"
+       - "30000:30000"
+    {% endif %}
+    ulimits:
+      memlock: '-1'
+      nofile:
+        hard: '65536'
+        soft: '65536'
+    volumes:
+    {% if core_node.data_directory is defined %}
+    - core_ledger:/home/radixdlt/RADIXDB
+    {% endif %}
+    - {{core_node.keydetails.keyfile_path ~ '/' ~ core_node.keydetails.keyfile_name }}:/home/radixdlt/node-keystore.ks
+    {% if common_config.genesis_json_location is defined %}
+    - "{{common_config.genesis_json_location}}:/home/radixdlt/genesis.json"
+    {% endif %}
+ {% endif %}
+ {% if common_config.nginx_settings is defined  and  ((common_config.nginx_settings.protect_core | lower | trim) == "true" or (common_config.nginx_settings.protect_gateway | lower | trim) == "true") %}
+  nginx:
+    environment:
+    {% if core_node is defined %}
+      RADIXDLT_NETWORK_USE_PROXY_PROTOCOL: '{{core_node.use_proxy_protocol or 'false'}}'
+    {% endif %}
+    {% if core_node is not defined %}
+      RADIXDLT_ENABLE_TCP_CORE_PROXY: 'false'
+    {% endif %}
+      RADIXDLT_GATEWAY_API_ENABLE: '{{common_config.nginx_settings.protect_gateway or 'false'}}'
+      RADIXDLT_TRANSACTIONS_API_ENABLE: '{{common_config.nginx_settings.enable_transaction_api or 'false'}}'
+      RADIXDLT_GATEWAY_BEHIND_AUTH: '{{common_config.nginx_settings.gateway_behind_auth or 'false'}}'
+    image: {{common_config.nginx_settings.repo}}:{{common_config.nginx_settings.release}}
+    ports:
+    - 443:443
+    - 30000:30000
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        hard: '65536'
+        soft: '65536'
+    volumes:
+    - nginx_secrets:/etc/nginx/secrets
+ {% endif %}
+{% if (gateway is defined and gateway.gateway_api is defined) %}
+  gateway_api: # This is the base -- the _image and _built containers are defined below
+    image: {{gateway.gateway_api.repo}}:{{gateway.gateway_api.release}}
+    ports:
+      - "127.0.0.1:{{gateway.gateway_api.applicationPortHostBinding or '5207'}}:80" # This allows you to connect to the API at http://localhost:5308
+      - "127.0.0.1:{{gateway.gateway_api.prometheusMetricsPortHostBinding or '1235' }}:1235" # This allows you to connect to the metrics API at http://localhost:1235
+    restart: {{gateway.gateway_api.restart or 'unless-stopped'}}
+{% if (gateway.postgres_db is defined and gateway.postgres_db.setup == 'local') %}
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+{% endif %}
+    environment:
+      ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
+      RADIX_NG_API__MaxWaitForDbOnStartupMs: "90" # Wait for PostGres to boot up
+      RADIX_NG_API__DisableCoreApiHttpsCertificateChecks: "{{gateway.gateway_api.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
+      RADIX_NG_API__NetworkName: "{{common_config.network_name}}"
+      RADIX_NG_API__EnableSwagger: "{{gateway.gateway_api.enable_swagger or 'false'}}"
+      RADIX_NG_API__MaxPageSize: "{{gateway.gateway_api.max_page_size or '30'}}"
+      RADIX_NG_API__ConnectionStrings__ReadOnlyDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      RADIX_NG_API__ConnectionStrings__ReadWriteDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      RADIX_NG_API__CoreApiNodes__0__Name: "{{gateway.gateway_api.coreApiNode.Name}}"
+      RADIX_NG_API__CoreApiNodes__0__CoreApiAddress: "{{gateway.gateway_api.coreApiNode.core_api_address}}"
+      {% if gateway.gateway_api.coreApiNode.auth_header is defined %}
+      RADIX_NG_API__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
+      {% endif %}
+      RADIX_NG_API__CoreApiNodes__0__RequestWeighting: "{{gateway.gateway_api.coreApiNode.request_weighting or '1'}}"
+      RADIX_NG_API__CoreApiNodes__0__Enabled: "{{gateway.gateway_api.coreApiNode.enabled or 'true'}}"
+{% endif %}
+{% if (gateway is defined and gateway.data_aggregator is defined) %}
+  data_aggregator:
+    image: {{gateway.data_aggregator.repo}}:{{gateway.data_aggregator.release}}
+    restart: {{gateway.data_aggregator.restart or 'unless-stopped'}}
+    cpus: {{gateway.data_aggregator.cpus or '2.0'}}
+{% if (gateway.postgres_db is defined and gateway.postgres_db.setup == 'local') %}
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+{% endif %}
+    ports:
+      - "127.0.0.1:{{gateway.data_aggregator.applicationPortHostBinding or '5208'}}:80" # This allows you to connect to the API (for root and health checks) at http://localhost:5207
+      - "127.0.0.1:{{gateway.data_aggregator.prometheusMetricsPortHostBinding or '1234'}}:1234" # This allows you to connect to the metrics API at http://localhost:1234
+    environment:
+      # WIPE_DATABASE: "true"
+      ASPNETCORE_URLS: "http://*:80" # Binds to 80 on all interfaces
+      RADIX_NG_AGGREGATOR__MaxWaitForDbOnStartupMs: "90"
+      RADIX_NG_AGGREGATOR__DisableCoreApiHttpsCertificateChecks:  "{{gateway.data_aggregator.coreApiNode.disable_core_api_https_certificate_checks or 'false'}}"
+      RADIX_NG_AGGREGATOR__NetworkName: "{{common_config.network_name}}"
+      RADIX_NG_AGGREGATOR__ConnectionStrings__AggregatorDbContext: "Host={{gateway.postgres_db.host}};Database={{gateway.postgres_db.dbname}};Username={{gateway.postgres_db.user}};Password={{gateway.postgres_db.password}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__Name: "{{gateway.data_aggregator.coreApiNode.Name}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAddress: "{{gateway.data_aggregator.coreApiNode.core_api_address}}"
+      {% if gateway.data_aggregator.coreApiNode.auth_header is defined %}
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__CoreApiAuthorizationHeader: "{{gateway.data_aggregator.coreApiNode.auth_header.Authorization}}"
+      {% endif %}
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__TrustWeighting:  "{{gateway.data_aggregator.coreApiNode.trust_weighting or '1'}}"
+      RADIX_NG_AGGREGATOR__CoreApiNodes__0__Enabled:  "{{gateway.data_aggregator.coreApiNode.enabled or 'true'}}"
+{% endif %}
+volumes:
+ {% if core_node is defined and core_node.data_directory is defined %}
+  core_ledger:
+    driver: local
+    driver_opts:
+      device: {{ core_node.data_directory }}
+      o: bind
+      type: none
+ {% endif %}
+  nginx_secrets:

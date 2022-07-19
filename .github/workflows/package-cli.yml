@@ -4,6 +4,8 @@ on:
   release:
     types: [published]
   push:
+    branches:
+       - main
     tags:
       - test-artifacts*
   pull_request:
@@ -12,7 +14,7 @@ on:
 jobs:
   package_ubuntu_cli:
     name: "Package cli for Ubuntu"
-    runs-on: [ubuntu-latest]
+    runs-on: [node-only]
     steps:
       - name: cancel running workflows
         uses: styfle/cancel-workflow-action@0.8.0
@@ -20,6 +22,8 @@ jobs:
           access_token: ${{ github.token }}
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Dump context
         uses: crazy-max/ghaction-dump-context@v1
       - name: Install build essentials
@@ -99,3 +103,227 @@ jobs:
           asset_name: radixnode-ubuntu-20.04
           asset_content_type: application/octet-stream
         if: ${{ github.event_name == 'release' }}
+
+  test-config-command:
+
+    runs-on: [ubuntu-latest]
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+
+      - name: core-gateway-all-local
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          mkdir -p $HOME/node-config
+          echo "HOME=$HOME"
+          echo "PATH=$PWD"
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/core-gateway-all-local.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: corenode-01
+        run: |
+          ls -a
+          chmod +x ./radixnode
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-01.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: corenode-02
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/corenode-02.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: gateway-remote-core-local-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-local-postgress.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: gateway-remote-core-remote-postgress
+        run: |
+          ls -a
+          export PROMPT_FEEDS="node-runner-cli/test-prompts/gateway-remote-core-remote-postgress.yml"
+          ./radixnode docker config -m DETAILED \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+
+  test-core-only-node:
+    runs-on: [node-only]
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Run configure command
+        run: |
+          chmod +x ./radixnode
+          ./radixnode docker dependencies
+      - name: Setup config
+        run: |
+          chmod +x ./radixnode
+          mkdir -p $HOME/node-config
+          export DISABLE_VERSION_CHECK=true
+          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          ./radixnode docker config -d $HOME/node-config \
+           -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 -m CORE -n 2 \
+           -k $KEYSTORE_PASSWORD -nk -a
+        env:
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: Run CLI setup
+        run: |
+          export DISABLE_VERSION_CHECK=true
+          export DOCKER_COMPOSE_LOCATION="/usr/local/bin/docker-compose"
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a
+          sleep 60
+          export DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu
+          ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          ./radixnode auth set-superadmin-password -m DOCKER -p $NGINX_SUPERADMIN_PASSWORD
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+
+  test-core-api:
+    runs-on: [node-only]
+    needs:
+      - test-core-only-node
+    steps:
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: setup python modules
+        run: |
+          cd node-runner-cli
+          make local
+      - name: Run api commands
+        run: |
+          export DISABLE_VERSION_CHECK=true
+          export NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD
+          export NGINX_METRICS_PASSWORD=$NGINX_METRICS_PASSWORD
+          export NGINX_SUPERADMIN_PASSWORD=$NGINX_SUPERADMIN_PASSWORD
+          python node-runner-cli/tests.py
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_SUPERADMIN_PASSWORD: ${{secrets.NGINX_SUPERADMIN_PASSWORD}}
+
+  test-full-stack:
+    runs-on: [node-cli-full-stack]
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Setup config
+        run: |
+          chmod +x ./radixnode
+          mkdir -p $HOME/node-config
+          export DISABLE_VERSION_CHECK=true
+          rm -rf $HOME/node-config
+          ./radixnode docker config -d $HOME/node-config \
+            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+            -m CORE GATEWAY -n 2 -k $KEYSTORE_PASSWORD -nk -p $POSTGRESS_PASSWORD -a
+          #grep -v "password" $HOME/node-config/config.yaml > temp && mv temp $HOME/node-config/config.yaml
+          cat $HOME/node-config/config.yaml
+        env:
+          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: Run CLI setup
+        run: |
+          export DISABLE_VERSION_CHECK=true
+          export COMPOSE_HTTP_TIMEOUT=360
+
+          ./radixnode docker stop -f $HOME/node-config/config.yaml
+
+          #Below PATH require when ansible is installed as part of pip
+          export PATH="$PATH:/home/ubuntu/.local/bin"
+
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-admin-password -m DOCKER -p $NGINX_ADMIN_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-metrics-password -m DOCKER -p $NGINX_METRICS_PASSWORD
+          DOCKER_COMPOSE_FOLDER_PREFIX=ubuntu ./radixnode auth set-gateway-password -m DOCKER -p $NGINX_GATEWAY_PASSWORD
+
+          ./radixnode monitoring stop
+          ./radixnode monitoring config \
+              -m MONITOR_CORE MONITOR_GATEWAY \
+              -cm $NGINX_METRICS_PASSWORD  \
+              -gm $NGINX_METRICS_PASSWORD  \
+              -am $NGINX_METRICS_PASSWORD
+
+          ./radixnode monitoring install -a
+
+          export POSTGRES_PASSWORD=${{secrets.POSTGRESS_PASSWORD}}
+          export RADIXDLT_NODE_KEY_PASSWORD=${{secrets.KEYSTORE_PASSWORD}}
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a
+          sleep 60
+
+          NGINX_ADMIN_PASSWORD=$NGINX_ADMIN_PASSWORD ./radixnode api system health
+          curl -f  --request POST --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/gateway
+          curl --insecure --user "gateway:$NGINX_GATEWAY_PASSWORD" https://localhost/token/native --header 'Content-Type: application/json' -d '{ "network_identifier":{"network":"stokenet"}}'
+          curl -k -f -u "metrics:$NGINX_METRICS_PASSWORD" https://localhost/gateway/metrics
+
+        env:
+          NGINX_ADMIN_PASSWORD: ${{secrets.NGINX_ADMIN_PASSWORD}}
+          NGINX_METRICS_PASSWORD: ${{secrets.NGINX_METRICS_PASSWORD}}
+          NGINX_GATEWAY_PASSWORD: ${{secrets.NGINX_GATEWAY_PASSWORD}}
+
+
+  test-full-stack-no-nginx:
+    runs-on: [node-cli-without-nginx]
+    needs:
+      - package_ubuntu_cli
+    steps:
+      - name: Download packaged cli
+        uses: actions/download-artifact@v3
+        with:
+          name: ubuntu 20.04
+      - name: Setup config
+        run: |
+          chmod +x ./radixnode
+          mkdir -p $HOME/node-config
+          export DISABLE_VERSION_CHECK=true
+          export COMPOSE_HTTP_TIMEOUT=360
+          ./radixnode docker config -d $HOME/node-config \
+            -t radix://tn1qv9f8ys7ade4khjyr2s6zlhuxjqvhzz39kvjskupaj9lvhl3lwxauc67nn8@65.1.217.210 \
+            -m CORE GATEWAY -n 2 -k password -nk -p postgres -xg false -xc false -a
+        env:
+          POSTGRESS_PASSWORD: ${{secrets.POSTGRESS_PASSWORD}}
+          KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
+      - name: Run CLI setup
+        run: |
+          export DISABLE_VERSION_CHECK=true
+          export COMPOSE_HTTP_TIMEOUT=360
+          ./radixnode docker stop -f $HOME/node-config/config.yaml
+
+          #Below PATH require when ansible is installed as part of pip
+          export PATH="$PATH:/home/ubuntu/.local/bin"
+          ./radixnode docker install -f $HOME/node-config/config.yaml -a -u
+          sleep 60
+          NODE_END_POINT="http://localhost:3333" NGINX=false ./radixnode api system health
+          curl -k -f -u "admin:$NGINX_ADMIN_PASSWORD" http://localhost:5207

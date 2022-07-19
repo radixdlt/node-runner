@@ -1,0 +1,97 @@
+
+= Node cli
+
+:sectnums:
+== Introduction
+
+Executable name - radixnode
+
+All the below commands can be executed on Ubuntu 20.04 ( supported OS) as below
+[source, bash]
+----
+radixnode <sub command>
+----
+
+To download the cli, following instructions from [here](https://docs.radixdlt.com/main/node-and-gateway/cli-install.html)
+
+The command line interface (CLI) provides a collection of tools for below tasks.
+It is organized in a hierarchy of subcommands, and each level comes with its own built-in documentation of command syntax and options.
+
+. To interact with node using common API calls
+. To setup node quickly on a fresh ubuntu machine using docker compose or systemd
+. To setup gateway on a fresh ubuntu machine using docker-compose
+. To setup monitoring for the node or gateway.
+
+For complete command reference refer document xref:docs/command_reference.adoc[Command reference]
+
+== Interaction with node on api endpoints
+
+
+To list the endpoints supported by cli
+[source, bash]
+----
+$ radixnode api
+
+
+usage: radixnode [-h] {version,system,core}
+radixnode: error: the following arguments are required: apicommand
+----
+
+To list the methods supported by the endpoints say for example core endpoint
+
+[source, bash]
+----
+$radixnode api core
+usage: radixnode [-h]
+                 {network-configuration,network-status,entity,key-list,mempool,mempool-transaction,update-validator-config}
+                 ...
+
+Core Api comands
+
+positional arguments:
+  {network-configuration,network-status,entity,key-list,mempool,mempool-transaction,update-validator-config}
+
+account commands
+
+positional arguments:
+  {register-validator,unregister-validator,get-info}
+----
+
+
+== More usage instructions
+
+To list all subcommands
+[source, bash]
+----
+# To list the subcommands
+radixnode -h
+usage: radixnode.py [-h]
+                    {docker,systemd,api,monitoring,version,optimise-node,auth}
+
+positional arguments:
+  {docker,systemd,api,monitoring,version,optimise-node,auth}
+                        Subcommand to run
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+----
+
+To list options/arguments for the subcommand
+[source, bash]
+----
+# Check the options for a subcommand such as start-docker
+radixnode docker -h
+
+usage: radixnode.py [-h] {setup,start,stop,configure} ...
+
+Docker commands
+
+positional arguments:
+  {setup,start,stop,configure}
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+----
+
