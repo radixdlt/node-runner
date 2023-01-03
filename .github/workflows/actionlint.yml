@@ -1,5 +1,4 @@
 name: Lint GitHub Actions workflows
-
 on:
   push:
     paths:
@@ -7,4 +6,16 @@ on:
 
 jobs:
   actionlint:
-    uses: radixdlt/iac-resuable-artifacts/.github/workflows/actionlint.yml@v0.7.2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+
+      - name: Check workflow files
+        uses: reviewdog/action-actionlint@41f27961f74609625c7d2dd980be7e26906c5e7e # v1.35.0
+        with:
+          tool_name: actionlint
+          level: warning
+          reporter: github-check
+          filter_mode: added
+          fail_on_error: true
