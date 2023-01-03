@@ -1,0 +1,10 @@
+name: Lint GitHub Actions workflows
+
+on:
+  push:
+    paths:
+      - '.github/**/*.yml'
+
+jobs:
+  actionlint:
+    uses: radixdlt/iac-resuable-artifacts/.github/workflows/actionlint.yml@v0.7.2
