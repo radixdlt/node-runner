@@ -46,6 +46,10 @@ jobs:
     environment: AWS_ARTIFACT
     runs-on: [ubuntu-latest]
     if: ${{ github.event_name == 'push' }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
     needs:
       - package_ubuntu_cli
     steps:
@@ -65,6 +69,11 @@ jobs:
         uses: unfor19/install-aws-cli-action@v1
         with:
           version: 2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
+        with:
+          role-to-assume: arn:aws:iam::${{secrets.ARTIFACT_AWS_ACCOUNT_ID }}:role/gh-asset-store-deployer
+          aws-region: eu-west-1
       - name: Download packaged cli
         uses: actions/download-artifact@v3
         with:
@@ -73,9 +82,6 @@ jobs:
         run: |
           ls */**
           aws s3 cp radixnode s3://${{secrets.ARTIFACT_AWS_BUCKET }}/radixnode/${{env.BRANCH_WITH_COMMIT}}/radixnode-ubuntu-20.04
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACT_AWS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACT_AWS_SECRET_ACCESS_KEY}}
 
   upload-release:
     runs-on: [ubuntu-latest]
