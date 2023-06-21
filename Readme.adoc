@@ -119,7 +119,7 @@ sudo cp out/ubuntu/jammy/radixnode /usr/local/bin/radixnode
 
 
 # For Ubuntu Focal ( 20.04 ):
-make output-ubuntu-jammy
+make output-ubuntu-focal
 chmod +x out/ubuntu/focal/radixnode
 sudo cp out/ubuntu/focal/radixnode /usr/local/bin/radixnode
 
