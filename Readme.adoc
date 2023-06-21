@@ -95,7 +95,7 @@ optional arguments:
 
 ----
 
-== Build instructions
+== Build and install instructions
 
 Install Docker Engine:
 
