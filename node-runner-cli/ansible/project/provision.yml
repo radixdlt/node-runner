@@ -8,6 +8,7 @@
     swap_size: 8G
     setup_swap: false
     setup_limits: false
+    postgres_local: false
     postgresql_version: 12
     postgresql_user: postgres
     postgresql_db_name: radixdlt_ledger
@@ -64,6 +65,19 @@
       when: setup_swap | bool
 
     - block:
+        - name: Ensure gpg is installed
+          apt:
+            name: gpg
+        - name: Add repository signing key
+          apt_key:
+            url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+            state: present
+        - name: Add postgresql repository
+          apt_repository:
+            repo: "deb https://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+            state: present
+            filename: pgdg
+
         - name: install PostgreSQL
           ansible.builtin.package:
             name:
@@ -83,11 +97,11 @@
           become_user: "{{ postgresql_user }}"
           community.postgresql.postgresql_user:
             name: "{{ postgresql_user }}"
-            password: "{{postgress_password}}"
+            password: "{{ postgress_password }}"
 
         - name: Grant
           community.postgresql.postgresql_pg_hba:
-            dest: /etc/postgresql/12/main/pg_hba.conf
+            dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
             contype: host
             users: all
             source: 0.0.0.0/0
@@ -108,6 +122,22 @@
 
         - name: restart postgresql
           service: name=postgresql state=restarted enabled=yes
+
+        - name: Create the database specified in vars
+          become: true
+          become_user: "{{ postgresql_user }}"
+          postgresql_db: name={{ postgresql_db_name }}
+            template='template0'
+            state=present
+
+        - name: Ensure user has access to the new database
+          become: true
+          become_user: "{{ postgresql_user }}"
+          postgresql_user: db={{ postgresql_db_name }}
+            name={{ postgresql_user }}
+            password={{ postgress_password }}
+            priv=ALL
+            state=present
 
       become: true
       when: postgres_local | bool
