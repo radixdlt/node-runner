@@ -93,22 +93,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ubuntu 20.04
-      - name: Get release
-        id: get_release
-        uses: bruceadams/get-release@v1.2.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
 
+      - name: Move zip
+        run: |
+          mv ./radixnode radixnode-ubuntu-20.04
       - name: Upload radixcli ubuntu binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d
         with:
-          upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: ./radixnode
-          asset_name: radixnode-ubuntu-20.04
-          asset_content_type: application/octet-stream
-        if: ${{ github.event_name == 'release' }}
+          files: radixnode-ubuntu-20.04
 
   test-config-command:
 
