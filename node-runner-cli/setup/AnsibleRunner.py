@@ -43,6 +43,9 @@ class AnsibleRunner:
                 sys.exit()
         return
 
+    def install_ansible_modules(self):
+        run_shell_command(f"ansible-galaxy collection install community.postgresql", shell=True, fail_on_error=True)
+
     @classmethod
     def run_setup_limits(cls, setup_limits):
         run_shell_command(

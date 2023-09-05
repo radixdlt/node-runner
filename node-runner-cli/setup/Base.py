@@ -69,6 +69,7 @@ class Base:
         file = 'ansible/project/provision.yml'
         ansibleRunner.check_install_ansible()
         ansibleRunner.download_ansible_file(file)
+        ansibleRunner.install_ansible_modules()
         setup_limits = Prompts.ask_ansible_setup_limits()
         if setup_limits:
             ansibleRunner.run_setup_limits(setup_limits)
